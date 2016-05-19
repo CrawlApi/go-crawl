@@ -2,10 +2,9 @@ package client
 
 import (
 	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/redis.v3"
 	"time"
-	_ "github.com/go-sql-driver/mysql"
-	"errors"
 )
 
 type Client struct {
@@ -21,19 +20,13 @@ func New() (*Client, error) {
 	}
 
 	redis := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "192.168.30.95:6379",
 		Password: "", // no password set
-		DB:       0, // use default DB
+		DB:       0,  // use default DB
 	})
 
-	_, err = redis.Ping().Result()
-
-	if err != nil {
-		return nil, err
-	}
-
 	client := Client{
-		db: db,
+		db:    db,
 		redis: redis,
 	}
 	return &client, nil
@@ -47,14 +40,10 @@ func (client *Client) Close() error {
 	return nil
 }
 
-func (client *Client) StartService() ([]string, error){
+func (client *Client) StartService() ([]string, error) {
+	return client.redis.BLPop(1*time.Second, "LIST").Result()
+}
 
-	if client.redis != nil {
-		data, err := client.redis.BLPop(1 * time.Second, "LIST").Result()
-		if err != nil {
-			return nil, err
-		}
-		return data, nil
-	}
-	return nil, errors.New("Redis Client is nil")
+func (client *Client) PushData(key string, data string) {
+	client.redis.RPush(key, data).Err()
 }

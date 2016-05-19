@@ -1,84 +1,53 @@
 package main
 
 import (
-	"fmt"
 	"gopkg.in/redis.v3"
+	"github.com/huandu/facebook"
+	"github.com/gin-gonic/gin"
+	"log"
 )
 
-type FaceBook struct {
-	Name        interface{} `json:"name"`
-	Posts       interface{} `json:"posts"`
-	Fan_count   interface{} `json:"fan_count"`
-	Is_verified interface{} `json:"is_verified"`
-	Id          interface{} `json:"id"`
-	Message     interface{} `json:"message"`
-	Status      interface{} `json:"status"`
-	Date        interface{} `json:"date"`
-}
-
-
-func RedisClient() {
+func RedisClient(key string) {
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "192.168.30.95:6379",
 		Password: "", // no password set
-		DB:       0,  // use default DB
+		DB:       0, // use default DB
 	})
-	pong, err := client.Ping().Result()
-	fmt.Println(pong, err)
-	err = client.RPush("LIST", "value").Err()
-	if err != nil {
-		panic(err)
+	for i := 0; i < 10; i++ {
+		err := client.RPush("LIST", `{"type": "facebook", "id": "5718732097", "access_token": "` + key + `", "ids": ["5718732097_10153714754837098", "5718732097_10153714372452098", "5718732097_10153711314922098"]}`).Err()
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
 func main() {
-	RedisClient()
-	//const APP_TOKEN = "EAACEdEose0cBAN2vcb22ODdD8i0oyNRthLvVrvv7iv5aKSIxbCknnMhz4p5gLaEEQvOQSdRShEDXYFpjJOf4wi7XYelB3WDFX2No5Gi8JMs1jpB1vF9exgYh7gSZBcZCbZC7PcsGf7ZBQenRseZBWQizk6VbjBWhWIlPI9VhnX1JZAP2b9yqUp"
-	//facebook.Version = "v2.6"
-	//
-	//r := gin.Default()
-	//
-	//r.GET("/fb/:userId/info", func(c *gin.Context) {
-	//	userId := "/" + c.Param("userId")
-	//	res, err := facebook.Get(userId, facebook.Params{
-	//		"fields":       "name,is_verified,fan_count,posts{created_time,shares,message,full_picture,picture}",
-	//		"access_token": APP_TOKEN,
-	//	})
-	//
-	//	if err != nil {
-	//		c.JSON(http.StatusOK, gin.H{
-	//			"message": err.Error(),
-	//			"status":  false,
-	//			"date":    time.Now().Unix(),
-	//		})
-	//	} else {
-	//		var result FaceBook
-	//
-	//		result.Id = res["id"]
-	//		result.Fan_count = res["fan_count"]
-	//		result.Name = res["name"]
-	//		result.Is_verified = res["is_verified"]
-	//		result.Posts = res["posts"]
-	//		//result.Id = "teste"
-	//		//result.Fan_count= "teste"
-	//		//result.Name= "teste"
-	//		//result.Is_verified= "teste"
-	//		c.JSON(http.StatusOK, gin.H{
-	//			"data":    result,
-	//			"message": "OK",
-	//			"status":  true,
-	//			"date":    time.Now().Unix(),
-	//		})
-	//	}
-	//})
-	//
-	//r.GET("/user/:name/*action", func(c *gin.Context) {
-	//	name := c.Param("name")
-	//	action := c.Param("action")
-	//	message := name + " is " + action
-	//	c.String(http.StatusOK, message)
-	//})
-	//
-	//r.Run(":8080")
+	r := gin.Default()
+	r.GET("/key/:key", func(c *gin.Context) {
+		key := c.Param("key")
+		RedisClient(key)
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	r.Run(":8080") // listen and server on 0.0.0.0:8080
+
+}
+
+func FaceBookTest() {
+	facebook.Version = "v2.6"
+
+	res, _ := facebook.Get("/5718732097_10153714372452098", facebook.Params{
+		"fields":       "message,picture,full_picture,shares,updated_time,created_time,name",
+		"access_token": "token",
+	})
+
+	likes, _ := facebook.Get("/5718732097_10153714372452098/likes?summary=true", facebook.Params{
+		"fields":       "message,picture,full_picture,shares,updated_time,created_time,name",
+		"access_token": "token",
+	})
+
+	log.Printf("%+v", res)
+	log.Printf("%+v", likes)
 }
