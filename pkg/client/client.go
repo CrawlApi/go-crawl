@@ -40,7 +40,7 @@ func (client *Client) Close() error {
 	return nil
 }
 
-func (client *Client) StartService() ([]string, error) {
+func (client *Client) StartRedis() ([]string, error) {
 	return client.redis.BLPop(1*time.Second, "LIST").Result()
 }
 

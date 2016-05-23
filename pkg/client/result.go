@@ -20,13 +20,14 @@ type FaceBook struct {
 }
 
 type FaceBookPost struct {
-	Post    *FaceBook `json:"post"`
+	Post    *FaceBook   `json:"post"`
 	Message interface{} `json:"message"`
 	Status  interface{} `json:"status"`
 	Date    interface{} `json:"date"`
 }
 
 type TokenStr struct {
+	Url         string   `json:"url"`
 	Id          string   `json:"id"`
 	Type        string   `json:"type"`
 	AccessToken string   `json:"access_token"`

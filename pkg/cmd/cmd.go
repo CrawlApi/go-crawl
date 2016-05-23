@@ -4,32 +4,38 @@ import (
 	"encoding/json"
 	"github.com/huandu/facebook"
 	"github.com/llitfkitfk/cirkol/pkg/client"
+	"github.com/parnurzeal/gorequest"
 	"log"
+	"regexp"
 	"time"
+	"github.com/llitfkitfk/cirkol/pkg/api"
 )
 
 const (
-	FACEBOOK = "facebook"
+	FACEBOOK           = "facebook"
+	REGEXP_FACEBOOK_ID = `fb://(page|profile)/(\d+)`
 )
 
 var (
-	DBClient *client.Client
+	Client  *client.Client
+	TokenCh chan string
+	CommCh  chan string
 )
 
 func GETPostInfoById(postId string, token string, userId string) string {
 	facebook.Version = "v2.6"
 
-	res, err1 := facebook.Get("/" + postId, facebook.Params{
+	res, err1 := facebook.Get("/"+postId, facebook.Params{
 		"fields":       "id,message,picture,full_picture,shares,updated_time,created_time,name,source,type",
 		"access_token": token,
 	})
 
-	likes, err2 := facebook.Get("/" + postId + "/likes?summary=true", facebook.Params{
+	likes, err2 := facebook.Get("/"+postId+"/likes?summary=true", facebook.Params{
 		"fields":       "",
 		"access_token": token,
 	})
 
-	comments, err3 := facebook.Get("/" + postId + "/comments?summary=true", facebook.Params{
+	comments, err3 := facebook.Get("/"+postId+"/comments?summary=true", facebook.Params{
 		"fields":       "",
 		"access_token": token,
 	})
@@ -78,31 +84,77 @@ func GETPostInfoById(postId string, token string, userId string) string {
 	return string(out)
 }
 
-func startPush(pushCh chan string, ids []string, accessToken string, userId string) {
-	for _, value := range ids {
-		pushCh <- GETPostInfoById(value, accessToken, userId)
-	}
+func startPush(pushCh chan string, accessToken string, userId string) {
+	//pushCh <- GETPostInfoById(accessToken, userId)
+
 }
+
 func fetchData(data []string) {
 
 	if len(data) > 1 {
-
-		var tokenStr client.TokenStr
-		err := json.Unmarshal([]byte(data[1]), &tokenStr)
+		var token client.TokenStr
+		err := json.Unmarshal([]byte(data[1]), &token)
 		if err != nil {
 			log.Println(err)
 		}
+
 		fbCh := make(chan string)
-		go startPush(fbCh, tokenStr.Ids, tokenStr.AccessToken, tokenStr.Id)
-		message := <-fbCh
-		DBClient.PushData(FACEBOOK, message)
+		fbIdCh := make(chan string)
+
+		request := gorequest.New()
+
+		go FetchIdFromUrl(fbIdCh, token.Url, request)
+
+		for id := range fbIdCh {
+			log.Println(id)
+			//go startPush(fbCh, token.Ids, token.AccessToken, id)
+		}
+
+		for message := range fbCh {
+			Client.PushData(FACEBOOK, message)
+		}
+
+		close(fbCh)
+	}
+}
+
+func FetchIdFromUrl(idCh chan string, url string, request *gorequest.SuperAgent) {
+
+	_, body, errs := request.Get(url).End()
+
+	if errs != nil {
+		log.Println(errs)
+	}
+	r, _ := regexp.Compile(REGEXP_FACEBOOK_ID)
+
+	matcher := r.FindStringSubmatch(body)
+
+	if len(matcher) > 2 {
+		idCh <- matcher[2]
+	}
+}
+
+func generateToken(tag string) {
+	switch tag {
+	case FACEBOOK:
+		TokenCh <- api.FACEBOOK_TOKEN
+	}
+}
+
+func StartTokenGen() {
+	for {
+		select {
+		case t := <-CommCh:
+			go generateToken(t)
+		}
 	}
 }
 
 func StartService() {
+	go StartTokenGen()
+	for {
+		data, _ := Client.StartRedis()
 
-	for true {
-		data, _ := DBClient.StartService()
 		if len(data) > 0 {
 			go fetchData(data)
 		}

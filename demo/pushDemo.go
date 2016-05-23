@@ -1,10 +1,10 @@
 package main
 
 import (
-	"gopkg.in/redis.v3"
 	"github.com/huandu/facebook"
-	"github.com/gin-gonic/gin"
+	"gopkg.in/redis.v3"
 	"log"
+	"time"
 )
 
 func RedisClient(key string) {
@@ -12,26 +12,28 @@ func RedisClient(key string) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     "192.168.30.95:6379",
 		Password: "", // no password set
-		DB:       0, // use default DB
+		DB:       0,  // use default DB
 	})
-	for i := 0; i < 10; i++ {
-		err := client.RPush("LIST", `{"type": "facebook", "id": "5718732097", "access_token": "` + key + `", "ids": ["5718732097_10153714754837098", "5718732097_10153714372452098", "5718732097_10153711314922098"]}`).Err()
+	for true {
+		err := client.RPush("LIST", `{"type": "facebook", "url": "https://www.facebook.com/justintimberlake/"}`).Err()
 		if err != nil {
 			panic(err)
 		}
+		time.Sleep(10 * time.Second)
 	}
 }
 
 func main() {
-	r := gin.Default()
-	r.GET("/key/:key", func(c *gin.Context) {
-		key := c.Param("key")
-		RedisClient(key)
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run(":8080") // listen and server on 0.0.0.0:8080
+	//r := gin.Default()
+	//r.GET("/key/:key", func(c *gin.Context) {
+	//	key := c.Param("key")
+	//	RedisClient(key)
+	//	c.JSON(200, gin.H{
+	//		"message": "pong",
+	//	})
+	//})
+	//r.Run(":8080") // listen and server on 0.0.0.0:8080
+	RedisClient("EAACEdEose0cBADZABlVMw8E5E9uxbjeZALGs3dMRUkZAWi3ZBxkW5semxefQWttu56a225duvYC0a5LZACEISgHc6fgL29tMCk7bTjemdHBhUuQkBDnBZAFwpZB1ZAZBcX7nApRgK1xLEHJkmBwL1tIpDBsj3wifnMfA3JdbTFOZBa5McnlGKbH4l0")
 
 }
 

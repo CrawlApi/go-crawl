@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/llitfkitfk/cirkol/pkg/client"
-	"os"
 	"github.com/llitfkitfk/cirkol/pkg/cmd"
+	"os"
 )
 
 func startService() {
@@ -22,15 +22,17 @@ func initClient() {
 	if err != nil {
 		exitWithMessage(err.Error())
 	}
-	cmd.DBClient = cl
+	cmd.Client = cl
+	cmd.TokenCh = make(chan string)
+	cmd.CommCh = make(chan string)
 }
 
 func main() {
 
 	initClient()
 
-	if cmd.DBClient != nil {
-		defer cmd.DBClient.Close()
+	if cmd.Client != nil {
+		defer cmd.Client.Close()
 	}
 
 	startService()
