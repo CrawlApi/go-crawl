@@ -72,6 +72,7 @@ func GetFBUid(c *gin.Context) {
 		r, _ := regexp.Compile(REGEXP_FACEBOOK_PROFILE_ID)
 		matcher := r.FindStringSubmatch(body)
 		if len(matcher) > 2 {
+			logCh <- matcher
 			uidCh <- `{"profile": {"type": "` + matcher[1] + `", "user_id": "` + matcher[2] + `"}}`
 		} else {
 			uidCh <- ""

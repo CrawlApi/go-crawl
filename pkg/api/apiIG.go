@@ -43,6 +43,7 @@ func GetIGUid(c *gin.Context) {
 		r, _ := regexp.Compile(REGEX_INSTAGRAM_PROFILE_ID)
 		matcher := r.FindStringSubmatch(body)
 		if len(matcher) > 0 {
+			logCh <- matcher
 			uidCh <- `{"profile": {"user_id": "` + matcher[1] + `"}}`
 		} else {
 			uidCh <- ""

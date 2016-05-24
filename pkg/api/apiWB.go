@@ -7,10 +7,10 @@ import (
 func GetWBUid(c *gin.Context) {
 }
 
-func GetWBProfile() {
+func GetWBProfile(c *gin.Context) {
 
 }
 
-func GetWBPosts() {
+func GetWBPosts(c *gin.Context) {
 
 }

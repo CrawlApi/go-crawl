@@ -6,7 +6,7 @@ import (
 
 func SetupRouter(router *gin.Engine) {
 
-	logCh = make(chan interface{})
+	logCh = make(chan interface{}, 10)
 	go Logging()
 	apiFB := router.Group("/api/fb")
 	{
@@ -24,9 +24,9 @@ func SetupRouter(router *gin.Engine) {
 
 	apiWB := router.Group("/api/wb")
 	{
-		apiIG.GET("/uid", GetWBUid)
-		apiIG.GET("/profile/:userId", GetWBProfile)
-		apiIG.GET("/posts/:userId", GetWBPosts)
+		apiWB.GET("/uid", GetWBUid)
+		apiWB.GET("/profile/:userId", GetWBProfile)
+		apiWB.GET("/posts/:userId", GetWBPosts)
 	}
 
 }

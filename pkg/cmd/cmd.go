@@ -3,12 +3,12 @@ package cmd
 import (
 	"encoding/json"
 	"github.com/huandu/facebook"
+	"github.com/llitfkitfk/cirkol/pkg/api"
 	"github.com/llitfkitfk/cirkol/pkg/client"
 	"github.com/parnurzeal/gorequest"
 	"log"
 	"regexp"
 	"time"
-	"github.com/llitfkitfk/cirkol/pkg/api"
 )
 
 const (
