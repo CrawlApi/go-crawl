@@ -5,13 +5,25 @@ import (
 	"log"
 	"regexp"
 	"time"
+	"net/url"
 )
 
 var tokenCh chan string
 var popchan chan string
 
 func main() {
-	StartTokenGen()
+	//StartTokenGen()
+	URLTest()
+}
+
+func URLTest() {
+	rawurl := "http:/www.facebook.com/"
+	realUrl, err := url.Parse(rawurl)
+	if err != nil {
+		log.Println("error: ", err)
+	} else {
+		log.Println("real url : ", realUrl.RequestURI())
+	}
 }
 
 func StartTokenGen() {

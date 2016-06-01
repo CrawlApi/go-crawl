@@ -2,12 +2,15 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func SetupRouter(router *gin.Engine) {
 
 	logCh = make(chan interface{}, 10)
 	go Logging()
+	
+	router.POST("/", PostRequest)
 	apiFB := router.Group("/api/fb")
 	{
 		apiFB.GET("/uid", GetFBUid)
@@ -29,4 +32,8 @@ func SetupRouter(router *gin.Engine) {
 		apiWB.GET("/posts/:userId", GetWBPosts)
 	}
 
+}
+
+func PostRequest(c *gin.Context) {
+	c.String(http.StatusOK, "test")
 }

@@ -4,9 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
 	"net/http"
-	"net/url"
-	"regexp"
 	"time"
+	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
 func FBResponse(body string, c *gin.Context) {
@@ -16,12 +15,13 @@ func FBResponse(body string, c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Request Facebook API Failed",
 			"status":  false,
+			"date": time.Now().Unix(),
 		})
 	}
 }
 
 func GetFBAPI(url string) string {
-	_, body, errs := gorequest.New().Timeout(5*time.Second).Get(url).Set("accept-language", "en-US").End()
+	_, body, errs := gorequest.New().Timeout(5 * time.Second).Get(url).Set("accept-language", "en-US").End()
 	if errs != nil {
 		return ""
 	}
@@ -59,24 +59,27 @@ func GetFBPosts(c *gin.Context) {
 // FaceBook user_id
 func GetFBUid(c *gin.Context) {
 	rawurl := c.Query("url")
-	url, err := url.Parse(rawurl)
-	if err != nil {
+	realUrl := util.Matcher(REGEXP_URI, rawurl)
+	if len(realUrl) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "not real url",
-			"user_id": nil,
+			"status": false,
+			"date": time.Now().Unix(),
 		})
+	} else {
+		uidCh := make(chan string)
+		go func() {
+			body := GetFBAPI(rawurl)
+			logCh <- body
+			matcher := util.Matcher(REGEXP_FACEBOOK_PROFILE_ID, body)
+			if len(matcher) > 2 {
+				logCh <- matcher
+				uidCh <- `{"profile": {"type": "` + matcher[1] + `", "user_id": "` + matcher[2] + `"}, "date": ` + util.ToString(time.Now().Unix()) + `}`
+			} else {
+				uidCh <- ""
+			}
+		}()
+		FBResponse(<-uidCh, c)
 	}
-	uidCh := make(chan string)
-	go func() {
-		body := GetFBAPI(url.String())
-		r, _ := regexp.Compile(REGEXP_FACEBOOK_PROFILE_ID)
-		matcher := r.FindStringSubmatch(body)
-		if len(matcher) > 2 {
-			logCh <- matcher
-			uidCh <- `{"profile": {"type": "` + matcher[1] + `", "user_id": "` + matcher[2] + `"}}`
-		} else {
-			uidCh <- ""
-		}
-	}()
-	FBResponse(<-uidCh, c)
+
 }

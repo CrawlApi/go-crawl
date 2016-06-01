@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"regexp"
 	"time"
+	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
 func GetIGAPI(url string) string {
@@ -24,6 +25,7 @@ func IGResponse(body string, c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Request Instagram API Failed",
 			"status":  false,
+			"date": time.Now().Unix(),
 		})
 	}
 }
@@ -44,7 +46,7 @@ func GetIGUid(c *gin.Context) {
 		matcher := r.FindStringSubmatch(body)
 		if len(matcher) > 0 {
 			logCh <- matcher
-			uidCh <- `{"profile": {"user_id": "` + matcher[1] + `"}}`
+			uidCh <- `{"profile": {"user_id": "` + matcher[1] + `"}, "date": ` + util.ToString(time.Now().Unix()) + `}`
 		} else {
 			uidCh <- ""
 		}
