@@ -1,7 +1,4 @@
 package: github.com/llitfkitfk/cirkol
 import:
 - package: github.com/gin-gonic/gin
-- package: github.com/go-sql-driver/mysql
-- package: github.com/huandu/facebook
-- package: gopkg.in/redis.v3
 - package: github.com/parnurzeal/gorequest
