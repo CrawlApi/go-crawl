@@ -13,7 +13,8 @@ var popchan chan string
 
 func main() {
 	//StartTokenGen()
-	URLTest()
+	//URLTest()
+	RegexpDemo()
 }
 
 func URLTest() {
@@ -62,9 +63,9 @@ func TokenGen(ch chan string) {
 	}
 }
 func RegexpDemo() {
-	r, _ := regexp.Compile(`/fb://page/(\d+)`)
+	r, _ := regexp.Compile(`微信号: (\S+)<`)
 
-	matcher := r.FindStringSubmatch("dsadfsdvdfb://page/123253412")
+	matcher := r.FindStringSubmatch("12412微信号: Bit_baike1241231")
 
 	fmt.Println(matcher)
 }

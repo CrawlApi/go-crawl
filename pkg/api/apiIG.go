@@ -2,57 +2,38 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/parnurzeal/gorequest"
-	"net/http"
-	"net/url"
-	"regexp"
 	"time"
 	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
 func GetIGAPI(url string) string {
-	_, body, errs := gorequest.New().Timeout(5 * time.Second).Get(url).End()
+	_, body, errs := reqClient.Timeout(5 * time.Second).Get(url).End()
 	if errs != nil {
 		return ""
 	}
 	return body
 }
 
-func IGResponse(body string, c *gin.Context) {
-	if len(body) > 0 {
-		c.String(http.StatusOK, body)
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Request Instagram API Failed",
-			"status":  false,
-			"date": time.Now().Unix(),
-		})
-	}
-}
-
 func GetIGUid(c *gin.Context) {
-	rawurl := c.Query("url")
-	url, err := url.Parse(rawurl)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "not real url",
-			"user_id": nil,
-		})
-	}
-	uidCh := make(chan string)
+	rawurl := c.PostForm("url")
+	uidCh := make(chan UID)
 	go func() {
-		body := GetIGAPI(url.String())
-		r, _ := regexp.Compile(REGEX_INSTAGRAM_PROFILE_ID)
-		matcher := r.FindStringSubmatch(body)
+		body := GetIGAPI(rawurl)
+		matcher := util.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
+		var result UID
+		result.Url = rawurl
+		result.Media = "ig"
 		if len(matcher) > 0 {
-			logCh <- matcher
-			uidCh <- `{"profile": {"user_id": "` + matcher[1] + `"}, "date": ` + util.ToString(time.Now().Unix()) + `}`
+			result.Status = true
+			result.UserId = matcher[1]
 		} else {
-			uidCh <- ""
+			result.Status = false
 		}
+		result.Date = time.Now().Unix()
+		uidCh <- result
 	}()
 
-	IGResponse(<-uidCh, c)
+	Response(uidCh, c)
 }
 
 func GetIGProfile(c *gin.Context) {
@@ -66,7 +47,7 @@ func GetIGProfile(c *gin.Context) {
 		body := GetIGAPI(url)
 		profileCh <- body
 	}()
-	IGResponse(<-profileCh, c)
+	StringResponse(<-profileCh, c)
 }
 
 func GetIGPosts(c *gin.Context) {
@@ -78,5 +59,5 @@ func GetIGPosts(c *gin.Context) {
 		postCh <- body
 	}()
 
-	IGResponse(<-postCh, c)
+	StringResponse(<-postCh, c)
 }

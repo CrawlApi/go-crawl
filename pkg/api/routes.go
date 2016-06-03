@@ -2,38 +2,40 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func SetupRouter(router *gin.Engine) {
 
-	logCh = make(chan interface{}, 10)
-	go Logging()
-	
-	router.POST("/", PostRequest)
-	apiFB := router.Group("/api/fb")
+	serverApi := router.Group("/api")
 	{
-		apiFB.GET("/uid", GetFBUid)
-		apiFB.GET("/profile/:userId", GetFBProfile)
-		apiFB.GET("/posts/:userId", GetFBPosts)
+		serverApi.POST("/uid", GetWhichUid)
+		apiFB := serverApi.Group("/fb")
+		{
+			apiFB.POST("/uid", GetFBUid)
+			apiFB.GET("/profile/:userId", GetFBProfile)
+			apiFB.GET("/posts/:userId", GetFBPosts)
+		}
+
+		apiIG := serverApi.Group("/ig")
+		{
+			apiIG.POST("/uid", GetIGUid)
+			apiIG.GET("/profile/:userId", GetIGProfile)
+			apiIG.GET("/posts/:userId", GetIGPosts)
+		}
+
+		apiWX := serverApi.Group("/wx")
+		{
+			apiWX.POST("/uid", GetWXUid)
+			apiWX.GET("/profile/:userId", GetWXProfile)
+			apiWX.GET("/posts/:userId", GetWXPosts)
+		}
+
+		apiWB := serverApi.Group("/wb")
+		{
+			apiWB.POST("/uid", GetWBUid)
+			apiWB.GET("/profile/:userId", GetWBProfile)
+			apiWB.GET("/posts/:userId", GetWBPosts)
+		}
+
 	}
-
-	apiIG := router.Group("/api/ig")
-	{
-		apiIG.GET("/uid", GetIGUid)
-		apiIG.GET("/profile/:userId", GetIGProfile)
-		apiIG.GET("/posts/:userId", GetIGPosts)
-	}
-
-	apiWB := router.Group("/api/wb")
-	{
-		apiWB.GET("/uid", GetWBUid)
-		apiWB.GET("/profile/:userId", GetWBProfile)
-		apiWB.GET("/posts/:userId", GetWBPosts)
-	}
-
-}
-
-func PostRequest(c *gin.Context) {
-	c.String(http.StatusOK, "test")
 }
