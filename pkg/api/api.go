@@ -28,7 +28,8 @@ const (
 	// INSTAGRAM CONST
 	REGEX_INSTAGRAM_PROFILE_ID = `"owner": {"id": "(\d+)`
 	REGEX_INSTAGRAM_PROFILE_NAME = `"user": {"username": "(\S+)",`
-	REGEX_INSTAGRAM_PROFILE = `window._sharedData = ([\s\S]+);<`
+	REGEX_INSTAGRAM_PROFILE = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
+	REGEX_INSTAGRAM_POSTS = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
 
 	// WEIXIN CONST
 	REGEXP_WEIXIN_PROFILE_ID = `微信号: (\S+)</p>`

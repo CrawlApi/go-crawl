@@ -46,8 +46,8 @@ func GetIGProfile(c *gin.Context) {
 		url := "https://www.instagram.com/" + userId + "/"
 		body := GetIGAPI(url)
 		profileMat := util.Matcher(REGEX_INSTAGRAM_PROFILE, body)
-		if len(profileMat) > 0 {
-			profileCh <- profileMat[1]
+		if len(profileMat) > 2 {
+			profileCh <- profileMat[1] + profileMat[3]
 		}
 	}()
 	StringResponse(<-profileCh, c)
@@ -61,9 +61,9 @@ func GetIGPosts(c *gin.Context) {
 		//url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
 		url := "https://www.instagram.com/" + userId + "/"
 		body := GetIGAPI(url)
-		profileMat := util.Matcher(REGEX_INSTAGRAM_PROFILE, body)
-		if len(profileMat) > 0 {
-			postCh <- profileMat[1]
+		profileMat := util.Matcher(REGEX_INSTAGRAM_POSTS, body)
+		if len(profileMat) > 2 {
+			postCh <- profileMat[2] + "]"
 		}
 	}()
 	StringResponse(<-postCh, c)
