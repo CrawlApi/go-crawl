@@ -7,7 +7,7 @@ import (
 )
 
 func GetFBAPI(url string) string {
-	_, body, errs := reqClient.Timeout(5 * time.Second).Get(url).Set("accept-language", "en-US").End()
+	_, body, errs := reqClient.Timeout(8 * time.Second).Get(url).Set("accept-language", "en-US").End()
 	if errs != nil {
 		return ""
 	}

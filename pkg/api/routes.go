@@ -37,5 +37,10 @@ func SetupRouter(router *gin.Engine) {
 			apiWB.GET("/posts/:userId", GetWBPosts)
 		}
 
+		//serverApi.POST("/token", UpdateToken)
+
+
+
+
 	}
 }

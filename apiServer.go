@@ -8,7 +8,7 @@ import (
 func main() {
 	// start server
 	router := gin.Default()
-	api.SetupComponent()
+	api.SetupComponent(router)
 	api.SetupRouter(router)
 	router.Run(":10086")
 }

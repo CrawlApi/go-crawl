@@ -19,13 +19,14 @@ func GetIGUid(c *gin.Context) {
 	uidCh := make(chan UID)
 	go func() {
 		body := GetIGAPI(rawurl)
-		matcher := util.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
+		nameMat := util.Matcher(REGEX_INSTAGRAM_PROFILE_NAME, body)
 		var result UID
 		result.Url = rawurl
 		result.Media = "ig"
-		if len(matcher) > 0 {
+
+		if len(nameMat) > 0 {
 			result.Status = true
-			result.UserId = matcher[1]
+			result.UserId = nameMat[1]
 		} else {
 			result.Status = false
 		}
@@ -40,24 +41,30 @@ func GetIGProfile(c *gin.Context) {
 	userId := c.Param("userId")
 
 	profileCh := make(chan string)
-
 	go func() {
 		//url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
-		url := "https://api.instagram.com/v1/users/" + userId + "/?access_token=" + INSTAGRAM_TOKEN
+		url := "https://www.instagram.com/" + userId + "/"
 		body := GetIGAPI(url)
-		profileCh <- body
+		profileMat := util.Matcher(REGEX_INSTAGRAM_PROFILE, body)
+		if len(profileMat) > 0 {
+			profileCh <- profileMat[1]
+		}
 	}()
 	StringResponse(<-profileCh, c)
 }
 
 func GetIGPosts(c *gin.Context) {
 	userId := c.Param("userId")
+
 	postCh := make(chan string)
 	go func() {
-		url := "https://api.instagram.com/v1/users/" + userId + "/media/recent?access_token=" + INSTAGRAM_TOKEN
+		//url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
+		url := "https://www.instagram.com/" + userId + "/"
 		body := GetIGAPI(url)
-		postCh <- body
+		profileMat := util.Matcher(REGEX_INSTAGRAM_PROFILE, body)
+		if len(profileMat) > 0 {
+			postCh <- profileMat[1]
+		}
 	}()
-
 	StringResponse(<-postCh, c)
 }
