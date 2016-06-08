@@ -5,13 +5,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
-	"net/http"
 	"time"
-	"sync"
 )
 
 func GetFBAPI(url string) string {
-	_, body, errs := reqClient.Timeout(8*time.Second).Get(url).Set("accept-language", "en-US").End()
+	_, body, errs := reqClient.Timeout(8 * time.Second).Get(url).Set("accept-language", "en-US").End()
 	if errs != nil {
 		return ""
 	}
@@ -36,7 +34,7 @@ func GetFBProfile(c *gin.Context) {
 			profile.MergeFBRawProfile(data)
 		}
 		profile.Date = time.Now().Unix()
-		profileCh <-  profile
+		profileCh <- profile
 	}()
 	ProfileResponse(profileCh, c)
 }
