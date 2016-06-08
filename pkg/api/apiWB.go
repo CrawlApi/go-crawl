@@ -4,15 +4,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/util"
 	"time"
+	"github.com/llitfkitfk/cirkol/pkg/result"
 )
 
 func GetWBUid(c *gin.Context) {
 	rawurl := c.PostForm("url")
-	uidCh := make(chan UID)
+	uidCh := make(chan result.UID)
 	go func() {
 		body := GetFBAPI(rawurl)
 		matcher := util.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
-		var result UID
+		var result result.UID
 		result.Url = rawurl
 		result.Media = "wb"
 		if len(matcher) > 2 {

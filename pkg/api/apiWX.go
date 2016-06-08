@@ -5,6 +5,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/util"
 	"time"
 	"html"
+	"github.com/llitfkitfk/cirkol/pkg/result"
 )
 
 func GetWXAPI(url string) string {
@@ -17,11 +18,11 @@ func GetWXAPI(url string) string {
 
 func GetWXUid(c *gin.Context) {
 	rawurl := c.PostForm("url")
-	uidCh := make(chan UID)
+	uidCh := make(chan result.UID)
 	go func() {
 		body := GetFBAPI(rawurl)
 		matcher := util.Matcher(REGEXP_WEIXIN_PROFILE_ID, body)
-		var result UID
+		var result result.UID
 		result.Url = rawurl
 		result.Media = "wx"
 		if len(matcher) > 0 {
@@ -41,7 +42,7 @@ func GetWXProfile(c *gin.Context) {
 
 	userId := c.Param("userId")
 
-	profileCh := make(chan Profile)
+	profileCh := make(chan result.Profile)
 
 	go func() {
 		url := "http://weixin.sogou.com/weixin?type=1&query=" + userId + "&ie=utf8&_sug_=n&_sug_type_="
@@ -49,11 +50,11 @@ func GetWXProfile(c *gin.Context) {
 		logoMat := util.Matcher(REGEXP_WEIXIN_LOGO, body)
 		featureMat := util.Matcher(REGEXP_WEIXIN_FEATURE, body)
 		urlMat := util.Matcher(REGEXP_WEIXIN_URL, body)
-		var result Profile
+		var result result.Profile
 		result.UserId = userId
 
 		if len(urlMat) > 0 {
-			result.Url = urlMat[1]
+			result.Website = urlMat[1]
 		}
 
 		if len(logoMat) > 0 {

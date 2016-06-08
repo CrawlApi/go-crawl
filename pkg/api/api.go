@@ -7,6 +7,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/util"
 	"time"
 	"github.com/gin-gonic/contrib/sessions"
+	"github.com/llitfkitfk/cirkol/pkg/result"
 )
 
 const (
@@ -58,17 +59,45 @@ func StringResponse(body string, c *gin.Context) {
 	}
 }
 
-func ProfileResponse(ch chan Profile, c *gin.Context) {
+func ProfileResponse2(ch chan result.Profile, c *gin.Context) {
+	var result result.Profile
+	for i := 0; i < 2; i++ {
+		select {
+		case profile := <-ch:
+			if profile.Status {
+				result = profile
+				break
+			}
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"profile": result,
+	})
+}
+
+func ProfileResponse(ch chan result.Profile, c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"profile": <-ch,
 	})
 }
 
-//func PostResponse(ch chan Post, c *gin.Context)  {
-//	c.JSON(http.StatusOK, gin.H{
-//		"profile": <-ch,
-//	})
-//}
+func PostsResponse(ch chan result.Posts, c *gin.Context) {
+	var result result.Posts
+	for i := 0; i < 2; i++ {
+		select {
+		case posts := <-ch:
+			log.Println(posts)
+			if posts.Status {
+				result = posts
+				break
+			}
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"posts": result,
+	})
+
+}
 
 func GetWhichUid(c *gin.Context) {
 	log.Println(c.PostForm("url"))
@@ -76,7 +105,7 @@ func GetWhichUid(c *gin.Context) {
 	realUrl := util.Matcher(REGEXP_URI, rawurl)
 	if len(realUrl) == 0 {
 		c.JSON(http.StatusOK, gin.H{
-			"uid":  &UID{
+			"uid":  &result.UID{
 				Message: "not real url",
 				Status: false,
 				Date: time.Now().Unix(),
@@ -86,7 +115,7 @@ func GetWhichUid(c *gin.Context) {
 		urlType, err := util.CheckUrl(rawurl)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
-				"uid": &UID{
+				"uid": &result.UID{
 					Message: "URL Type Not Found",
 					Status: false,
 					Date: time.Now().Unix(),
@@ -98,7 +127,7 @@ func GetWhichUid(c *gin.Context) {
 	}
 }
 
-func Response(ch chan UID, c *gin.Context) {
+func Response(ch chan result.UID, c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"uid": <-ch,
 	})

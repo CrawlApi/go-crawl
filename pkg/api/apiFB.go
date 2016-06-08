@@ -1,13 +1,17 @@
 package api
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"time"
+	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
+	"net/http"
+	"time"
+	"sync"
 )
 
 func GetFBAPI(url string) string {
-	_, body, errs := reqClient.Timeout(8 * time.Second).Get(url).Set("accept-language", "en-US").End()
+	_, body, errs := reqClient.Timeout(8*time.Second).Get(url).Set("accept-language", "en-US").End()
 	if errs != nil {
 		return ""
 	}
@@ -18,14 +22,23 @@ func GetFBAPI(url string) string {
 func GetFBProfile(c *gin.Context) {
 	userId := c.Param("userId")
 
-	profileCh := make(chan string)
+	profileCh := make(chan result.Profile)
 
 	go func() {
 		url := "https://graph.facebook.com/v2.6/" + userId + "?fields=" + PAGE_PROFILE_FIELDS_ENABLE + "&access_token=" + FACEBOOK_TOKEN
 		body := GetFBAPI(url)
-		profileCh <- body
+		var profile result.Profile
+		var data result.FBRawProfile
+		err := json.Unmarshal([]byte(body), &data)
+		if err != nil {
+			profile.Status = false
+		} else {
+			profile.MergeFBRawProfile(data)
+		}
+		profile.Date = time.Now().Unix()
+		profileCh <-  profile
 	}()
-	StringResponse(<-profileCh, c)
+	ProfileResponse(profileCh, c)
 }
 
 // FaceBook Posts
@@ -45,11 +58,11 @@ func GetFBPosts(c *gin.Context) {
 // FaceBook user_id
 func GetFBUid(c *gin.Context) {
 	rawurl := c.PostForm("url")
-	uidCh := make(chan UID)
+	uidCh := make(chan result.UID)
 	go func() {
 		body := GetFBAPI(rawurl)
 		matcher := util.Matcher(REGEXP_FACEBOOK_PROFILE_ID, body)
-		var result UID
+		var result result.UID
 		result.Url = rawurl
 		result.Media = "fb"
 		if len(matcher) > 2 {
