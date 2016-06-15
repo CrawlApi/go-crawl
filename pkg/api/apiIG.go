@@ -39,12 +39,13 @@ func GetIGUid(c *gin.Context) {
 }
 
 func GetIGProfile(c *gin.Context) {
+	timer := time.After(8 * time.Second)
 	userId := c.Param("userId")
 	profileCh := make(chan result.Profile)
 	querySrc := c.Query("q")
 	go getIgProfileFromName(querySrc, profileCh)
 	go getIgProfileFromId(userId, profileCh)
-	ProfileResponse2(profileCh, c)
+	ProfileResponse2(profileCh, c, timer)
 }
 
 func getIgProfileFromId(userId string, ch chan result.Profile) {
@@ -57,10 +58,9 @@ func getIgProfileFromId(userId string, ch chan result.Profile) {
 	if err != nil {
 		profile.Status = false
 	} else {
-		profile.MergeIDProfile(data)
+		profile.MergeIGIDProfile(data)
+		ch <- profile
 	}
-	profile.Date = time.Now().Unix()
-	ch <- profile
 
 }
 
@@ -76,13 +76,14 @@ func getIgProfileFromName(userName string, ch chan result.Profile) {
 		if err != nil {
 			profile.Status = false
 		} else {
-			profile.MergeNameProfile(data)
+			profile.MergeIGNameProfile(data)
+			ch <- profile
+
 		}
 	} else {
 		profile.Status = false
 	}
-	profile.Date = time.Now().Unix()
-	ch <- profile
+
 }
 
 func GetIGPosts(c *gin.Context) {
@@ -104,7 +105,7 @@ func getIgPostFromName(userName string, ch chan result.Posts) {
 	if err != nil {
 		posts.Status = false
 	} else {
-		posts.MergeNamePosts(data)
+		posts.MergeIGNamePosts(data)
 	}
 	posts.Date = time.Now().Unix()
 	ch <- posts
@@ -143,7 +144,7 @@ func getIgPostFromRegex(userId string, ch chan result.Posts) {
 		if err != nil {
 			posts.Status = false
 		} else {
-			posts.MergeIdPosts(data)
+			posts.MergeIGIdPosts(data)
 		}
 	} else {
 		posts.Status = false

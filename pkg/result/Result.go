@@ -2,6 +2,7 @@ package result
 
 import (
 	"strconv"
+	"time"
 )
 
 type UID struct {
@@ -51,7 +52,7 @@ type Posts struct {
 	RawData string `json:"raw_data"`
 }
 
-func (p *Posts) MergeIdPosts(rawPost IGIDRawPosts) {
+func (p *Posts) MergeIGIdPosts(rawPost IGIDRawPosts) {
 	var data post
 	for _, node := range rawPost.Nodes {
 		data.CreatedAt = strconv.Itoa(node.Date)
@@ -76,7 +77,7 @@ func (p *Posts) MergeIdPosts(rawPost IGIDRawPosts) {
 	p.Status = true
 }
 
-func (p *Posts) MergeNamePosts(rawPost IGNameRawPosts) {
+func (p *Posts) MergeIGNamePosts(rawPost IGNameRawPosts) {
 
 	var data post
 	for _, item := range rawPost.Items {
@@ -98,7 +99,7 @@ func (p *Posts) MergeNamePosts(rawPost IGNameRawPosts) {
 	p.Status = true
 }
 
-func (p *Profile) MergeNameProfile(data IGNameRawProfile) {
+func (p *Profile) MergeIGNameProfile(data IGNameRawProfile) {
 	p.UserId = data.User.Username
 	p.Name = data.User.FullName
 	p.Avatar = data.User.ProfilePicURL
@@ -108,10 +109,11 @@ func (p *Profile) MergeNameProfile(data IGNameRawProfile) {
 
 	p.Website = "https://www.instagram.com/" + data.User.Username + "/"
 	p.Status = true
+	p.Date = time.Now().Unix()
 
 }
 
-func (p *Profile) MergeIDProfile(data IGIDRawProfile) {
+func (p *Profile) MergeIGIDProfile(data IGIDRawProfile) {
 	p.UserId = strconv.Itoa(data.User.Pk)
 	p.Name = data.User.Username
 	p.Avatar = data.User.ProfilePicURL
@@ -121,6 +123,8 @@ func (p *Profile) MergeIDProfile(data IGIDRawProfile) {
 	p.About = data.User.Biography
 	p.Website = "https://www.instagram.com/" + data.User.Username + "/"
 	p.Status = true
+	p.Date = time.Now().Unix()
+
 }
 
 func (p *Profile) MergeFBRawProfile(data FBRawProfile) {
@@ -133,4 +137,18 @@ func (p *Profile) MergeFBRawProfile(data FBRawProfile) {
 	p.Website = data.Link
 	p.Status = true
 }
+
+func (p *Profile) MergeWBRawProfile(data WBRawProfile) {
+	p.UserId = strconv.Itoa(data.UserInfo.ID)
+	p.Name = data.UserInfo.Name
+	p.Avatar = data.UserInfo.ProfileImageURL
+	p.PostNum = data.UserInfo.StatusesCount
+	p.FollowNum = data.UserInfo.FriendsCount
+	p.Fans = data.UserInfo.FollowersCount
+	p.About = data.UserInfo.Description
+
+	p.Status = true
+}
+
+
 

@@ -27,7 +27,8 @@ func GetFBProfile(c *gin.Context) {
 		body := GetFBAPI(url)
 		var profile result.Profile
 		var data result.FBRawProfile
-		err := json.Unmarshal([]byte(body), &data)
+		profile.RawData = body
+		err := json.Unmarshal([]byte(profile.RawData), &data)
 		if err != nil {
 			profile.Status = false
 		} else {

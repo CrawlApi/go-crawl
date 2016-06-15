@@ -39,7 +39,7 @@ const (
 	REGEXP_WEIXIN_URL = `href="((http://mp.weixin.qq.com/profile)\S+)"`
 	REGEXP_WEIXIN_POSTS = `var msgList = '(\S+)';`
 
-	REGEXP_WEIBO_PROFILE_ID = ``
+	REGEXP_WEIBO_PROFILE_ID = `uid=(\d+)`
 )
 
 var (
@@ -59,20 +59,20 @@ func StringResponse(body string, c *gin.Context) {
 	}
 }
 
-func ProfileResponse2(ch chan result.Profile, c *gin.Context) {
-	var result result.Profile
-	for i := 0; i < 2; i++ {
-		select {
-		case profile := <-ch:
-			if profile.Status {
-				result = profile
-				break
-			}
-		}
+func ProfileResponse2(ch chan result.Profile, c *gin.Context, timer <-chan time.Time) {
+	select {
+	case profile := <-ch:
+		c.JSON(http.StatusOK, gin.H{
+			"profile": profile,
+		})
+	case <-timer:
+		var result result.Profile
+		result.Status = false
+		c.JSON(http.StatusOK, gin.H{
+			"profile": result,
+		})
+
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"profile": result,
-	})
 }
 
 func ProfileResponse(ch chan result.Profile, c *gin.Context) {
