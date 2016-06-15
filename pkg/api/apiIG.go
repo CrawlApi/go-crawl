@@ -40,51 +40,17 @@ func GetIGUid(c *gin.Context) {
 
 func GetIGProfile(c *gin.Context) {
 	timer := time.After(8 * time.Second)
-	userId := c.Param("userId")
+	//userId := c.Param("userId")
 	profileCh := make(chan result.Profile)
-	querySrc := c.Query("q")
-	go getIgProfileFromName(querySrc, profileCh)
-	go getIgProfileFromId(userId, profileCh)
+	//querySrc := c.Query("q")
+	//go getIgProfileFromName(querySrc, profileCh)
+	//go getIgProfileFromId(userId, profileCh)
 	ProfileResponse2(profileCh, c, timer)
 }
 
-func getIgProfileFromId(userId string, ch chan result.Profile) {
-	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
-	body := GetIGAPI(url)
-	var profile result.Profile
-	var data result.IGIDRawProfile
-	profile.RawData = body
-	err := json.Unmarshal([]byte(body), &data)
-	if err != nil {
-		profile.Status = false
-	} else {
-		profile.MergeIGIDProfile(data)
-		ch <- profile
-	}
 
-}
 
-func getIgProfileFromName(userName string, ch chan result.Profile) {
-	url := "https://www.instagram.com/" + userName + "/"
-	body := GetIGAPI(url)
-	profileMat := util.Matcher(REGEX_INSTAGRAM_PROFILE, body)
-	var profile result.Profile
-	var data result.IGNameRawProfile
-	if len(profileMat) > 2 {
-		profile.RawData = profileMat[1] + profileMat[3]
-		err := json.Unmarshal([]byte(profile.RawData), &data)
-		if err != nil {
-			profile.Status = false
-		} else {
-			profile.MergeIGNameProfile(data)
-			ch <- profile
 
-		}
-	} else {
-		profile.Status = false
-	}
-
-}
 
 func GetIGPosts(c *gin.Context) {
 	userId := c.Param("userId")
