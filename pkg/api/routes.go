@@ -9,6 +9,10 @@ func SetupRouter(router *gin.Engine) {
 	serverApi := router.Group("/api")
 	{
 		serverApi.POST("/uid", GetWhichUid)
+
+		serverApi.GET("/v2/:type/profile/:userId", GetProfile)
+		serverApi.GET("/v2/:type/posts/:userId", GetPosts)
+
 		apiFB := serverApi.Group("/fb")
 		{
 			apiFB.POST("/uid", GetFBUid)
@@ -38,8 +42,6 @@ func SetupRouter(router *gin.Engine) {
 		}
 
 		//serverApi.POST("/token", UpdateToken)
-
-
 
 
 	}

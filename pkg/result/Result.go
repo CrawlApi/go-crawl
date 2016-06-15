@@ -16,23 +16,25 @@ type UID struct {
 }
 
 type Profile struct {
-	UserId    string `json:"user_id"`
-	Name      string `json:"name"`
-	Avatar    string `json:"avatar"`
-	PostNum   int    `json:"post_num"`
-	FollowNum int    `json:"follow_num"`
-	Fans      int    `json:"fans"`
-	Birthday  string `json:"birthday"`
-	Website   string `json:"website"`
-	About     string `json:"about"`
-	RawData   string `json:"raw_data"`
-	Status    bool   `json:"status"`
-	Date      int64  `json:"date"`
+	UserId     string `json:"user_id"`
+	Name       string `json:"name"`
+	Avatar     string `json:"avatar"`
+	PostNum    int    `json:"post_num"`
+	FollowNum  int    `json:"follow_num"`
+	Fans       int    `json:"fans"`
+	Birthday   string `json:"birthday"`
+	Website    string `json:"website"`
+	About      string `json:"about"`
+	RawData    string `json:"raw_data"`
+	Status     bool   `json:"status"`
+	Date       int64  `json:"date"`
+	ErrCode    int    `json:"error_code"`
+	ErrMessage string `json:"error_message"`
 }
 
 type post struct {
 	CreatedAt          string `json:"created_at"`
-	UpdatedAt          int64  `json:"updated_at"`
+	UpdatedAt          string `json:"updated_at"`
 	ShareCount         int    `json:"share_count"`
 	LikeCount          int    `json:"like_count"`
 	CommentCount       int    `json:"comment_count"`
@@ -50,6 +52,8 @@ type Posts struct {
 	Date    int64  `json:"date"`
 	Status  bool   `json:"status"`
 	RawData string `json:"raw_data"`
+	ErrCode    int    `json:"error_code"`
+	ErrMessage string `json:"error_message"`
 }
 
 func (p *Posts) MergeIGIdPosts(rawPost IGIDRawPosts) {
@@ -87,11 +91,33 @@ func (p *Posts) MergeIGNamePosts(rawPost IGNameRawPosts) {
 		data.CommentCount = item.Comments.Count
 		data.ViewCount = item.VideoViews
 		data.ContentType = item.Type
-
 		data.ContentCaption = item.Caption.Text
+
 		data.ContentFullPicture = item.Images.StandardResolution.URL
 		data.PermalinkUrl = item.Link
 		data.HasComment = item.CanViewComments
+
+		p.Items = append(p.Items, data)
+	}
+
+	p.Status = true
+}
+
+func (p *Posts) MergeFBRawPosts(rawPosts FBRawPosts) {
+	var data post
+	for _, item := range rawPosts.Data {
+		data.CreatedAt = item.CreatedTime
+		data.UpdatedAt = item.UpdatedTime
+		data.ShareCount = item.Shares.Count
+		data.LikeCount = item.Likes.Summary.TotalCount
+		data.CommentCount = item.Comments.Summary.TotalCount
+
+		data.ContentType = item.Type
+
+		data.ContentBody = item.Message
+		data.ContentFullPicture = item.FullPicture
+		data.PermalinkUrl = item.PermalinkURL
+		data.HasComment = item.Comments.Summary.CanComment
 
 		p.Items = append(p.Items, data)
 	}
@@ -149,6 +175,3 @@ func (p *Profile) MergeWBRawProfile(data WBRawProfile) {
 
 	p.Status = true
 }
-
-
-

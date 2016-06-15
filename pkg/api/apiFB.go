@@ -6,11 +6,13 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
 	"time"
+	"log"
 )
 
 func GetFBAPI(url string) string {
 	_, body, errs := reqClient.Timeout(8 * time.Second).Get(url).Set("accept-language", "en-US").End()
 	if errs != nil {
+		log.Println(errs)
 		return ""
 	}
 	return body
@@ -44,14 +46,25 @@ func GetFBProfile(c *gin.Context) {
 func GetFBPosts(c *gin.Context) {
 	userId := c.Param("userId")
 	limit := c.DefaultQuery("limit", "10")
-	postCh := make(chan string)
+	postCh := make(chan result.Posts)
 	go func() {
 		url := "https://graph.facebook.com/v2.6/" + userId + "/feed?fields=" + PAGE_FEED_FIELDS_ENABLE + "," + PAGE_FEED_CONNECTIONS + "&limit=" + limit + "&access_token=" + FACEBOOK_TOKEN
 		body := GetFBAPI(url)
-		postCh <- body
+		var posts result.Posts
+		var data result.FBRawPosts
+		posts.RawData = body
+		err := json.Unmarshal([]byte(posts.RawData), &data)
+		if err != nil {
+			posts.Status = false
+		} else {
+			posts.MergeFBRawPosts(data)
+		}
+		posts.Date = time.Now().Unix()
+		postCh <- posts
+
 	}()
 
-	StringResponse(<-postCh, c)
+	PostsResponse(postCh, c)
 }
 
 // FaceBook user_id

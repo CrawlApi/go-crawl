@@ -101,7 +101,7 @@ func getIgPostFromName(userName string, ch chan result.Posts) {
 	var posts result.Posts
 	var data result.IGNameRawPosts
 	posts.RawData = body
-	err := json.Unmarshal([]byte(body), &data)
+	err := json.Unmarshal([]byte(posts.RawData), &data)
 	if err != nil {
 		posts.Status = false
 	} else {

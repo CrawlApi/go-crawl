@@ -1,13 +1,13 @@
 package api
 
 import (
-	"log"
-	"github.com/gin-gonic/gin"
-	"net/http"
-	"github.com/llitfkitfk/cirkol/pkg/util"
-	"time"
 	"github.com/gin-gonic/contrib/sessions"
+	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
+	"github.com/llitfkitfk/cirkol/pkg/util"
+	"log"
+	"net/http"
+	"time"
 )
 
 const (
@@ -42,10 +42,79 @@ const (
 	REGEXP_WEIBO_PROFILE_ID = `uid=(\d+)`
 )
 
+const (
+	ERROR_CODE_API_MISS_MATCHED = 4001
+	ERROR_CODE_API_TIMEOUT = 4002
+	ERROR_CODE_JSON_ERROR = 4003
+	ERROR_CODE_TIMEOUT = 4004
+)
+
 var (
 	FACEBOOK_TOKEN = "490895874437565|3ce74d840577a6d598af56cd46fd0450"
 	INSTAGRAM_TOKEN = "28177225.e67f6b8.1a30e1aa29d44d4eb34d76dd128c7788"
 )
+
+func GetProfile(c *gin.Context) {
+	timer := time.After(5 * time.Second)
+	apiType := c.Param("type")
+	userId := c.Param("userId")
+	pCh := make(chan result.Profile)
+	var profile result.Profile
+
+	switch apiType {
+	case "fb":
+		go SearchFBProfile(userId, c, pCh)
+	case "ig":
+	case "wb":
+	case "wx":
+	default:
+		profile.ErrCode = ERROR_CODE_API_MISS_MATCHED
+		profile.ErrMessage = "no api matched"
+	}
+
+	select {
+	case profile = <-pCh:
+		profile = profile
+	case <-timer:
+		profile.ErrCode = ERROR_CODE_TIMEOUT
+		profile.ErrMessage = "request timeout"
+	}
+	profile.Date = time.Now().Unix()
+	c.JSON(http.StatusOK, gin.H{
+		"profile": profile,
+	})
+}
+
+func GetPosts(c *gin.Context) {
+	timer := time.After(8 * time.Second)
+	apiType := c.Param("type")
+	userId := c.Param("userId")
+	pCh := make(chan result.Posts)
+	var posts result.Posts
+
+	switch apiType {
+	case "fb":
+		go SearchFBPosts(userId, c, pCh)
+	case "ig":
+	case "wb":
+	case "wx":
+	default:
+		posts.ErrCode = ERROR_CODE_API_MISS_MATCHED
+		posts.ErrMessage = "no api matched"
+	}
+
+	select {
+	case posts = <-pCh:
+		posts = posts
+	case <-timer:
+		posts.ErrCode = ERROR_CODE_TIMEOUT
+		posts.ErrMessage = "request timeout"
+	}
+	posts.Date = time.Now().Unix()
+	c.JSON(http.StatusOK, gin.H{
+		"posts": posts,
+	})
+}
 
 func StringResponse(body string, c *gin.Context) {
 	if len(body) > 0 {
@@ -54,7 +123,7 @@ func StringResponse(body string, c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Request API Failed",
 			"status":  false,
-			"date": time.Now().Unix(),
+			"date":    time.Now().Unix(),
 		})
 	}
 }
@@ -105,10 +174,10 @@ func GetWhichUid(c *gin.Context) {
 	realUrl := util.Matcher(REGEXP_URI, rawurl)
 	if len(realUrl) == 0 {
 		c.JSON(http.StatusOK, gin.H{
-			"uid":  &result.UID{
+			"uid": &result.UID{
 				Message: "not real url",
-				Status: false,
-				Date: time.Now().Unix(),
+				Status:  false,
+				Date:    time.Now().Unix(),
 			},
 		})
 	} else {
@@ -117,8 +186,8 @@ func GetWhichUid(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"uid": &result.UID{
 					Message: "URL Type Not Found",
-					Status: false,
-					Date: time.Now().Unix(),
+					Status:  false,
+					Date:    time.Now().Unix(),
 				},
 			})
 		} else {
@@ -143,4 +212,3 @@ func UpdateToken(c *gin.Context) {
 
 	c.String(http.StatusOK, "success")
 }
-

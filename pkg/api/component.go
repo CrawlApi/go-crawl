@@ -13,7 +13,7 @@ var (
 )
 
 func SetupComponent(router *gin.Engine) {
-	setSession(router)
+	//setSession(router)
 	setupRequestClient()
 	setupLogger()
 }
