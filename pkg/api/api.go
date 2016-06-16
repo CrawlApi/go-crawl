@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"errors"
 )
 
 const (
@@ -53,6 +54,7 @@ const (
 var (
 	FACEBOOK_TOKEN  = "490895874437565|3ce74d840577a6d598af56cd46fd0450"
 	INSTAGRAM_TOKEN = "28177225.e67f6b8.1a30e1aa29d44d4eb34d76dd128c7788"
+	WEIBO_TOKEN = "2.00m9AuWD0IVHcF858d98077e0YDshC"
 )
 
 func GetProfile(c *gin.Context) {
@@ -100,8 +102,10 @@ func GetPosts(c *gin.Context) {
 	case "fb":
 		go SearchFBPosts(userId, c, pCh)
 	case "ig":
+		go SearchIGPosts(userId, c, pCh)
 	case "wb":
 	case "wx":
+		go SearchWXPosts(userId, c, pCh)
 	default:
 		posts.ErrCode = ERROR_CODE_API_MISS_MATCHED
 		posts.ErrMessage = "no api matched"
@@ -123,6 +127,16 @@ func GetPosts(c *gin.Context) {
 func GetUid(c *gin.Context) {
 
 }
+
+func ReqApi(url string) (string, error) {
+	_, body, errs := reqClient.Set("accept-language", "en-US").Get(url).End()
+	if errs != nil {
+		return "", errors.New("request api timeout")
+	}
+	return body, nil
+}
+
+
 
 func StringResponse(body string, c *gin.Context) {
 	if len(body) > 0 {

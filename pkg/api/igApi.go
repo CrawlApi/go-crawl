@@ -5,8 +5,11 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
 	"encoding/json"
-	"errors"
 )
+
+func SearchIGPosts(userId string, c *gin.Context, ch chan <- result.Posts) {
+
+}
 
 func SearchIGProfile(userId string, c *gin.Context, ch chan <- result.Profile) {
 	querySrc := c.Query("q")
@@ -30,7 +33,7 @@ func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
 	var profile result.Profile
 	var data result.IGNameRawProfile
 
-	body, err := ReqIGApi(url)
+	body, err := ReqApi(url)
 	if err != nil {
 		profile.ErrCode = ERROR_CODE_API_TIMEOUT
 		profile.ErrMessage = err.Error()
@@ -60,7 +63,7 @@ func SearchIGProfileForId(userId string, ch chan <-result.Profile) {
 	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
 	var profile result.Profile
 	var data result.IGIDRawProfile
-	body, err := ReqIGApi(url)
+	body, err := ReqApi(url)
 	if err != nil {
 		profile.ErrCode = ERROR_CODE_API_TIMEOUT
 		profile.ErrMessage = err.Error()
@@ -75,12 +78,4 @@ func SearchIGProfileForId(userId string, ch chan <-result.Profile) {
 		}
 	}
 	ch <- profile
-}
-
-func ReqIGApi(url string) (string, error) {
-	_, body, errs := reqClient.Get(url).End()
-	if errs != nil {
-		return "", errors.New("request ig api timeout")
-	}
-	return body, nil
 }
