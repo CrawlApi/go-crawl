@@ -18,6 +18,13 @@ func ToString(v interface{}) string {
 	return fmt.Sprintf("%+v", v)
 }
 
+func JsonToString(data []byte, err error) string {
+	if err != nil {
+		return err.Error()
+	}
+	return string(data)
+}
+
 func CheckUrl(url string) (string, error) {
 	r, _ := regexp.Compile(REGEX_URL_TYPE)
 	matcher := r.FindStringSubmatch(url)

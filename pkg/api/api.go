@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
@@ -8,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"errors"
 )
 
 const (
@@ -36,7 +36,7 @@ const (
 	// WEIXIN CONST
 	REGEXP_WEIXIN_PROFILE_ID = `微信号: (\S+)</p>`
 	REGEXP_WEIXIN_LOGO       = `src="((http://img01.sogoucdn.com/app/a)\S+)"`
-	REGEXP_WEIXIN_FEATURE    = `功能介绍(\S+)\sclass="sp-txt">(\S+)</span>`
+	REGEXP_WEIXIN_FEATURE    = `功能介绍(...+)class="sp-txt">(...+)</span>`
 	REGEXP_WEIXIN_URL        = `href="((http://mp.weixin.qq.com/profile)\S+)"`
 	REGEXP_WEIXIN_POSTS      = `var msgList = '(\S+)';`
 
@@ -49,12 +49,18 @@ const (
 	ERROR_CODE_JSON_ERROR         = 4003
 	ERROR_CODE_TIMEOUT            = 4004
 	ERROR_CODE_REGEX_MISS_MATCHED = 4005
+
+	ERROR_MSG_API_MISS_MATCHED   = ""
+	ERROR_MSG_API_TIMEOUT        = ""
+	ERROR_MSG_JSON_ERROR         = ""
+	ERROR_MSG_TIMEOUT            = ""
+	ERROR_MSG_REGEX_MISS_MATCHED = ""
 )
 
 var (
 	FACEBOOK_TOKEN  = "490895874437565|3ce74d840577a6d598af56cd46fd0450"
 	INSTAGRAM_TOKEN = "28177225.e67f6b8.1a30e1aa29d44d4eb34d76dd128c7788"
-	WEIBO_TOKEN = "2.00m9AuWD0IVHcF858d98077e0YDshC"
+	WEIBO_TOKEN     = "2.00m9AuWD0IVHcF858d98077e0YDshC"
 )
 
 func GetProfile(c *gin.Context) {
@@ -135,8 +141,6 @@ func ReqApi(url string) (string, error) {
 	}
 	return body, nil
 }
-
-
 
 func StringResponse(body string, c *gin.Context) {
 	if len(body) > 0 {

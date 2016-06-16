@@ -40,8 +40,7 @@ func SearchFBPosts(userId string, c *gin.Context, ch chan <- result.Posts) {
 		posts.ErrCode = ERROR_CODE_API_TIMEOUT
 		posts.ErrMessage = err.Error()
 	} else {
-		posts.RawData = body
-		err = json.Unmarshal([]byte(posts.RawData), &data)
+		err = json.Unmarshal([]byte(body), &data)
 		if err != nil {
 			posts.ErrCode = ERROR_CODE_JSON_ERROR
 			posts.ErrMessage = err.Error()

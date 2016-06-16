@@ -1,15 +1,11 @@
 package api
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
-	"encoding/json"
 )
-
-func SearchIGPosts(userId string, c *gin.Context, ch chan <- result.Posts) {
-
-}
 
 func SearchIGProfile(userId string, c *gin.Context, ch chan <- result.Profile) {
 	querySrc := c.Query("q")
@@ -52,14 +48,14 @@ func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
 			}
 		} else {
 			profile.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-			profile.ErrMessage = "ig regex miss matched"
+			profile.ErrMessage = "regex miss matched"
 		}
 	}
 	ch <- profile
 
 }
 
-func SearchIGProfileForId(userId string, ch chan <-result.Profile) {
+func SearchIGProfileForId(userId string, ch chan <- result.Profile) {
 	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
 	var profile result.Profile
 	var data result.IGIDRawProfile
@@ -78,4 +74,93 @@ func SearchIGProfileForId(userId string, ch chan <-result.Profile) {
 		}
 	}
 	ch <- profile
+}
+
+func SearchIGPosts(userId string, c *gin.Context, ch chan <- result.Posts) {
+	querySrc := c.Query("q")
+	middleCh := make(chan result.Posts, 2)
+
+	go SearchIGPostsForName(querySrc, middleCh)
+	go SearchIGPostsForId(userId, middleCh)
+
+	for i := 0; i < 2; i++ {
+		select {
+		case item := <-middleCh:
+			if item.Status {
+				ch <- item
+			}
+		}
+	}
+}
+
+func SearchIGPostsForName(userName string, ch chan result.Posts) {
+	url := "https://www.instagram.com/" + userName + "/media/"
+	var posts result.Posts
+	var data result.IGNameRawPosts
+
+	body, err := ReqApi(url)
+	if err != nil {
+		posts.ErrCode = ERROR_CODE_API_TIMEOUT
+		posts.ErrMessage = err.Error()
+	} else {
+		err := json.Unmarshal([]byte(body), &data)
+		if err != nil {
+			posts.ErrCode = ERROR_CODE_JSON_ERROR
+			posts.ErrMessage = err.Error()
+		} else {
+			posts.MergeIGNamePosts(data)
+		}
+	}
+	ch <- posts
+
+}
+
+func SearchIGPostsForId(userId string, ch chan result.Posts) {
+	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
+	var posts result.Posts
+	var data result.IGIDRawProfile
+	body, err := ReqApi(url)
+	if err != nil {
+		posts.ErrCode = ERROR_CODE_API_TIMEOUT
+		posts.ErrMessage = err.Error()
+	} else {
+		err := json.Unmarshal([]byte(body), &data)
+		if err != nil {
+			posts.ErrCode = ERROR_CODE_JSON_ERROR
+			posts.ErrMessage = err.Error()
+		} else {
+			userName := data.User.Username
+
+			SearchIGPostsForRegex(userName, ch, &posts)
+
+		}
+	}
+	ch <- posts
+}
+
+func SearchIGPostsForRegex(userName string, ch chan result.Posts, posts *result.Posts) {
+	url := "https://www.instagram.com/" + userName + "/"
+	body, err := ReqApi(url)
+	if err != nil {
+		posts.ErrCode = ERROR_CODE_API_TIMEOUT
+		posts.ErrMessage = err.Error()
+	} else {
+		postsMat := util.Matcher(REGEX_INSTAGRAM_POSTS, body)
+		var data result.IGIDRawPosts
+		if len(postsMat) > 2 {
+
+			jsonData := `{ "nodes": ` + postsMat[2] + "]}"
+
+			err = json.Unmarshal([]byte(jsonData), &data)
+			if err != nil {
+				posts.ErrCode = ERROR_CODE_JSON_ERROR
+				posts.ErrMessage = err.Error()
+			} else {
+				posts.MergeIGIdPosts(data)
+			}
+		} else {
+			posts.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+			posts.ErrMessage = "regex miss matched"
+		}
+	}
 }

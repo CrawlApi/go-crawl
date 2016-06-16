@@ -3,6 +3,8 @@ package result
 import (
 	"strconv"
 	"time"
+	"encoding/json"
+	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
 type UID struct {
@@ -45,13 +47,14 @@ type post struct {
 	ContentFullPicture string `json:"content_full_picture"`
 	PermalinkUrl       string `json:"permalink_url"`
 	HasComment         bool   `json:"has_comment"`
+	RawData            string `json:"raw_data"`
 }
 
 type Posts struct {
-	Items   []post `json:"data"`
-	Date    int64  `json:"date"`
-	Status  bool   `json:"status"`
-	RawData string `json:"raw_data"`
+	Items      []post `json:"data"`
+	Date       int64  `json:"date"`
+	Status     bool   `json:"status"`
+	RawData    string `json:"raw_data"`
 	ErrCode    int    `json:"error_code"`
 	ErrMessage string `json:"error_message"`
 }
@@ -74,6 +77,7 @@ func (p *Posts) MergeIGIdPosts(rawPost IGIDRawPosts) {
 		data.ContentFullPicture = node.DisplaySrc
 		data.PermalinkUrl = "https://www.instagram.com/p/" + node.Code + "/"
 		data.HasComment = true
+		data.RawData = util.JsonToString(json.Marshal(node))
 
 		p.Items = append(p.Items, data)
 	}
@@ -96,6 +100,7 @@ func (p *Posts) MergeIGNamePosts(rawPost IGNameRawPosts) {
 		data.ContentFullPicture = item.Images.StandardResolution.URL
 		data.PermalinkUrl = item.Link
 		data.HasComment = item.CanViewComments
+		data.RawData = util.JsonToString(json.Marshal(item))
 
 		p.Items = append(p.Items, data)
 	}
@@ -118,6 +123,7 @@ func (p *Posts) MergeFBRawPosts(rawPosts FBRawPosts) {
 		data.ContentFullPicture = item.FullPicture
 		data.PermalinkUrl = item.PermalinkURL
 		data.HasComment = item.Comments.Summary.CanComment
+		data.RawData = util.JsonToString(json.Marshal(item))
 
 		p.Items = append(p.Items, data)
 	}
