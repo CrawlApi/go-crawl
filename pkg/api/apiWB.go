@@ -2,64 +2,54 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/llitfkitfk/cirkol/pkg/util"
-	"time"
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"encoding/json"
+	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
-func GetWBAPI(url string) string {
-	_, body, errs := reqClient.Timeout(5 * time.Second).Get(url).End()
-	if errs != nil {
-		return ""
-	}
-	return body
-}
-
-func GetWBUid(c *gin.Context) {
-	rawurl := c.PostForm("url")
-	uidCh := make(chan result.UID)
-	go func() {
-		body := GetFBAPI(rawurl)
-		matcher := util.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
-		var result result.UID
-		result.Url = rawurl
-		result.Media = "wb"
-		if len(matcher) > 1 {
-			result.Status = true
-			result.UserId = matcher[1]
-		} else {
-			result.Status = false
-		}
-		result.Date = time.Now().Unix()
-
-		uidCh <- result
-	}()
-}
-
-func GetWBProfile(c *gin.Context) {
+func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
 	userId := c.Param("userId")
 
-	profileCh := make(chan result.Profile)
+	url := "http://mapi.weibo.com/2/profile?gsid=_&c=&s=&user_domain=" + userId
+	var profile result.Profile
+	var data result.WBRawProfile
 
-	go func() {
-		url := "http://mapi.weibo.com/2/profile?gsid=_&c=&s=&user_domain=" + userId
-		body := GetWBAPI(url)
-		var profile result.Profile
-		var data result.WBRawProfile
+	body, err := ReqApi(url)
+	if err != nil {
+		profile.ErrCode = ERROR_CODE_API_TIMEOUT
+		profile.ErrMessage = err.Error()
+	} else {
 		profile.Website = url
 		profile.RawData = body
-		err := json.Unmarshal([]byte(profile.RawData), &data)
+		err = json.Unmarshal([]byte(profile.RawData), &data)
 		if err != nil {
-			profile.Status = false
+			profile.ErrCode = ERROR_CODE_JSON_ERROR
+			profile.ErrMessage = err.Error()
 		} else {
 			profile.MergeWBRawProfile(data)
 		}
-		profile.Date = time.Now().Unix()
-		profileCh <- profile
-	}()
+	}
+	ch <- profile
 }
 
-func GetWBPosts(c *gin.Context) {
-
+func SearchWBUID(c *gin.Context, ch chan <-result.UID) {
+	rawurl := c.PostForm("url")
+	var uid result.UID
+	body, err := ReqApi(rawurl)
+	if err != nil {
+		uid.ErrCode = ERROR_CODE_API_TIMEOUT
+		uid.ErrMessage = err.Error()
+	} else {
+		matcher := util.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
+		uid.Url = rawurl
+		uid.Media = "wb"
+		if len(matcher) > 1 {
+			uid.Status = true
+			uid.UserId = matcher[1]
+		} else {
+			uid.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+			uid.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
+		}
+	}
+	ch <- uid
 }
