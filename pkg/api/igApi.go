@@ -7,7 +7,8 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
-func SearchIGProfile(userId string, c *gin.Context, ch chan <- result.Profile) {
+func SearchIGProfile(c *gin.Context, ch chan <- result.Profile) {
+	userId := c.Param("userId")
 	querySrc := c.Query("q")
 	middleCh := make(chan result.Profile, 2)
 
@@ -27,15 +28,13 @@ func SearchIGProfile(userId string, c *gin.Context, ch chan <- result.Profile) {
 func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
 	url := "https://www.instagram.com/" + userName + "/"
 	var profile result.Profile
-	var data result.IGNameRawProfile
-
 	body, err := ReqApi(url)
 	if err != nil {
 		profile.ErrCode = ERROR_CODE_API_TIMEOUT
 		profile.ErrMessage = err.Error()
 	} else {
 		profileMat := util.Matcher(REGEX_INSTAGRAM_PROFILE, body)
-
+		var data result.IGNameRawProfile
 		if len(profileMat) > 2 {
 			profile.RawData = profileMat[1] + profileMat[3]
 			err = json.Unmarshal([]byte(profile.RawData), &data)
@@ -58,12 +57,12 @@ func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
 func SearchIGProfileForId(userId string, ch chan <- result.Profile) {
 	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
 	var profile result.Profile
-	var data result.IGIDRawProfile
 	body, err := ReqApi(url)
 	if err != nil {
 		profile.ErrCode = ERROR_CODE_API_TIMEOUT
 		profile.ErrMessage = err.Error()
 	} else {
+		var data result.IGIDRawProfile
 		profile.RawData = body
 		err := json.Unmarshal([]byte(profile.RawData), &data)
 		if err != nil {
@@ -76,7 +75,8 @@ func SearchIGProfileForId(userId string, ch chan <- result.Profile) {
 	ch <- profile
 }
 
-func SearchIGPosts(userId string, c *gin.Context, ch chan <- result.Posts) {
+func SearchIGPosts(c *gin.Context, ch chan <- result.Posts) {
+	userId := c.Param("userId")
 	querySrc := c.Query("q")
 	middleCh := make(chan result.Posts, 2)
 
@@ -96,13 +96,13 @@ func SearchIGPosts(userId string, c *gin.Context, ch chan <- result.Posts) {
 func SearchIGPostsForName(userName string, ch chan result.Posts) {
 	url := "https://www.instagram.com/" + userName + "/media/"
 	var posts result.Posts
-	var data result.IGNameRawPosts
 
 	body, err := ReqApi(url)
 	if err != nil {
 		posts.ErrCode = ERROR_CODE_API_TIMEOUT
 		posts.ErrMessage = err.Error()
 	} else {
+		var data result.IGNameRawPosts
 		err := json.Unmarshal([]byte(body), &data)
 		if err != nil {
 			posts.ErrCode = ERROR_CODE_JSON_ERROR
@@ -118,12 +118,12 @@ func SearchIGPostsForName(userName string, ch chan result.Posts) {
 func SearchIGPostsForId(userId string, ch chan result.Posts) {
 	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
 	var posts result.Posts
-	var data result.IGIDRawProfile
 	body, err := ReqApi(url)
 	if err != nil {
 		posts.ErrCode = ERROR_CODE_API_TIMEOUT
 		posts.ErrMessage = err.Error()
 	} else {
+		var data result.IGIDRawProfile
 		err := json.Unmarshal([]byte(body), &data)
 		if err != nil {
 			posts.ErrCode = ERROR_CODE_JSON_ERROR

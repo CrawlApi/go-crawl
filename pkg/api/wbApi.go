@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 )
 
-func SearchWBProfile(userId string, c *gin.Context, ch chan <- result.Profile) {
+func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
+	userId := c.Param("userId")
+
 	url := "http://mapi.weibo.com/2/profile?gsid=_&c=&s=&user_domain=" + userId
 	var profile result.Profile
 	var data result.WBRawProfile

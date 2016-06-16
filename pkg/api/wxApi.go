@@ -4,10 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
+	"html"
+	"encoding/json"
 	"log"
 )
 
-func SearchWXProfile(userId string, c *gin.Context, ch chan <- result.Profile) {
+func SearchWXProfile(c *gin.Context, ch chan <- result.Profile) {
+	userId := c.Param("userId")
 	url := "http://weixin.sogou.com/weixin?type=1&query=" + userId + "&ie=utf8&_sug_=n&_sug_type_="
 	var profile result.Profile
 	body, err := ReqApi(url)
@@ -35,11 +38,13 @@ func SearchWXProfile(userId string, c *gin.Context, ch chan <- result.Profile) {
 	if len(featureMat) > 1 {
 		profile.About = featureMat[2]
 	}
+	profile.Status = true
 
 	ch <- profile
 }
 
-func SearchWXPosts(userId string, c *gin.Context, ch chan <- result.Posts) {
+func SearchWXPosts(c *gin.Context, ch chan <- result.Posts) {
+	userId := c.Param("userId")
 	url := "http://weixin.sogou.com/weixin?type=1&query=" + userId + "&ie=utf8&_sug_=n&_sug_type_="
 	var posts result.Posts
 	body, err := ReqApi(url)
@@ -57,11 +62,24 @@ func SearchWXPosts(userId string, c *gin.Context, ch chan <- result.Posts) {
 		} else {
 			postMat := util.Matcher(REGEXP_WEIXIN_POSTS, postBody)
 			if len(postMat) > 0 {
-				log.Println(postMat[1])
-				//log.Println(html.UnescapeString(postMat[1]))
+
+				jsonStr := html.UnescapeString(postMat[1])
+				var data result.WXRawPosts
+				err = json.Unmarshal([]byte(jsonStr), &data)
+				if err != nil {
+					posts.ErrCode = ERROR_CODE_JSON_ERROR
+					posts.ErrMessage = err.Error()
+				} else {
+					posts.MergeWXRawPosts(data)
+				}
 			}
 		}
-
 	}
+	ch <- posts
+}
+
+func SearchWXUID(c *gin.Context, ch chan <-result.UID) {
+	rawurl := c.PostForm("url")
+	log.Println(rawurl)
 
 }
