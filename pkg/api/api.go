@@ -50,11 +50,11 @@ const (
 	ERROR_CODE_TIMEOUT            = 4004
 	ERROR_CODE_REGEX_MISS_MATCHED = 4005
 
-	ERROR_MSG_API_MISS_MATCHED   = ""
-	ERROR_MSG_API_TIMEOUT        = ""
+	ERROR_MSG_API_MISS_MATCHED   = "no api matched"
+	ERROR_MSG_API_TIMEOUT        = "request api timeout"
 	ERROR_MSG_JSON_ERROR         = ""
-	ERROR_MSG_TIMEOUT            = ""
-	ERROR_MSG_REGEX_MISS_MATCHED = ""
+	ERROR_MSG_TIMEOUT            = "request timeout"
+	ERROR_MSG_REGEX_MISS_MATCHED = "regex miss matched"
 )
 
 var (
@@ -81,7 +81,7 @@ func GetProfile(c *gin.Context) {
 		go SearchWXProfile(userId, c, pCh)
 	default:
 		profile.ErrCode = ERROR_CODE_API_MISS_MATCHED
-		profile.ErrMessage = "no api matched"
+		profile.ErrMessage = ERROR_MSG_API_MISS_MATCHED
 	}
 
 	select {
@@ -89,7 +89,7 @@ func GetProfile(c *gin.Context) {
 		profile = profile
 	case <-timer:
 		profile.ErrCode = ERROR_CODE_TIMEOUT
-		profile.ErrMessage = "request timeout"
+		profile.ErrMessage = ERROR_MSG_TIMEOUT
 	}
 	profile.Date = time.Now().Unix()
 	c.JSON(http.StatusOK, gin.H{
@@ -114,7 +114,7 @@ func GetPosts(c *gin.Context) {
 		go SearchWXPosts(userId, c, pCh)
 	default:
 		posts.ErrCode = ERROR_CODE_API_MISS_MATCHED
-		posts.ErrMessage = "no api matched"
+		posts.ErrMessage = ERROR_MSG_API_MISS_MATCHED
 	}
 
 	select {
@@ -122,7 +122,7 @@ func GetPosts(c *gin.Context) {
 		posts = posts
 	case <-timer:
 		posts.ErrCode = ERROR_CODE_TIMEOUT
-		posts.ErrMessage = "request timeout"
+		posts.ErrMessage = ERROR_MSG_TIMEOUT
 	}
 	posts.Date = time.Now().Unix()
 	c.JSON(http.StatusOK, gin.H{
@@ -137,7 +137,7 @@ func GetUid(c *gin.Context) {
 func ReqApi(url string) (string, error) {
 	_, body, errs := reqClient.Set("accept-language", "en-US").Get(url).End()
 	if errs != nil {
-		return "", errors.New("request api timeout")
+		return "", errors.New(ERROR_MSG_API_TIMEOUT)
 	}
 	return body, nil
 }

@@ -48,7 +48,7 @@ func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
 			}
 		} else {
 			profile.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-			profile.ErrMessage = "regex miss matched"
+			profile.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
 		}
 	}
 	ch <- profile
@@ -160,7 +160,7 @@ func SearchIGPostsForRegex(userName string, ch chan result.Posts, posts *result.
 			}
 		} else {
 			posts.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-			posts.ErrMessage = "regex miss matched"
+			posts.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
 		}
 	}
 }
