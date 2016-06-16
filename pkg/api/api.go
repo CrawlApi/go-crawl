@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
@@ -49,12 +48,14 @@ const (
 	ERROR_CODE_JSON_ERROR = 4003
 	ERROR_CODE_TIMEOUT = 4004
 	ERROR_CODE_REGEX_MISS_MATCHED = 4005
+	ERROR_CODE_URL_TYPE_NOT_FOUND = 4006
 
 	ERROR_MSG_API_MISS_MATCHED = "no api matched"
 	ERROR_MSG_API_TIMEOUT = "request api timeout"
-	ERROR_MSG_JSON_ERROR = ""
+	ERROR_MSG_JSON_ERROR = "json parse error"
 	ERROR_MSG_TIMEOUT = "request timeout"
 	ERROR_MSG_REGEX_MISS_MATCHED = "regex miss matched"
+	ERROR_MSG_URL_MISS_MATCHED = "url miss matched"
 )
 
 var (
@@ -62,6 +63,14 @@ var (
 	INSTAGRAM_TOKEN = "28177225.e67f6b8.1a30e1aa29d44d4eb34d76dd128c7788"
 	WEIBO_TOKEN = "2.00m9AuWD0IVHcF858d98077e0YDshC"
 )
+
+func ReqApi(url string) (string, error) {
+	_, body, errs := reqClient.Set("accept-language", "en-US").Get(url).End()
+	if errs != nil {
+		return "", errors.New(ERROR_MSG_API_TIMEOUT)
+	}
+	return body, nil
+}
 
 func SearchOtherProfile(c *gin.Context, ch chan <- result.Profile) {
 	var profile result.Profile
@@ -157,7 +166,32 @@ func GetPosts(c *gin.Context) {
 
 func GetUid(c *gin.Context) {
 	timer := time.After(5 * time.Second)
-	apiType := c.Param("type")
+	rawurl := c.PostForm("url")
+	realUrl := util.Matcher(REGEXP_URI, rawurl)
+
+	var uid result.UID
+	if len(realUrl) == 0 {
+		uid.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+		uid.ErrMessage = ERROR_MSG_URL_MISS_MATCHED
+		uid.Date = time.Now().Unix()
+
+		c.JSON(http.StatusOK, gin.H{
+			"uid": uid,
+		})
+		return
+	}
+
+	apiType, err := util.CheckUrl(rawurl)
+	if err != nil {
+		uid.ErrCode = ERROR_CODE_URL_TYPE_NOT_FOUND
+		uid.ErrMessage = err.Error()
+		uid.Date = time.Now().Unix()
+		c.JSON(http.StatusOK, gin.H{
+			"uid": uid,
+		})
+		return
+	}
+
 	uidCh := make(chan result.UID)
 	switch apiType {
 	case "fb":
@@ -173,7 +207,7 @@ func GetUid(c *gin.Context) {
 	}
 
 	select {
-	case uid := <-uidCh:
+	case uid = <-uidCh:
 		uid.Date = time.Now().Unix()
 		c.JSON(http.StatusOK, gin.H{
 			"uid": uid,
@@ -189,107 +223,8 @@ func GetUid(c *gin.Context) {
 	}
 }
 
-func ReqApi(url string) (string, error) {
-	_, body, errs := reqClient.Set("accept-language", "en-US").Get(url).End()
-	if errs != nil {
-		return "", errors.New(ERROR_MSG_API_TIMEOUT)
-	}
-	return body, nil
-}
-
-func StringResponse(body string, c *gin.Context) {
-	if len(body) > 0 {
-		c.String(http.StatusOK, body)
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Request API Failed",
-			"status":  false,
-			"date":    time.Now().Unix(),
-		})
-	}
-}
-
-func ProfileResponse2(ch chan result.Profile, c *gin.Context, timer <-chan time.Time) {
-	select {
-	case profile := <-ch:
-		c.JSON(http.StatusOK, gin.H{
-			"profile": profile,
-		})
-	case <-timer:
-		var result result.Profile
-		result.Status = false
-		c.JSON(http.StatusOK, gin.H{
-			"profile": result,
-		})
-
-	}
-}
-
-func ProfileResponse(ch chan result.Profile, c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"profile": <-ch,
-	})
-}
-
-func PostsResponse(ch chan result.Posts, c *gin.Context) {
-	var result result.Posts
-	for i := 0; i < 2; i++ {
-		select {
-		case posts := <-ch:
-			log.Println(posts)
-			if posts.Status {
-				result = posts
-				break
-			}
-		}
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"posts": result,
-	})
-
-}
-
-func GetWhichUid(c *gin.Context) {
-	log.Println(c.PostForm("url"))
-	rawurl := c.PostForm("url")
-	realUrl := util.Matcher(REGEXP_URI, rawurl)
-	if len(realUrl) == 0 {
-		c.JSON(http.StatusOK, gin.H{
-			"uid": &result.UID{
-				Message: "not real url",
-				Status:  false,
-				Date:    time.Now().Unix(),
-			},
-		})
-	} else {
-		urlType, err := util.CheckUrl(rawurl)
-		if err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"uid": &result.UID{
-					Message: "URL Type Not Found",
-					Status:  false,
-					Date:    time.Now().Unix(),
-				},
-			})
-		} else {
-			c.Redirect(http.StatusTemporaryRedirect, "/api/" + urlType + "/uid")
-		}
-	}
-}
-
-func Response(ch chan result.UID, c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"uid": <-ch,
-	})
-}
-
 func UpdateToken(c *gin.Context) {
-	token := c.PostForm("url")
+	token := c.PostForm("token")
 	log.Println(token)
-	session := sessions.Default(c)
-	session.Set("token", token)
-	session.Save()
-	log.Println("Session Update")
-
 	c.String(http.StatusOK, "success")
 }

@@ -39,7 +39,6 @@ func GetFBProfile(c *gin.Context) {
 		profile.Date = time.Now().Unix()
 		profileCh <- profile
 	}()
-	ProfileResponse(profileCh, c)
 }
 
 // FaceBook Posts
@@ -64,7 +63,6 @@ func GetFBPosts(c *gin.Context) {
 
 	}()
 
-	PostsResponse(postCh, c)
 }
 
 // FaceBook user_id
@@ -88,5 +86,4 @@ func GetFBUid(c *gin.Context) {
 
 		uidCh <- result
 	}()
-	Response(uidCh, c)
 }

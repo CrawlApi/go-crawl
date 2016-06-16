@@ -35,19 +35,7 @@ func GetIGUid(c *gin.Context) {
 		uidCh <- uid
 	}()
 
-	Response(uidCh, c)
 }
-
-func GetIGProfile(c *gin.Context) {
-	timer := time.After(8 * time.Second)
-	//userId := c.Param("userId")
-	profileCh := make(chan result.Profile)
-	//querySrc := c.Query("q")
-	//go getIgProfileFromName(querySrc, profileCh)
-	//go getIgProfileFromId(userId, profileCh)
-	ProfileResponse2(profileCh, c, timer)
-}
-
 
 
 
@@ -58,7 +46,6 @@ func GetIGPosts(c *gin.Context) {
 	querySrc := c.Query("q")
 	go getIgPostFromName(querySrc, postCh)
 	go getIgPostFromId(userId, postCh)
-	PostsResponse(postCh, c)
 }
 
 func getIgPostFromName(userName string, ch chan result.Posts) {

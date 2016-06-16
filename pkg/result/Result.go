@@ -37,8 +37,8 @@ type Profile struct {
 
 type post struct {
 	ID                 string `json:"id"`
-	CreatedAt          int64    `json:"created_at"`
-	UpdatedAt          int64    `json:"updated_at"`
+	CreatedAt          string `json:"created_at"`
+	UpdatedAt          string `json:"updated_at"`
 	ShareCount         int    `json:"share_count"`
 	LikeCount          int    `json:"like_count"`
 	CommentCount       int    `json:"comment_count"`
@@ -90,7 +90,7 @@ func (p *Posts) MergeIGIdPosts(rawPost IGIDRawPosts) {
 	for _, node := range rawPost.Nodes {
 		var data post
 		data.ID = node.ID
-		data.CreatedAt = int64(node.Date)
+		data.CreatedAt = util.Int2Str(node.Date)
 
 		data.LikeCount = node.Likes.Count
 		data.CommentCount = node.Comments.Count
@@ -119,7 +119,7 @@ func (p *Posts) MergeIGNamePosts(rawPost IGNameRawPosts) {
 	for _, item := range rawPost.Items {
 		var data post
 		data.ID = item.ID
-		data.CreatedAt = util.Str2Int(item.CreatedTime)
+		data.CreatedAt = item.CreatedTime
 
 		data.LikeCount = item.Likes.Count
 		data.CommentCount = item.Comments.Count
@@ -191,7 +191,7 @@ func (p *Posts) MergeWXRawPosts(rawPosts WXRawPosts) {
 	for _, item := range rawPosts.List {
 		var data post
 		data.ID = util.Int2Str(item.AppMsgExtInfo.Fileid)
-		data.CreatedAt = int64(item.CommMsgInfo.Datetime)
+		data.CreatedAt = util.Int2Str(item.CommMsgInfo.Datetime)
 
 		data.ContentFullPicture = item.AppMsgExtInfo.Cover
 
@@ -208,7 +208,7 @@ func (p *Posts) MergeWXRawPosts(rawPosts WXRawPosts) {
 			for _, item2 := range item.AppMsgExtInfo.MultiAppMsgItemList {
 				var data2 post
 				data2.ID = util.Int2Str(item2.Fileid)
-				data2.CreatedAt = int64(item.CommMsgInfo.Datetime)
+				data2.CreatedAt = util.Int2Str(item.CommMsgInfo.Datetime)
 
 				data2.ContentFullPicture = item2.Cover
 

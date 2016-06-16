@@ -35,7 +35,6 @@ func GetWBUid(c *gin.Context) {
 
 		uidCh <- result
 	}()
-	Response(uidCh, c)
 }
 
 func GetWBProfile(c *gin.Context) {
@@ -59,7 +58,6 @@ func GetWBProfile(c *gin.Context) {
 		profile.Date = time.Now().Unix()
 		profileCh <- profile
 	}()
-	ProfileResponse(profileCh, c)
 }
 
 func GetWBPosts(c *gin.Context) {

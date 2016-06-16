@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	REGEX_URL_TYPE   = `(facebook|instagram|weixin|weibo)`
+	REGEX_URL_TYPE = `(facebook|instagram|weixin|weibo)`
 	TIMESTAMP_LAYOUT = "2006-01-02T15:04:05+0000"
+	ERROR_MSG_URL_TYPE_NOT_FOUND = "URL Type Not Found"
 )
 
 func Matcher(expr string, s string) []string {
@@ -42,12 +43,12 @@ func Str2Int(src string) int64 {
 	return int64(i)
 }
 
-func DateFormat(dateStr string) int64 {
+func DateFormat(dateStr string) string {
 	time, err := time.Parse(TIMESTAMP_LAYOUT, dateStr)
 	if err != nil {
-		return 0
+		return ""
 	}
-	return time.Unix()
+	return fmt.Sprintf("%d", time.Unix())
 
 }
 
@@ -66,5 +67,5 @@ func CheckUrl(url string) (string, error) {
 			return "wb", nil
 		}
 	}
-	return "", errors.New("Not Found")
+	return "", errors.New(ERROR_MSG_URL_TYPE_NOT_FOUND)
 }
