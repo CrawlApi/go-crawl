@@ -41,7 +41,13 @@ func main() {
 	//GoRoutine()
 	//WaitGroupDemo()
 	//RequestDemo()
-	MongoQuery()
+	//MongoQuery()
+
+	t, err := time.Parse(time.RFC3339Nano, "2016-06-15T18:51:33+0000")
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(t)
 }
 func MongoQuery() {
 	session, err := mgo.Dial("192.168.20.24:27000")

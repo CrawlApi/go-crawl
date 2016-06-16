@@ -1,14 +1,17 @@
 package util
 
 import (
-	"regexp"
-	"fmt"
 	"errors"
+	"fmt"
+	"regexp"
 	"strconv"
 	"time"
 )
 
-const REGEX_URL_TYPE = `(facebook|instagram|weixin|weibo)`
+const (
+	REGEX_URL_TYPE   = `(facebook|instagram|weixin|weibo)`
+	TIMESTAMP_LAYOUT = "2006-01-02T15:04:05+0000"
+)
 
 func Matcher(expr string, s string) []string {
 	r, _ := regexp.Compile(expr)
@@ -40,7 +43,7 @@ func Str2Int(src string) int64 {
 }
 
 func DateFormat(dateStr string) int64 {
-	time, err := time.Parse(time.RFC3339, dateStr)
+	time, err := time.Parse(TIMESTAMP_LAYOUT, dateStr)
 	if err != nil {
 		return 0
 	}
