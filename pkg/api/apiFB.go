@@ -1,89 +1,78 @@
 package api
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
+	"encoding/json"
 	"github.com/llitfkitfk/cirkol/pkg/util"
-	"time"
-	"log"
 )
 
-func GetFBAPI(url string) string {
-	_, body, errs := reqClient.Timeout(8 * time.Second).Get(url).Set("accept-language", "en-US").End()
-	if errs != nil {
-		log.Println(errs)
-		return ""
-	}
-	return body
-}
-
-// FaceBook Profile
-func GetFBProfile(c *gin.Context) {
+func SearchFBProfile(c *gin.Context, ch chan <- result.Profile) {
 	userId := c.Param("userId")
+	url := "https://graph.facebook.com/v2.6/" + userId + "?fields=" + PAGE_PROFILE_FIELDS_ENABLE + "&access_token=" + FACEBOOK_TOKEN
+	var profile result.Profile
 
-	profileCh := make(chan result.Profile)
-
-	go func() {
-		url := "https://graph.facebook.com/v2.6/" + userId + "?fields=" + PAGE_PROFILE_FIELDS_ENABLE + "&access_token=" + FACEBOOK_TOKEN
-		body := GetFBAPI(url)
-		var profile result.Profile
+	body, err := ReqApi(url)
+	if err != nil {
+		profile.ErrCode = ERROR_CODE_API_TIMEOUT
+		profile.ErrMessage = err.Error()
+	} else {
 		var data result.FBRawProfile
 		profile.RawData = body
-		err := json.Unmarshal([]byte(profile.RawData), &data)
+		err = json.Unmarshal([]byte(profile.RawData), &data)
 		if err != nil {
-			profile.Status = false
+			profile.ErrCode = ERROR_CODE_JSON_ERROR
+			profile.ErrMessage = err.Error()
 		} else {
 			profile.MergeFBRawProfile(data)
 		}
-		profile.Date = time.Now().Unix()
-		profileCh <- profile
-	}()
+	}
+
+	ch <- profile
 }
 
-// FaceBook Posts
-func GetFBPosts(c *gin.Context) {
+func SearchFBPosts(c *gin.Context, ch chan <- result.Posts) {
 	userId := c.Param("userId")
 	limit := c.DefaultQuery("limit", "10")
-	postCh := make(chan result.Posts)
-	go func() {
-		url := "https://graph.facebook.com/v2.6/" + userId + "/feed?fields=" + PAGE_FEED_FIELDS_ENABLE + "," + PAGE_FEED_CONNECTIONS + "&limit=" + limit + "&access_token=" + FACEBOOK_TOKEN
-		body := GetFBAPI(url)
-		var posts result.Posts
+	url := "https://graph.facebook.com/v2.6/" + userId + "/feed?fields=" + PAGE_FEED_FIELDS_ENABLE + "," + PAGE_FEED_CONNECTIONS + "&limit=" + limit + "&access_token=" + FACEBOOK_TOKEN
+	var posts result.Posts
+
+	body, err := ReqApi(url)
+	if err != nil {
+		posts.ErrCode = ERROR_CODE_API_TIMEOUT
+		posts.ErrMessage = err.Error()
+	} else {
 		var data result.FBRawPosts
-		posts.RawData = body
-		err := json.Unmarshal([]byte(posts.RawData), &data)
+		err = json.Unmarshal([]byte(body), &data)
 		if err != nil {
-			posts.Status = false
+			posts.ErrCode = ERROR_CODE_JSON_ERROR
+			posts.ErrMessage = err.Error()
 		} else {
 			posts.MergeFBRawPosts(data)
 		}
-		posts.Date = time.Now().Unix()
-		postCh <- posts
-
-	}()
-
+	}
+	ch <- posts
 }
 
-// FaceBook user_id
-func GetFBUid(c *gin.Context) {
+func SearchFBUID(c *gin.Context, ch chan <-result.UID) {
 	rawurl := c.PostForm("url")
-	uidCh := make(chan result.UID)
-	go func() {
-		body := GetFBAPI(rawurl)
+	var uid result.UID
+	body, err := ReqApi(rawurl)
+	if err != nil {
+		uid.ErrCode = ERROR_CODE_API_TIMEOUT
+		uid.ErrMessage = err.Error()
+	} else {
 		matcher := util.Matcher(REGEXP_FACEBOOK_PROFILE_ID, body)
-		var result result.UID
-		result.Url = rawurl
-		result.Media = "fb"
+		uid.Url = rawurl
+		uid.Media = "fb"
 		if len(matcher) > 2 {
-			result.Status = true
-			result.Type = matcher[1]
-			result.UserId = matcher[2]
+			uid.Status = true
+			uid.Type = matcher[1]
+			uid.UserId = matcher[2]
 		} else {
-			result.Status = false
+			uid.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+			uid.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
 		}
-		result.Date = time.Now().Unix()
-
-		uidCh <- result
-	}()
+	}
+	ch <- uid
 }

@@ -195,7 +195,7 @@ func GetUid(c *gin.Context) {
 	uidCh := make(chan result.UID)
 	switch apiType {
 	case "fb":
-	//go SearchFBUID(c, uidCh)
+		go SearchFBUID(c, uidCh)
 	case "ig":
 		go SearchIGUID(c, uidCh)
 	case "wb":
