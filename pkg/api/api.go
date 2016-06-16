@@ -197,7 +197,7 @@ func GetUid(c *gin.Context) {
 	case "fb":
 	//go SearchFBUID(c, uidCh)
 	case "ig":
-	//go SearchIGUID(c, uidCh)
+		go SearchIGUID(c, uidCh)
 	case "wb":
 	//go SearchWBUID(c, uidCh)
 	case "wx":

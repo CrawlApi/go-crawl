@@ -1,108 +1,188 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
-	"time"
-	"github.com/llitfkitfk/cirkol/pkg/util"
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
+	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
-func GetIGAPI(url string) string {
-	_, body, errs := reqClient.Timeout(8 * time.Second).Get(url).End()
-	if errs != nil {
-		return ""
+func SearchIGProfile(c *gin.Context, ch chan <- result.Profile) {
+	userId := c.Param("userId")
+	querySrc := c.Query("q")
+	middleCh := make(chan result.Profile, 2)
+
+	go SearchIGProfileForName(querySrc, middleCh)
+	go SearchIGProfileForId(userId, middleCh)
+
+	for i := 0; i < 2; i++ {
+		select {
+		case item := <-middleCh:
+			if item.Status {
+				ch <- item
+			}
+		}
 	}
-	return body
 }
 
-func GetIGUid(c *gin.Context) {
+func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
+	url := "https://www.instagram.com/" + userName + "/"
+	var profile result.Profile
+	body, err := ReqApi(url)
+	if err != nil {
+		profile.ErrCode = ERROR_CODE_API_TIMEOUT
+		profile.ErrMessage = err.Error()
+	} else {
+		profileMat := util.Matcher(REGEX_INSTAGRAM_PROFILE, body)
+		var data result.IGNameRawProfile
+		if len(profileMat) > 2 {
+			profile.RawData = profileMat[1] + profileMat[3]
+			err = json.Unmarshal([]byte(profile.RawData), &data)
+			if err != nil {
+				profile.ErrCode = ERROR_CODE_JSON_ERROR
+				profile.ErrMessage = err.Error()
+			} else {
+				profile.MergeIGNameProfile(data)
+
+			}
+		} else {
+			profile.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+			profile.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
+		}
+	}
+	ch <- profile
+
+}
+
+func SearchIGProfileForId(userId string, ch chan <- result.Profile) {
+	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
+	var profile result.Profile
+	body, err := ReqApi(url)
+	if err != nil {
+		profile.ErrCode = ERROR_CODE_API_TIMEOUT
+		profile.ErrMessage = err.Error()
+	} else {
+		var data result.IGIDRawProfile
+		profile.RawData = body
+		err := json.Unmarshal([]byte(profile.RawData), &data)
+		if err != nil {
+			profile.ErrCode = ERROR_CODE_JSON_ERROR
+			profile.ErrMessage = err.Error()
+		} else {
+			profile.MergeIGIDProfile(data)
+		}
+	}
+	ch <- profile
+}
+
+func SearchIGPosts(c *gin.Context, ch chan <- result.Posts) {
+	userId := c.Param("userId")
+	querySrc := c.Query("q")
+	middleCh := make(chan result.Posts, 2)
+
+	go SearchIGPostsForName(querySrc, middleCh)
+	go SearchIGPostsForId(userId, middleCh)
+
+	for i := 0; i < 2; i++ {
+		select {
+		case item := <-middleCh:
+			if item.Status {
+				ch <- item
+			}
+		}
+	}
+}
+
+func SearchIGPostsForName(userName string, ch chan result.Posts) {
+	url := "https://www.instagram.com/" + userName + "/media/"
+	var posts result.Posts
+
+	body, err := ReqApi(url)
+	if err != nil {
+		posts.ErrCode = ERROR_CODE_API_TIMEOUT
+		posts.ErrMessage = err.Error()
+	} else {
+		var data result.IGNameRawPosts
+		err := json.Unmarshal([]byte(body), &data)
+		if err != nil {
+			posts.ErrCode = ERROR_CODE_JSON_ERROR
+			posts.ErrMessage = err.Error()
+		} else {
+			posts.MergeIGNamePosts(data)
+		}
+	}
+	ch <- posts
+
+}
+
+func SearchIGPostsForId(userId string, ch chan result.Posts) {
+	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
+	var posts result.Posts
+	body, err := ReqApi(url)
+	if err != nil {
+		posts.ErrCode = ERROR_CODE_API_TIMEOUT
+		posts.ErrMessage = err.Error()
+	} else {
+		var data result.IGIDRawProfile
+		err := json.Unmarshal([]byte(body), &data)
+		if err != nil {
+			posts.ErrCode = ERROR_CODE_JSON_ERROR
+			posts.ErrMessage = err.Error()
+		} else {
+			userName := data.User.Username
+
+			SearchIGPostsForRegex(userName, ch, &posts)
+
+		}
+	}
+	ch <- posts
+}
+
+func SearchIGPostsForRegex(userName string, ch chan result.Posts, posts *result.Posts) {
+	url := "https://www.instagram.com/" + userName + "/"
+	body, err := ReqApi(url)
+	if err != nil {
+		posts.ErrCode = ERROR_CODE_API_TIMEOUT
+		posts.ErrMessage = err.Error()
+	} else {
+		postsMat := util.Matcher(REGEX_INSTAGRAM_POSTS, body)
+		var data result.IGIDRawPosts
+		if len(postsMat) > 2 {
+
+			jsonData := `{ "nodes": ` + postsMat[2] + "]}"
+
+			err = json.Unmarshal([]byte(jsonData), &data)
+			if err != nil {
+				posts.ErrCode = ERROR_CODE_JSON_ERROR
+				posts.ErrMessage = err.Error()
+			} else {
+				posts.MergeIGIdPosts(data)
+			}
+		} else {
+			posts.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+			posts.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
+		}
+	}
+}
+
+func SearchIGUID(c *gin.Context, ch chan <-result.UID) {
 	rawurl := c.PostForm("url")
-	uidCh := make(chan result.UID)
-	go func() {
-		body := GetIGAPI(rawurl)
+	var uid result.UID
+	body, err := ReqApi(rawurl)
+	if err != nil {
+		uid.ErrCode = ERROR_CODE_API_TIMEOUT
+		uid.ErrMessage = err.Error()
+	} else {
 		matcher := util.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
-		var uid result.UID
 		uid.Url = rawurl
 		uid.Media = "ig"
 		if len(matcher) > 0 {
 			uid.Status = true
 			uid.UserId = matcher[1]
 		} else {
-			uid.Status = false
+			uid.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+			uid.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
 		}
-		uid.Date = time.Now().Unix()
-		uidCh <- uid
-	}()
-
-}
-
-
-
-
-func GetIGPosts(c *gin.Context) {
-	userId := c.Param("userId")
-	postCh := make(chan result.Posts)
-	querySrc := c.Query("q")
-	go getIgPostFromName(querySrc, postCh)
-	go getIgPostFromId(userId, postCh)
-}
-
-func getIgPostFromName(userName string, ch chan result.Posts) {
-	url := "https://www.instagram.com/" + userName + "/media/"
-	body := GetIGAPI(url)
-	var posts result.Posts
-	var data result.IGNameRawPosts
-	posts.RawData = body
-	err := json.Unmarshal([]byte(posts.RawData), &data)
-	if err != nil {
-		posts.Status = false
-	} else {
-		posts.MergeIGNamePosts(data)
 	}
-	posts.Date = time.Now().Unix()
-	ch <- posts
-
-}
-
-func getIgPostFromId(userId string, ch chan result.Posts) {
-	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
-	body := GetIGAPI(url)
-	var data result.IGIDRawProfile
-	err := json.Unmarshal([]byte(body), &data)
-	if err != nil {
-		var result result.Posts
-		result.Status = false
-		ch <- result
-	} else {
-		userName := data.User.Username
-
-		getIgPostFromRegex(userName, ch)
-	}
-
-}
-
-func getIgPostFromRegex(userId string, ch chan result.Posts) {
-	url := "https://www.instagram.com/" + userId + "/"
-	body := GetIGAPI(url)
-	postsMat := util.Matcher(REGEX_INSTAGRAM_POSTS, body)
-
-	var posts result.Posts
-	var data result.IGIDRawPosts
-	if len(postsMat) > 2 {
-
-		posts.RawData = `{ "nodes": ` + postsMat[2] + "]}"
-
-		err := json.Unmarshal([]byte(posts.RawData), &data)
-		if err != nil {
-			posts.Status = false
-		} else {
-			posts.MergeIGIdPosts(data)
-		}
-	} else {
-		posts.Status = false
-	}
-
-	ch <- posts
-
+	ch <- uid
 }
