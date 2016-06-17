@@ -9,25 +9,17 @@ import (
 
 func SearchFBProfile(c *gin.Context, ch chan <- result.Profile) {
 	userId := c.Param("userId")
+
 	url := "https://graph.facebook.com/v2.6/" + userId + "?fields=" + PAGE_PROFILE_FIELDS_ENABLE + "&access_token=" + FACEBOOK_TOKEN
+	body := GetApi(url, ch)
+
 	var profile result.Profile
-
-	body, err := ReqApi(url)
-	if err != nil {
-		profile.ErrCode = ERROR_CODE_API_TIMEOUT
-		profile.ErrMessage = err.Error()
-	} else {
-		var data result.FBRawProfile
-		profile.RawData = body
-		err = json.Unmarshal([]byte(profile.RawData), &data)
-		if err != nil {
-			profile.ErrCode = ERROR_CODE_JSON_ERROR
-			profile.ErrMessage = err.Error()
-		} else {
-			profile.MergeFBRawProfile(data)
-		}
-	}
-
+	var data result.FBRawProfile
+	profile.UserId = userId
+	profile.Website = url
+	profile.RawData = body
+	ParseJson(profile.RawData, &data, ch)
+	profile.MergeFBRawProfile(data)
 	ch <- profile
 }
 

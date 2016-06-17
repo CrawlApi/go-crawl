@@ -73,15 +73,14 @@ func ReqApi(url string) (string, error) {
 	return body, nil
 }
 
-func ParseJson(data string, v interface{}, ch chan<- result.Profile) {
-	err := json.Unmarshal([]byte(data), v)
-	if err == nil {
+func ParseJson(src string, v interface{}, ch chan<- result.Profile) {
+	err := json.Unmarshal([]byte(src), v)
+	if err != nil {
 		ch <- result.Profile{
-			RawData:    data,
+			RawData:    src,
 			ErrCode:    ERROR_CODE_JSON_ERROR,
 			ErrMessage: err.Error(),
 		}
-		log.Println(err.Error())
 	}
 }
 

@@ -8,11 +8,14 @@ import (
 
 func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
 	userId := c.Param("userId")
-	var profile result.Profile
+
 	url := "http://mapi.weibo.com/2/profile?gsid=_&c=&s=&user_domain=" + userId
 	body := GetApi(url, ch)
+	var profile result.Profile
+	profile.UserId = userId
 	profile.Website = url
 	profile.RawData = body
+
 	var data result.WBRawProfile
 	ParseJson(profile.RawData, &data, ch)
 	profile.MergeWBRawProfile(data)

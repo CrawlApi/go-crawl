@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+	"html"
 )
 
 const (
@@ -14,10 +15,23 @@ const (
 	ERROR_MSG_URL_TYPE_NOT_FOUND = "URL Type Not Found"
 )
 
+func MatchString(length int, expr string, src string) string {
+	r, _ := regexp.Compile(expr)
+	matcher := r.FindStringSubmatch(src)
+	if len(matcher) > length {
+		return matcher[length + 1]
+	}
+	return ""
+}
+
 func Matcher(expr string, s string) []string {
 	r, _ := regexp.Compile(expr)
 	matcher := r.FindStringSubmatch(s)
 	return matcher
+}
+
+func DecodeString(src string) string {
+	return html.UnescapeString(src)
 }
 
 func ToString(v interface{}) string {

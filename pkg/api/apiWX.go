@@ -4,47 +4,22 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
-	"html"
 	"encoding/json"
 )
 
 func SearchWXProfile(c *gin.Context, ch chan <- result.Profile) {
 	userId := c.Param("userId")
 	url := "http://weixin.sogou.com/weixin?type=1&query=" + userId + "&ie=utf8&_sug_=n&_sug_type_="
+	body := GetApi(url, ch)
+
 	var profile result.Profile
-	body, err := ReqApi(url)
-	if err != nil {
-		profile.ErrCode = ERROR_CODE_API_TIMEOUT
-		profile.ErrMessage = err.Error()
-	}
-	logoMat := util.Matcher(REGEXP_WEIXIN_LOGO, body)
-	featureMat := util.Matcher(REGEXP_WEIXIN_FEATURE, body)
-	urlMat := util.Matcher(REGEXP_WEIXIN_URL, body)
-
 	profile.UserId = userId
+	profile.RawData = body
+	profile.Website = util.DecodeString(util.MatchString(0, REGEXP_WEIXIN_URL, body))
+	profile.Avatar = util.MatchString(0, REGEXP_WEIXIN_LOGO, body)
+	profile.About = util.MatchString(1, REGEXP_WEIXIN_FEATURE, body)
 
-	if len(urlMat) > 0 {
-		profile.Website = urlMat[1]
-	} else {
-		profile.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-		profile.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
-	}
-
-	if len(logoMat) > 0 {
-		profile.Avatar = logoMat[1]
-	} else {
-		profile.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-		profile.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
-	}
-
-	if len(featureMat) > 1 {
-		profile.About = featureMat[2]
-	} else {
-		profile.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-		profile.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
-	}
 	profile.Status = true
-
 	ch <- profile
 }
 
@@ -66,7 +41,7 @@ func SearchWXPosts(c *gin.Context, ch chan <- result.Posts) {
 				postMat := util.Matcher(REGEXP_WEIXIN_POSTS, postBody)
 				if len(postMat) > 0 {
 
-					jsonStr := html.UnescapeString(postMat[1])
+					jsonStr := util.DecodeString(postMat[1])
 					var data result.WXRawPosts
 					err = json.Unmarshal([]byte(jsonStr), &data)
 					if err != nil {

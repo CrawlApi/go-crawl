@@ -28,28 +28,20 @@ func SearchIGProfile(c *gin.Context, ch chan <- result.Profile) {
 func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
 	url := "https://www.instagram.com/" + userName + "/"
 	var profile result.Profile
-	body, err := ReqApi(url)
-	if err != nil {
-		profile.ErrCode = ERROR_CODE_API_TIMEOUT
-		profile.ErrMessage = err.Error()
-	} else {
-		profileMat := util.Matcher(REGEX_INSTAGRAM_PROFILE, body)
-		var data result.IGNameRawProfile
-		if len(profileMat) > 2 {
-			profile.RawData = profileMat[1] + profileMat[3]
-			err = json.Unmarshal([]byte(profile.RawData), &data)
-			if err != nil {
-				profile.ErrCode = ERROR_CODE_JSON_ERROR
-				profile.ErrMessage = err.Error()
-			} else {
-				profile.MergeIGNameProfile(data)
+	body := GetApi(url, ch)
+	profileMat := util.Matcher(REGEX_INSTAGRAM_PROFILE, body)
+	var data result.IGNameRawProfile
 
-			}
-		} else {
-			profile.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-			profile.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
-		}
+	if len(profileMat) > 2 {
+		profile.RawData = profileMat[1] + profileMat[3]
+		ParseJson(profile.RawData, &data, ch)
+		profile.MergeIGNameProfile(data)
+
+	} else {
+		profile.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+		profile.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
 	}
+
 	ch <- profile
 
 }
@@ -57,21 +49,14 @@ func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
 func SearchIGProfileForId(userId string, ch chan <- result.Profile) {
 	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
 	var profile result.Profile
-	body, err := ReqApi(url)
-	if err != nil {
-		profile.ErrCode = ERROR_CODE_API_TIMEOUT
-		profile.ErrMessage = err.Error()
-	} else {
-		var data result.IGIDRawProfile
-		profile.RawData = body
-		err := json.Unmarshal([]byte(profile.RawData), &data)
-		if err != nil {
-			profile.ErrCode = ERROR_CODE_JSON_ERROR
-			profile.ErrMessage = err.Error()
-		} else {
-			profile.MergeIGIDProfile(data)
-		}
-	}
+	body := GetApi(url, ch)
+
+	var data result.IGIDRawProfile
+	profile.UserId = userId
+	profile.Website = url
+	profile.RawData = body
+	ParseJson(profile.RawData, &data, ch)
+	profile.MergeIGIDProfile(data)
 	ch <- profile
 }
 
@@ -165,7 +150,7 @@ func SearchIGPostsForRegex(userName string, ch chan result.Posts, posts *result.
 	}
 }
 
-func SearchIGUID(c *gin.Context, ch chan <-result.UID) {
+func SearchIGUID(c *gin.Context, ch chan <- result.UID) {
 	rawurl := c.PostForm("url")
 	var uid result.UID
 	body, err := ReqApi(rawurl)
