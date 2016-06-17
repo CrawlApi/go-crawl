@@ -11,14 +11,14 @@ func SearchFBProfile(c *gin.Context, ch chan <- result.Profile) {
 	userId := c.Param("userId")
 
 	url := "https://graph.facebook.com/v2.6/" + userId + "?fields=" + PAGE_PROFILE_FIELDS_ENABLE + "&access_token=" + FACEBOOK_TOKEN
-	body := GetApi(url, ch)
+	body := GetProfileApi(url, ch)
 
 	var profile result.Profile
 	var data result.FBRawProfile
 	profile.UserId = userId
 	profile.Website = url
 	profile.RawData = body
-	ParseJson(profile.RawData, &data, ch)
+	ParseProfileJson(profile.RawData, &data, ch)
 	profile.MergeFBRawProfile(data)
 	ch <- profile
 }

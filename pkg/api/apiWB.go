@@ -10,14 +10,14 @@ func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
 	userId := c.Param("userId")
 
 	url := "http://mapi.weibo.com/2/profile?gsid=_&c=&s=&user_domain=" + userId
-	body := GetApi(url, ch)
+	body := GetProfileApi(url, ch)
 	var profile result.Profile
 	profile.UserId = userId
 	profile.Website = url
 	profile.RawData = body
 
 	var data result.WBRawProfile
-	ParseJson(profile.RawData, &data, ch)
+	ParseProfileJson(profile.RawData, &data, ch)
 	profile.MergeWBRawProfile(data)
 	ch <- profile
 }
