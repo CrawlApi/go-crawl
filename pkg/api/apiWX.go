@@ -42,23 +42,14 @@ func SearchWXPosts(c *gin.Context, ch chan <- result.Posts) {
 
 func SearchWXUID(c *gin.Context, ch chan <-result.UID) {
 	rawurl := c.PostForm("url")
-	var uid result.UID
-	body, err := ReqApi(rawurl)
-	if err != nil {
-		uid.ErrCode = ERROR_CODE_API_TIMEOUT
-		uid.ErrMessage = err.Error()
-	} else {
-		matcher := util.Matcher(REGEXP_WEIXIN_PROFILE_ID, body)
 
-		uid.Url = rawurl
-		uid.Media = "wx"
-		if len(matcher) > 0 {
-			uid.Status = true
-			uid.UserId = matcher[1]
-		} else {
-			uid.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-			uid.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
-		}
-	}
+	body := GetUidApi(rawurl, ch)
+
+	var uid result.UID
+	uid.Url = rawurl
+	uid.Media = "wx"
+	uid.UserId = MatchStrUidCh(0, REGEXP_WEIXIN_PROFILE_ID, body, ch)
+	uid.Status = true
+
 	ch <- uid
 }

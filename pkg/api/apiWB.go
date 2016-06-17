@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
-	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
 func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
@@ -46,22 +45,12 @@ func SearchWBPosts(c *gin.Context, ch chan <- result.Posts) {
 func SearchWBUID(c *gin.Context, ch chan <-result.UID) {
 	rawurl := c.PostForm("url")
 	var uid result.UID
-	body, err := ReqApi(rawurl)
-	if err != nil {
-		uid.ErrCode = ERROR_CODE_API_TIMEOUT
-		uid.ErrMessage = err.Error()
-	} else {
-		matcher := util.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
-		uid.Url = rawurl
-		uid.Media = "wb"
-		if len(matcher) > 1 {
-			uid.Status = true
-			uid.UserId = matcher[1]
-		} else {
-			uid.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-			uid.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
-		}
-	}
+	body := GetUidApi(rawurl, ch)
+
+	uid.Url = rawurl
+	uid.Media = "wb"
+	uid.UserId = MatchStrUidCh(0, REGEXP_WEIBO_PROFILE_ID, body, ch)
+	uid.Status = true
 	ch <- uid
 }
 
