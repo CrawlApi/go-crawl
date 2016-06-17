@@ -140,6 +140,7 @@ func GetPosts(c *gin.Context) {
 	case "ig":
 		go SearchIGPosts(c, pCh)
 	case "wb":
+		go SearchWBPosts(c, pCh)
 	case "wx":
 		go SearchWXPosts(c, pCh)
 	default:

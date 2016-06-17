@@ -11,6 +11,8 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"strconv"
+	"os"
+	"os/signal"
 )
 
 var tokenCh chan string
@@ -40,14 +42,15 @@ func main() {
 	//RegexpDemo()
 	//GoRoutine()
 	//WaitGroupDemo()
-	//RequestDemo()
+	RequestDemo()
 	//MongoQuery()
 
-	t, err := time.Parse(time.RFC3339Nano, "2016-06-15T18:51:33+0000")
-	if err != nil {
-		log.Println(err)
-	}
-	log.Println(t)
+	//t, err := time.Parse("2006-01-02T15:04:05", "2016-02-01T12:01:03")
+	//if err != nil {
+	//	log.Println(err)
+	//}
+	//log.Println(t)
+
 }
 func MongoQuery() {
 	session, err := mgo.Dial("192.168.20.24:27000")
@@ -86,8 +89,20 @@ func MongoQuery() {
 	//fmt.Println("Phone:", result.)
 }
 func RequestDemo() {
-	response, _, _ := gorequest.New().Get("http://it-ebooks.info/book/1464606901/").End()
-	log.Println(response.Request.URL.Path)
+	agent := gorequest.New()
+	go func() {
+		for {
+			response, _, _ := agent.Get("http://localhost:10086/api/wb/profile/1732447702").End()
+			log.Println(response.Header)
+		}
+	}()
+
+	handleSignals()
+}
+func handleSignals() {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, os.Kill)
+	<-c
 }
 func URLTest() {
 	rawurl := "http:/www.facebook.com/"

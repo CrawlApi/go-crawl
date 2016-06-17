@@ -32,6 +32,27 @@ func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
 	ch <- profile
 }
 
+func SearchWBPosts(c *gin.Context, ch chan <- result.Posts) {
+
+	//url := "https://www.instagram.com/" + "" + "/"
+	//var posts result.Posts
+	//urlCh := make(chan string)
+	//SearchApiData(url, &posts)
+
+	//select {
+	//case body := <- urlCh:
+	//
+	//}
+	//postsMat := util.Matcher(REGEX_INSTAGRAM_POSTS, body)
+	//if len(postsMat) > 2 {
+	//
+	//} else {
+	//	posts.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+	//	posts.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
+	//}
+
+}
+
 func SearchWBUID(c *gin.Context, ch chan <-result.UID) {
 	rawurl := c.PostForm("url")
 	var uid result.UID
@@ -53,3 +74,4 @@ func SearchWBUID(c *gin.Context, ch chan <-result.UID) {
 	}
 	ch <- uid
 }
+
