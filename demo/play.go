@@ -93,7 +93,7 @@ func RequestDemo() {
 	go func() {
 		for {
 			response, _, _ := agent.Get("http://localhost:10086/api/wb/profile/1732447702").End()
-			log.Println(response.Header)
+			log.Println(response.Body)
 		}
 	}()
 
