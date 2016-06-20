@@ -22,7 +22,8 @@ func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
 }
 
 func SearchWBPosts(c *gin.Context, ch chan <- result.Posts) {
-
+	//userId := c.Param("userId")
+	//querySrc := c.Query("q")
 	//url := "https://www.instagram.com/" + "" + "/"
 	//var posts result.Posts
 	//urlCh := make(chan string)

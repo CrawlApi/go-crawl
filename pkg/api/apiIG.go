@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
@@ -71,103 +70,76 @@ func SearchIGPosts(c *gin.Context, ch chan <- result.Posts) {
 	for i := 0; i < 2; i++ {
 		select {
 		case item := <-middleCh:
-			if item.Status {
+			if i == 1 {
 				ch <- item
+			} else {
+				if item.Status {
+					ch <- item
+				}
 			}
+
 		}
 	}
 }
 
 func SearchIGPostsForName(userName string, ch chan result.Posts) {
 	url := "https://www.instagram.com/" + userName + "/media/"
-	var posts result.Posts
 
-	body, err := ReqApi(url)
-	if err != nil {
-		posts.ErrCode = ERROR_CODE_API_TIMEOUT
-		posts.ErrMessage = err.Error()
-	} else {
-		var data result.IGNameRawPosts
-		err := json.Unmarshal([]byte(body), &data)
-		if err != nil {
-			posts.ErrCode = ERROR_CODE_JSON_ERROR
-			posts.ErrMessage = err.Error()
-		} else {
-			posts.MergeIGNamePosts(data)
-		}
-	}
+	body := GetPostsApi(url, ch)
+
+	var data result.IGNameRawPosts
+	ParsePostsJson(body, &data, ch)
+
+	var posts result.Posts
+	posts.MergeIGNamePosts(data)
 	ch <- posts
 
 }
 
 func SearchIGPostsForId(userId string, ch chan result.Posts) {
 	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
+
+	body := GetPostsApi(url, ch)
+
+	var data result.IGIDRawProfile
+	ParsePostsJson(body, &data, ch)
+	userName := data.User.Username
+
 	var posts result.Posts
-	body, err := ReqApi(url)
-	if err != nil {
-		posts.ErrCode = ERROR_CODE_API_TIMEOUT
-		posts.ErrMessage = err.Error()
-	} else {
-		var data result.IGIDRawProfile
-		err := json.Unmarshal([]byte(body), &data)
-		if err != nil {
-			posts.ErrCode = ERROR_CODE_JSON_ERROR
-			posts.ErrMessage = err.Error()
-		} else {
-			userName := data.User.Username
+	SearchIGPostsForRegex(userName, ch, &posts)
 
-			SearchIGPostsForRegex(userName, ch, &posts)
-
-		}
-	}
 	ch <- posts
 }
 
 func SearchIGPostsForRegex(userName string, ch chan result.Posts, posts *result.Posts) {
 	url := "https://www.instagram.com/" + userName + "/"
-	body, err := ReqApi(url)
-	if err != nil {
-		posts.ErrCode = ERROR_CODE_API_TIMEOUT
-		posts.ErrMessage = err.Error()
+	body := GetPostsApi(url, ch)
+
+	postsMat := util.Matcher(REGEX_INSTAGRAM_POSTS, body)
+	var data result.IGIDRawPosts
+	if len(postsMat) > 1 {
+
+		jsonData := `{ "nodes": ` + postsMat[2] + "]}"
+
+		ParsePostsJson(jsonData, &data, ch)
+
+		posts.MergeIGIdPosts(data)
+
 	} else {
-		postsMat := util.Matcher(REGEX_INSTAGRAM_POSTS, body)
-		var data result.IGIDRawPosts
-		if len(postsMat) > 2 {
-
-			jsonData := `{ "nodes": ` + postsMat[2] + "]}"
-
-			err = json.Unmarshal([]byte(jsonData), &data)
-			if err != nil {
-				posts.ErrCode = ERROR_CODE_JSON_ERROR
-				posts.ErrMessage = err.Error()
-			} else {
-				posts.MergeIGIdPosts(data)
-			}
-		} else {
-			posts.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-			posts.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
-		}
+		posts.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
+		posts.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
 	}
+
 }
 
 func SearchIGUID(c *gin.Context, ch chan <- result.UID) {
 	rawurl := c.PostForm("url")
+	body := GetUidApi(rawurl, ch)
+
 	var uid result.UID
-	body, err := ReqApi(rawurl)
-	if err != nil {
-		uid.ErrCode = ERROR_CODE_API_TIMEOUT
-		uid.ErrMessage = err.Error()
-	} else {
-		matcher := util.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
-		uid.Url = rawurl
-		uid.Media = "ig"
-		if len(matcher) > 0 {
-			uid.Status = true
-			uid.UserId = matcher[1]
-		} else {
-			uid.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-			uid.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
-		}
-	}
+	uid.Url = rawurl
+	uid.Media = "ig"
+	uid.UserId = MatchStrUidCh(0, REGEX_INSTAGRAM_PROFILE_ID, body, ch)
+	uid.Status = true
 	ch <- uid
 }

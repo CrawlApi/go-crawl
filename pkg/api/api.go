@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/llitfkitfk/cirkol/pkg/util"
@@ -206,14 +205,6 @@ func MatchStrNoCh(length int, expr string, src string) string {
 func GetApi(url string) (string, []error) {
 	_, body, errs := reqClient.Timeout(10 * time.Second).Set("accept-language", "en-US").Get(url).End()
 	return body, errs
-}
-
-func ReqApi(url string) (string, error) {
-	_, body, errs := reqClient.Timeout(10 * time.Second).Set("accept-language", "en-US").Get(url).End()
-	if errs != nil {
-		return "", errors.New(ERROR_MSG_API_TIMEOUT)
-	}
-	return body, nil
 }
 
 func UpdateToken(c *gin.Context) {

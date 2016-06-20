@@ -42,15 +42,23 @@ func main() {
 	//RegexpDemo()
 	//GoRoutine()
 	//WaitGroupDemo()
-	RequestDemo()
+	//RequestDemo()
 	//MongoQuery()
 
-	//t, err := time.Parse("2006-01-02T15:04:05", "2016-02-01T12:01:03")
-	//if err != nil {
-	//	log.Println(err)
-	//}
-	//log.Println(t)
+	//TimeParse()
+	Decode()
 
+}
+func Decode() {
+	url := "http://mp.weixin.qq.com/s?src=3&amp;timestamp=1466051965&amp;ver=1&amp;signature=1YSeL*0wzSX-IYC-oABCW6*rKniaRYV7Zh7FJ1lQnl5BAFJwaJD7Jptz5PgLwCFMbZGVIX-ajeuTRbou*h4umb4QGEj0ImG6SsWjqdH1g2EST9nrHNqUKD9U3UBWhh1vfkjydHYqvhgHSeRns-oWroFmmfq76oxOiFKH1DrniIw="
+	fmt.Printf("%s", url)
+}
+func TimeParse() {
+	t, err := time.Parse("2006-01-02T15:04:05", "2016-02-01T12:01:03")
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(t)
 }
 func MongoQuery() {
 	session, err := mgo.Dial("192.168.20.24:27000")
