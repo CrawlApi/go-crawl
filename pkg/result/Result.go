@@ -187,6 +187,30 @@ func (p *Profile) MergeWBRawProfile(data WBRawProfile) {
 	p.Status = true
 }
 
+func (p *Posts) MergeWBRawPosts(data WBRawPosts) {
+	for _, node := range data.CardGroup {
+		var data post
+		data.ID = node.Mblog.Bid
+
+		data.CreatedAt = node.Mblog.CreatedAt
+		//data.UpdatedAt = node.Mblog
+		data.ShareCount = node.Mblog.RepostsCount
+		data.LikeCount = node.Mblog.AttitudesCount
+		data.CommentCount = node.Mblog.CommentsCount
+		//data.ViewCount
+		//data.ContentType        =
+		//data.ContentCaption	=
+		data.ContentBody = node.Mblog.Text
+		data.ContentFullPicture = node.Mblog.ThumbnailPic
+		data.PermalinkUrl = "http://m.weibo.cn/" + util.Int2Str(node.Mblog.User.ID) + "/" + node.Mblog.Bid
+		data.HasComment = true
+		data.RawData = util.JsonToString(json.Marshal(node))
+		data.Date = time.Now().Unix()
+		p.Items = append(p.Items, data)
+	}
+	p.Status = true
+}
+
 func (p *Posts) MergeWXRawPosts(rawPosts WXRawPosts) {
 	for _, item := range rawPosts.List {
 		var data post

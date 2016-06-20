@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/result"
+	"log"
+	"strings"
 )
 
 func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
@@ -22,24 +24,26 @@ func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
 }
 
 func SearchWBPosts(c *gin.Context, ch chan <- result.Posts) {
-	//userId := c.Param("userId")
-	//querySrc := c.Query("q")
-	//url := "https://www.instagram.com/" + "" + "/"
-	//var posts result.Posts
-	//urlCh := make(chan string)
-	//SearchApiData(url, &posts)
+	userId := c.Param("userId")
+	log.Println(userId)
+	querySrc := c.Query("q")
 
-	//select {
-	//case body := <- urlCh:
-	//
-	//}
-	//postsMat := util.Matcher(REGEX_INSTAGRAM_POSTS, body)
-	//if len(postsMat) > 2 {
-	//
-	//} else {
-	//	posts.ErrCode = ERROR_CODE_REGEX_MISS_MATCHED
-	//	posts.ErrMessage = ERROR_MSG_REGEX_MISS_MATCHED
-	//}
+	url := "http://m.weibo.cn/d/" + querySrc
+	body := GetPostsApi(url, ch)
+	userPostsId := MatchStrPostCh(0, REGEXP_WEIBO_POSTS_ID, body, ch)
+	log.Printf(userPostsId)
+	urlPosts := "http://m.weibo.cn/page/tpl?containerid=" + userPostsId + "_-_WEIBO_SECOND_PROFILE_WEIBO&itemid=&title=全部微博"
+	postsRawDataBody := GetPostsApi(urlPosts, ch)
+
+	postsRawData := MatchStrPostCh(1, REGEXP_WEIBO_POSTS, postsRawDataBody, ch)
+
+	postsRawData = "{" + strings.Replace(postsRawData, "(MISSING)", "", -1)
+	var data result.WBRawPosts
+	ParsePostsJson(postsRawData, &data, ch)
+	var posts result.Posts
+	posts.MergeWBRawPosts(data)
+
+	ch <- posts
 
 }
 

@@ -158,3 +158,8 @@ type FBRawPosts struct {
 		     Previous string `json:"previous"`
 	     } `json:"paging"`
 }
+
+type FBRawUid struct {
+	
+
+}

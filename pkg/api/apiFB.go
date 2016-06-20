@@ -38,7 +38,31 @@ func SearchFBPosts(c *gin.Context, ch chan <- result.Posts) {
 }
 
 func SearchFBUID(c *gin.Context, ch chan <-result.UID) {
+
+
 	rawurl := c.PostForm("url")
+	//name := c.PostForm("name")
+
+	middleCh := make(chan result.UID)
+	//go SearchFBUIDForName(name, middleCh)
+	go SearchFBUIDForUrl(rawurl, middleCh)
+
+	for i := 0; i < 1; i++ {
+		select {
+		case item := <-middleCh:
+			if i == 1 {
+				ch <- item
+			} else {
+				if item.Status {
+					ch <- item
+				}
+			}
+
+		}
+	}
+
+}
+func SearchFBUIDForUrl(rawurl string, ch chan result.UID) {
 	body := GetUidApi(rawurl, ch)
 	matcher := util.Matcher(REGEXP_FACEBOOK_PROFILE_ID, body)
 
@@ -55,4 +79,15 @@ func SearchFBUID(c *gin.Context, ch chan <-result.UID) {
 	}
 
 	ch <- uid
+}
+func SearchFBUIDForName(userName string, ch chan result.UID)  {
+	//url := "https://graph.facebook.com/v2.6/" + userName + "?fields=id"
+	//
+	//body := GetUidApi(url, ch)
+	//
+	//var data result.FBRawUid
+	//
+	//
+	//var uid result.UID
+	//ch <- uid
 }

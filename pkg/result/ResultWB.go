@@ -108,4 +108,98 @@ type WBRawProfile struct {
 		     } `json:"userInfo"`
 }
 
+type WBRawPosts struct {
+	CardGroup []struct {
+		CardType int `json:"card_type"`
+		Mblog    struct {
+				 AttitudesCount   int    `json:"attitudes_count"`
+				 AttitudesStatus  int    `json:"attitudes_status"`
+				 Bid              string `json:"bid"`
+				 BizFeature       int    `json:"biz_feature"`
+				 BmiddlePic       string `json:"bmiddle_pic"`
+				 CommentsCount    int    `json:"comments_count"`
+				 CreatedAt        string `json:"created_at"`
+				 CreatedTimestamp int    `json:"created_timestamp"`
+				 ExtendInfo       struct {
+							  WeiboCamera struct {
+									      C []string `json:"c"`
+								      } `json:"weibo_camera"`
+						  } `json:"extend_info"`
+				 Favorited    bool          `json:"favorited"`
+				 HotWeiboTags []interface{} `json:"hot_weibo_tags"`
+				 ID           int           `json:"id"`
+				 Idstr        string        `json:"idstr"`
+				 IsLongText   bool          `json:"isLongText"`
+				 LikeCount    int           `json:"like_count"`
+				 Mblogtype    int           `json:"mblogtype"`
+				 Mid          string        `json:"mid"`
+				 Mlevel       int           `json:"mlevel"`
+				 OriginalPic  string        `json:"original_pic"`
+				 PageType     int           `json:"page_type"`
+				 PicStatus    string        `json:"picStatus"`
+				 PicIds       []string      `json:"pic_ids"`
+				 Pics         []struct {
+					 Geo struct {
+						     Byte   int  `json:"byte"`
+						     Croped bool `json:"croped"`
+						     Height int  `json:"height"`
+						     Width  int  `json:"width"`
+					     } `json:"geo"`
+					 Pid  string `json:"pid"`
+					 Size string `json:"size"`
+					 URL  string `json:"url"`
+				 } `json:"pics"`
+				 PositiveRecomFlag int           `json:"positive_recom_flag"`
+				 RepostsCount      int           `json:"reposts_count"`
+				 Source            string        `json:"source"`
+				 SourceAllowclick  int           `json:"source_allowclick"`
+				 SourceType        int           `json:"source_type"`
+				 Text              string        `json:"text"`
+				 TextLength        int           `json:"textLength"`
+				 TextTagTips       []interface{} `json:"text_tag_tips"`
+				 ThumbnailPic      string        `json:"thumbnail_pic"`
+				 TopicStruct       []struct {
+					 TopicTitle string `json:"topic_title"`
+					 TopicURL   string `json:"topic_url"`
+				 } `json:"topic_struct"`
+				 User struct {
+							  Description string `json:"description"`
+							  FansNum     string `json:"fansNum"`
+							  FollowMe    bool   `json:"follow_me"`
+							  Following   bool   `json:"following"`
+							  Gender      string `json:"gender"`
+							  H5icon      struct {
+									      Main  string   `json:"main"`
+									      Other []string `json:"other"`
+								      } `json:"h5icon"`
+							  ID              int         `json:"id"`
+							  Ismember        int         `json:"ismember"`
+							  Mbtype          int         `json:"mbtype"`
+							  ProfileImageURL string      `json:"profile_image_url"`
+							  ProfileURL      string      `json:"profile_url"`
+							  Remark          string      `json:"remark"`
+							  ScreenName      string      `json:"screen_name"`
+							  StatusesCount   int         `json:"statuses_count"`
+							  Valid           interface{} `json:"valid"`
+							  Verified        bool        `json:"verified"`
+							  VerifiedReason  string      `json:"verified_reason"`
+							  VerifiedType    int         `json:"verified_type"`
+						  } `json:"user"`
+				 UserType int `json:"userType"`
+				 Visible  struct {
+							  ListID int `json:"list_id"`
+							  Type   int `json:"type"`
+						  } `json:"visible"`
+			 } `json:"mblog"`
+	} `json:"card_group"`
+	LoadMore       bool   `json:"loadMore"`
+	MaxPage        int    `json:"maxPage"`
+	ModType        string `json:"mod_type"`
+	NextCursor     string `json:"next_cursor"`
+	Page           int    `json:"page"`
+	PreviousCursor string `json:"previous_cursor"`
+	URL            string `json:"url"`
+}
+
+
 

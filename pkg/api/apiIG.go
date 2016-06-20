@@ -17,8 +17,12 @@ func SearchIGProfile(c *gin.Context, ch chan <- result.Profile) {
 	for i := 0; i < 2; i++ {
 		select {
 		case item := <-middleCh:
-			if item.Status {
+			if i == 1 {
 				ch <- item
+			} else {
+				if item.Status {
+					ch <- item
+				}
 			}
 		}
 	}

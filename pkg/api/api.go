@@ -39,6 +39,9 @@ const (
 	REGEXP_WEIXIN_POSTS = `var msgList = '(\S+)';`
 
 	REGEXP_WEIBO_PROFILE_ID = `uid=(\d+)`
+	REGEXP_WEIBO_POSTS_ID = `itemid":"(\d+)`
+	REGEXP_WEIBO_POSTS = `render_data (...+)mod\\/pagelist",(...+)]},'common(...+);</script><script src=`
+	REGEXP_WEIBO_POSTS_2 = `mod\\/pagelist",(...+)]},'common`
 )
 
 const (
