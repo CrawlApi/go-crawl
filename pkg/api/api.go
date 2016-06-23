@@ -23,6 +23,7 @@ const (
 
 	PAGE_FEED_FIELDS_ENABLE = "actions,admin_creator,application,call_to_action,child_attachments,caption,comments_mirroring_domain,coordinates,created_time,description,event,expanded_height,expanded_width,feed_targeting,from,full_picture,height,icon,id,is_expired,is_crossposting_eligible,instagram_eligibility,is_hidden,is_instagram_eligible,is_popular,is_published,is_spherical,link,message,message_tags,name,object_id,parent_id,permalink_url,picture,place,privacy,promotion_status,properties,scheduled_publish_time,shares,source,status_type,story,story_tags,subscribed,target,targeting,timeline_visibility,type,updated_time,via,width,with_tags"
 	PAGE_FEED_CONNECTIONS = "comments.limit(1).summary(true),likes.limit(1).summary(true)"
+	PAGE_FEED_CONNECTIONS_DISABLE = "sharedposts.summary(true),insights,attachments"
 	PAGE_FEED_FIELDS_DISABLE = "allowed_advertising_objectives,entities,implicit_place,is_app_share"
 
 	// INSTAGRAM CONST

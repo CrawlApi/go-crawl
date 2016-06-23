@@ -15,6 +15,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"reflect"
+	"github.com/llitfkitfk/cirkol/pkg/models"
 )
 
 var tokenCh chan string
@@ -49,7 +51,17 @@ func main() {
 
 	//TimeParse()
 	//Decode()
-	jsonParse()
+	//jsonParse()
+	var rawData models.FBRawProfile
+	rawData.Name = "fb"
+
+	reflectDemo(rawData)
+
+}
+func reflectDemo(v interface{}) {
+	log.Println(reflect.TypeOf(v).Name())
+
+
 
 }
 func jsonParse() {
