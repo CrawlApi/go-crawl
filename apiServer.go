@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/common"
-	"log"
 	"github.com/llitfkitfk/cirkol/pkg/routers"
+	"log"
 )
 
 func main() {

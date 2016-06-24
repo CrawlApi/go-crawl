@@ -2,7 +2,6 @@ package api
 
 import "github.com/llitfkitfk/cirkol/pkg/result"
 
-
 func MatchStrUidCh(length int, expr string, src string, ch chan<- result.UID) string {
 
 	des := MatchStrNoCh(length, expr, src)
@@ -17,7 +16,7 @@ func MatchStrUidCh(length int, expr string, src string, ch chan<- result.UID) st
 	}
 }
 
-func GetUidApi(url string, ch chan <- result.UID) string {
+func GetUidApi(url string, ch chan<- result.UID) string {
 	body, errs := GetApi(url)
 	if errs != nil {
 		ch <- result.UID{

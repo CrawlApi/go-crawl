@@ -6,7 +6,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
-func SearchWXProfile(c *gin.Context, ch chan <- result.Profile) {
+func SearchWXProfile(c *gin.Context, ch chan<- result.Profile) {
 	userId := c.Param("userId")
 	url := "http://weixin.sogou.com/weixin?type=1&query=" + userId + "&ie=utf8&_sug_=n&_sug_type_="
 	body := GetProfileApi(url, ch)
@@ -22,7 +22,7 @@ func SearchWXProfile(c *gin.Context, ch chan <- result.Profile) {
 	ch <- profile
 }
 
-func SearchWXPosts(c *gin.Context, ch chan <- result.Posts) {
+func SearchWXPosts(c *gin.Context, ch chan<- result.Posts) {
 	userId := c.Param("userId")
 	url := "http://weixin.sogou.com/weixin?type=1&query=" + userId + "&ie=utf8&_sug_=n&_sug_type_="
 	body := GetPostsApi(url, ch)
@@ -40,7 +40,7 @@ func SearchWXPosts(c *gin.Context, ch chan <- result.Posts) {
 	ch <- posts
 }
 
-func SearchWXUID(c *gin.Context, ch chan <-result.UID) {
+func SearchWXUID(c *gin.Context, ch chan<- result.UID) {
 	rawurl := c.PostForm("url")
 
 	body := GetUidApi(rawurl, ch)

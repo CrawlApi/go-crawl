@@ -1,18 +1,36 @@
 package common
 
 import (
-	"time"
-	"strconv"
-	"github.com/gin-gonic/gin"
+	"encoding/json"
 	"fmt"
+	"html"
+	"regexp"
+	"strconv"
+	"time"
 )
 
-const TIMESTAMP_LAYOUT = "2006-01-02T15:04:05+0000"
+const (
+	ERROR_CODE_API_FETCH   = 4001
+	ERROR_CODE_API_TIMEOUT = 4002
+	ERROR_CODE_JSON_ERROR  = 4003
+	//ERROR_CODE_API_MISS_MATCHED = 4001
+	//ERROR_CODE_TIMEOUT = 4004
+	//ERROR_CODE_REGEX_MISS_MATCHED = 4005
+	//ERROR_CODE_URL_TYPE_NOT_FOUND = 4006
 
-func Timer(c *gin.Context) <-chan time.Time {
-	//timeout := Str2Int(c.DefaultQuery("timeout", "5"))
-	return time.After(5 * time.Second)
-}
+	//ERROR_MSG_API_FETCH = "request api timeout"
+	//ERROR_MSG_API_MISS_MATCHED = "no api matched"
+	ERROR_MSG_API_TIMEOUT        = "request api timeout"
+	ERROR_MSG_JSON_ERROR         = "json parse error"
+	ERROR_MSG_WX_POSTS_API_FETCH = "weixin fetch api error"
+	ERROR_MSG_REGEX_MISS_MATCHED = "regex miss matched"
+	//ERROR_MSG_TIMEOUT = "request timeout"
+	//ERROR_MSG_URL_MISS_MATCHED = "url miss matched"
+)
+
+const (
+	TIMESTAMP_LAYOUT = "2006-01-02T15:04:05+0000"
+)
 
 func Str2Int(src string) int {
 	i, err := strconv.Atoi(src)
@@ -31,9 +49,28 @@ func DateFormat(dateStr string) string {
 
 }
 
+func ParseJson(data string, v interface{}) error {
+	return json.Unmarshal([]byte(data), v)
+}
+
+func DecodeString(src string) string {
+	return html.UnescapeString(src)
+}
+
 func JsonToString(data []byte, err error) string {
 	if err != nil {
 		return err.Error()
 	}
 	return string(data)
+}
+
+func Matcher(expr string, s string) []string {
+	r, _ := regexp.Compile(expr)
+	return r.FindStringSubmatch(s)
+
+}
+
+func Timeout(d string) <-chan time.Time {
+	i := time.Duration(Str2Int(d))
+	return time.After(i * time.Second)
 }

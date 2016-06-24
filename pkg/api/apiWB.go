@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
+func SearchWBProfile(c *gin.Context, ch chan<- result.Profile) {
 	userId := c.Param("userId")
 
 	url := "http://mapi.weibo.com/2/profile?gsid=_&c=&s=&user_domain=" + userId
@@ -23,7 +23,7 @@ func SearchWBProfile(c *gin.Context, ch chan <- result.Profile) {
 	ch <- profile
 }
 
-func SearchWBPosts(c *gin.Context, ch chan <- result.Posts) {
+func SearchWBPosts(c *gin.Context, ch chan<- result.Posts) {
 	userId := c.Param("userId")
 	log.Println(userId)
 	querySrc := c.Query("q")
@@ -47,7 +47,7 @@ func SearchWBPosts(c *gin.Context, ch chan <- result.Posts) {
 
 }
 
-func SearchWBUID(c *gin.Context, ch chan <-result.UID) {
+func SearchWBUID(c *gin.Context, ch chan<- result.UID) {
 	rawurl := c.PostForm("url")
 	var uid result.UID
 	body := GetUidApi(rawurl, ch)
@@ -58,4 +58,3 @@ func SearchWBUID(c *gin.Context, ch chan <-result.UID) {
 	uid.Status = true
 	ch <- uid
 }
-

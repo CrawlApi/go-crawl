@@ -9,4 +9,3 @@ func GetIGProfile(c *gin.Context) {
 func GetIGPosts(c *gin.Context) {
 
 }
-

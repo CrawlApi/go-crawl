@@ -1,11 +1,11 @@
 package api
 
 import (
-	"github.com/llitfkitfk/cirkol/pkg/result"
 	"encoding/json"
+	"github.com/llitfkitfk/cirkol/pkg/result"
 )
 
-func GetPostsApi(url string, ch chan <- result.Posts) string {
+func GetPostsApi(url string, ch chan<- result.Posts) string {
 
 	body, errs := GetApi(url)
 	if errs != nil {
@@ -18,7 +18,7 @@ func GetPostsApi(url string, ch chan <- result.Posts) string {
 	return body
 }
 
-func ParsePostsJson(src string, v interface{}, ch chan <- result.Posts) {
+func ParsePostsJson(src string, v interface{}, ch chan<- result.Posts) {
 	err := json.Unmarshal([]byte(src), v)
 	if err != nil {
 		ch <- result.Posts{

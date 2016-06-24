@@ -1,14 +1,14 @@
 package api
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
 	"log"
-	"github.com/gin-gonic/gin"
 )
 
 var (
-	logCh chan interface{}
-	reqClient  *gorequest.SuperAgent
+	logCh     chan interface{}
+	reqClient *gorequest.SuperAgent
 )
 
 func SetupComponent(router *gin.Engine) {

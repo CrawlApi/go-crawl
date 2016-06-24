@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"time"
 	"log"
+	"time"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 	default:
 		fmt.Println("no message received")
 	}
-	log.Println("1 ",time.Since(timer))
+	log.Println("1 ", time.Since(timer))
 	// A non-blocking send works similarly.
 	msg := "hi"
 	time.Sleep(time.Second)
@@ -49,7 +49,7 @@ func main() {
 		fmt.Println("no activity")
 	}
 
-	log.Println("3 ",time.Since(timer))
+	log.Println("3 ", time.Since(timer))
 
 	time.Sleep(time.Second)
 }

@@ -1,9 +1,12 @@
 package models
 
-type WXRawProfile struct  {
-
-
-
+type WXRawProfile struct {
+	UserId  string
+	Name    string
+	RawData string
+	Website string
+	Avatar  string
+	About   string
 }
 type WXRawPosts struct {
 	List []struct {

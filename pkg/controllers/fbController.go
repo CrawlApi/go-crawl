@@ -2,74 +2,26 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/llitfkitfk/cirkol/pkg/data"
 	"github.com/llitfkitfk/cirkol/pkg/common"
-	"net/http"
+	"github.com/llitfkitfk/cirkol/pkg/data"
 )
 
 func GetFBProfile(c *gin.Context) {
-	timer := common.Timer(c)
-	pCh := make(chan Profile)
+	userId := c.Param("userId")
 
-	go fetchFBProfile(c, pCh)
-
-	select {
-	case profile := <-pCh:
-		c.JSON(http.StatusOK, gin.H{
-			"profile": profile,
-		})
-	case <-timer:
-		c.JSON(http.StatusOK, gin.H{
-			"profile": TimeOutProfile(),
-		})
+	repo := &data.FBRepo{
+		Agent: common.GetAgent(),
+		Url:   "https://graph.facebook.com/v2.6/" + userId + "?fields=" + common.PAGE_PROFILE_FIELDS_ENABLE + "&access_token=" + common.GetFBToken(),
 	}
+	GetProfile(c, repo)
 }
 
 func GetFBPosts(c *gin.Context) {
-	timer := common.Timer(c)
-	pCh := make(chan Posts)
-
-	go fetchFBPosts(c, pCh)
-
-	select {
-	case posts := <-pCh:
-		c.JSON(http.StatusOK, gin.H{
-			"posts": posts,
-		})
-	case <-timer:
-		c.JSON(http.StatusOK, gin.H{
-			"posts": TimeOutPosts(),
-		})
+	userId := c.Param("userId")
+	limit := c.DefaultQuery("limit", "10")
+	repo := &data.FBRepo{
+		Agent: common.GetAgent(),
+		Url:   "https://graph.facebook.com/v2.6/" + userId + "/feed?fields=" + common.PAGE_FEED_FIELDS_ENABLE + "," + common.PAGE_FEED_CONNECTIONS + "&limit=" + limit + "&access_token=" + common.GetFBToken(),
 	}
-}
-
-func fetchFBProfile(c *gin.Context, ch chan Profile) {
-	var profile Profile
-
-	repo := data.FBRepo{
-		Agent:common.GetAgent(),
-	}
-	rawData, err := repo.GetRawProfile(c)
-	if err != nil {
-		profile.FetchErr(err)
-		ch <- profile
-		return
-	}
-	profile.ParseRawProfile(rawData)
-	ch <- profile
-}
-
-func fetchFBPosts(c *gin.Context, ch chan Posts) {
-	var posts Posts
-	repo := data.FBRepo{
-		Agent:common.GetAgent(),
-	}
-	rawData, err := repo.GetRawPosts(c)
-	if err != nil {
-		posts.FetchErr(err)
-		ch <- posts
-		return
-	}
-	posts.ParseRawPosts(rawData)
-	ch <- posts
+	GetPosts(c, repo)
 }

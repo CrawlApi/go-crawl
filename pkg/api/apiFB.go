@@ -6,7 +6,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
-func SearchFBProfile(c *gin.Context, ch chan <- result.Profile) {
+func SearchFBProfile(c *gin.Context, ch chan<- result.Profile) {
 	userId := c.Param("userId")
 
 	url := "https://graph.facebook.com/v2.6/" + userId + "?fields=" + PAGE_PROFILE_FIELDS_ENABLE + "&access_token=" + FACEBOOK_TOKEN
@@ -22,7 +22,7 @@ func SearchFBProfile(c *gin.Context, ch chan <- result.Profile) {
 	ch <- profile
 }
 
-func SearchFBPosts(c *gin.Context, ch chan <- result.Posts) {
+func SearchFBPosts(c *gin.Context, ch chan<- result.Posts) {
 	userId := c.Param("userId")
 	limit := c.DefaultQuery("limit", "10")
 	url := "https://graph.facebook.com/v2.6/" + userId + "/feed?fields=" + PAGE_FEED_FIELDS_ENABLE + "," + PAGE_FEED_CONNECTIONS + "&limit=" + limit + "&access_token=" + FACEBOOK_TOKEN
@@ -37,8 +37,7 @@ func SearchFBPosts(c *gin.Context, ch chan <- result.Posts) {
 	ch <- posts
 }
 
-func SearchFBUID(c *gin.Context, ch chan <-result.UID) {
-
+func SearchFBUID(c *gin.Context, ch chan<- result.UID) {
 
 	rawurl := c.PostForm("url")
 	//name := c.PostForm("name")
@@ -80,7 +79,7 @@ func SearchFBUIDForUrl(rawurl string, ch chan result.UID) {
 
 	ch <- uid
 }
-func SearchFBUIDForName(userName string, ch chan result.UID)  {
+func SearchFBUIDForName(userName string, ch chan result.UID) {
 	//url := "https://graph.facebook.com/v2.6/" + userName + "?fields=id"
 	//
 	//body := GetUidApi(url, ch)

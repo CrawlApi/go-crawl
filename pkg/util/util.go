@@ -3,19 +3,17 @@ package util
 import (
 	"errors"
 	"fmt"
+	"html"
 	"regexp"
 	"strconv"
 	"time"
-	"html"
 )
 
 const (
-	REGEX_URL_TYPE = `(facebook|instagram|weixin|weibo)`
-	TIMESTAMP_LAYOUT = "2006-01-02T15:04:05+0000"
+	REGEX_URL_TYPE               = `(facebook|instagram|weixin|weibo)`
+	TIMESTAMP_LAYOUT             = "2006-01-02T15:04:05+0000"
 	ERROR_MSG_URL_TYPE_NOT_FOUND = "URL Type Not Found"
 )
-
-
 
 func Matcher(expr string, s string) []string {
 	r, _ := regexp.Compile(expr)

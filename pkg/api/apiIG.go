@@ -6,7 +6,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
-func SearchIGProfile(c *gin.Context, ch chan <- result.Profile) {
+func SearchIGProfile(c *gin.Context, ch chan<- result.Profile) {
 	userId := c.Param("userId")
 	querySrc := c.Query("q")
 	middleCh := make(chan result.Profile, 2)
@@ -28,7 +28,7 @@ func SearchIGProfile(c *gin.Context, ch chan <- result.Profile) {
 	}
 }
 
-func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
+func SearchIGProfileForName(userName string, ch chan<- result.Profile) {
 	url := "https://www.instagram.com/" + userName + "/"
 	var profile result.Profile
 	body := GetProfileApi(url, ch)
@@ -49,7 +49,7 @@ func SearchIGProfileForName(userName string, ch chan <- result.Profile) {
 
 }
 
-func SearchIGProfileForId(userId string, ch chan <- result.Profile) {
+func SearchIGProfileForId(userId string, ch chan<- result.Profile) {
 	url := "https://i.instagram.com/api/v1/users/" + userId + "/info/"
 	var profile result.Profile
 	body := GetProfileApi(url, ch)
@@ -63,7 +63,7 @@ func SearchIGProfileForId(userId string, ch chan <- result.Profile) {
 	ch <- profile
 }
 
-func SearchIGPosts(c *gin.Context, ch chan <- result.Posts) {
+func SearchIGPosts(c *gin.Context, ch chan<- result.Posts) {
 	userId := c.Param("userId")
 	querySrc := c.Query("q")
 	middleCh := make(chan result.Posts, 2)
@@ -136,7 +136,7 @@ func SearchIGPostsForRegex(userName string, ch chan result.Posts, posts *result.
 
 }
 
-func SearchIGUID(c *gin.Context, ch chan <- result.UID) {
+func SearchIGUID(c *gin.Context, ch chan<- result.UID) {
 	rawurl := c.PostForm("url")
 	body := GetUidApi(rawurl, ch)
 

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/llitfkitfk/cirkol/pkg/result"
 	"github.com/parnurzeal/gorequest"
 	"gopkg.in/mgo.v2"
@@ -11,12 +12,11 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"reflect"
 	"regexp"
 	"strconv"
 	"sync"
 	"time"
-	"reflect"
-	"github.com/llitfkitfk/cirkol/pkg/models"
 )
 
 var tokenCh chan string
@@ -60,8 +60,6 @@ func main() {
 }
 func reflectDemo(v interface{}) {
 	log.Println(reflect.TypeOf(v).Name())
-
-
 
 }
 func jsonParse() {

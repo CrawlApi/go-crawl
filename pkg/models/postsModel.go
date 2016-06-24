@@ -1,10 +1,10 @@
-package controllers
+package models
 
 import (
-	"time"
-	"github.com/llitfkitfk/cirkol/pkg/models"
 	"encoding/json"
 	"github.com/llitfkitfk/cirkol/pkg/common"
+	"github.com/llitfkitfk/cirkol/pkg/util"
+	"time"
 )
 
 type post struct {
@@ -35,21 +35,13 @@ type Posts struct {
 }
 
 func (p *Posts) FetchErr(err error) {
-	p.ErrCode = ERROR_CODE_API_FETCH
+	p.ErrCode = common.ERROR_CODE_API_FETCH
 	p.ErrMessage = err.Error()
 	p.Date = time.Now().Unix()
 	p.Status = false
 }
-func TimeOutPosts() Posts {
-	var p Posts
-	p.ErrCode = ERROR_CODE_API_TIMEOUT
-	p.ErrMessage = ERROR_MSG_API_TIMEOUT
-	p.Date = time.Now().Unix()
-	p.Status = false
-	return p
-}
 
-func (p *Posts) ParseRawPosts(data models.FBRawPosts) {
+func (p *Posts) ParseFBRawPosts(data FBRawPosts) {
 	for _, item := range data.Data {
 		var data post
 		data.ID = item.ID
@@ -71,5 +63,44 @@ func (p *Posts) ParseRawPosts(data models.FBRawPosts) {
 		p.Items = append(p.Items, data)
 	}
 
+	p.Status = true
+}
+
+func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
+	for _, item := range data.List {
+		var data post
+		data.ID = util.Int2Str(item.AppMsgExtInfo.Fileid)
+		data.CreatedAt = util.Int2Str(item.CommMsgInfo.Datetime)
+
+		data.ContentFullPicture = item.AppMsgExtInfo.Cover
+
+		data.ContentCaption = item.AppMsgExtInfo.Title
+		data.ContentBody = item.AppMsgExtInfo.Digest
+		data.ContentFullPicture = item.AppMsgExtInfo.Cover
+		data.PermalinkUrl = "http://mp.weixin.qq.com" + item.AppMsgExtInfo.ContentURL
+		data.RawData = util.JsonToString(json.Marshal(item))
+		data.Date = time.Now().Unix()
+
+		p.Items = append(p.Items, data)
+
+		if item.AppMsgExtInfo.IsMulti == 1 {
+			for _, item2 := range item.AppMsgExtInfo.MultiAppMsgItemList {
+				var data2 post
+				data2.ID = util.Int2Str(item2.Fileid)
+				data2.CreatedAt = util.Int2Str(item.CommMsgInfo.Datetime)
+
+				data2.ContentFullPicture = item2.Cover
+
+				data2.ContentCaption = item2.Title
+				data2.ContentBody = item2.Digest
+				data2.ContentFullPicture = item2.Cover
+				data2.PermalinkUrl = "http://mp.weixin.qq.com" + item2.ContentURL
+				data2.RawData = util.JsonToString(json.Marshal(item2))
+				data2.Date = time.Now().Unix()
+
+				p.Items = append(p.Items, data2)
+			}
+		}
+	}
 	p.Status = true
 }

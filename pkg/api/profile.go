@@ -1,11 +1,11 @@
 package api
 
 import (
-	"github.com/llitfkitfk/cirkol/pkg/result"
 	"encoding/json"
+	"github.com/llitfkitfk/cirkol/pkg/result"
 )
 
-func GetProfileApi(url string, ch chan <- result.Profile) string {
+func GetProfileApi(url string, ch chan<- result.Profile) string {
 	body, errs := GetApi(url)
 	if errs != nil {
 		ch <- result.Profile{
@@ -18,7 +18,7 @@ func GetProfileApi(url string, ch chan <- result.Profile) string {
 	return body
 }
 
-func ParseProfileJson(src string, v interface{}, ch chan <- result.Profile) {
+func ParseProfileJson(src string, v interface{}, ch chan<- result.Profile) {
 	err := json.Unmarshal([]byte(src), v)
 	if err != nil {
 		ch <- result.Profile{
@@ -29,7 +29,7 @@ func ParseProfileJson(src string, v interface{}, ch chan <- result.Profile) {
 	}
 }
 
-func MatchStrProfileCh(length int, expr string, src string, ch chan <- result.Profile) string {
+func MatchStrProfileCh(length int, expr string, src string, ch chan<- result.Profile) string {
 
 	des := MatchStrNoCh(length, expr, src)
 	if des != "" {
