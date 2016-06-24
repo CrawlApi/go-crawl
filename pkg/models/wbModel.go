@@ -164,14 +164,9 @@ type WBRawPosts struct {
 				 } `json:"topic_struct"`
 				 User struct {
 							  Description string `json:"description"`
-							  FansNum     string `json:"fansNum"`
 							  FollowMe    bool   `json:"follow_me"`
 							  Following   bool   `json:"following"`
 							  Gender      string `json:"gender"`
-							  H5icon      struct {
-									      Main  string   `json:"main"`
-									      Other []string `json:"other"`
-								      } `json:"h5icon"`
 							  ID              int         `json:"id"`
 							  Ismember        int         `json:"ismember"`
 							  Mbtype          int         `json:"mbtype"`
