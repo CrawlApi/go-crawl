@@ -1,10 +1,8 @@
 package models
 
 import (
-	"encoding/json"
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/util"
-	"time"
 )
 
 type post struct {
@@ -37,7 +35,7 @@ type Posts struct {
 func (p *Posts) FetchErr(err error) {
 	p.ErrCode = common.ERROR_CODE_API_FETCH
 	p.ErrMessage = err.Error()
-	p.Date = time.Now().Unix()
+	p.Date = common.Now()
 	p.Status = false
 }
 
@@ -57,12 +55,36 @@ func (p *Posts) ParseFBRawPosts(data FBRawPosts) {
 		data.ContentFullPicture = item.FullPicture
 		data.PermalinkUrl = item.PermalinkURL
 		data.HasComment = item.Comments.Summary.CanComment
-		data.RawData = common.JsonToString(json.Marshal(item))
-		data.Date = time.Now().Unix()
+		data.RawData = common.Interface2String(item)
+		data.Date = common.Now()
 
 		p.Items = append(p.Items, data)
 	}
 
+	p.Status = true
+}
+
+func (p *Posts) ParseWBRawPosts(data WBRawPosts) {
+	for _, node := range data.CardGroup {
+		var data post
+		data.ID = node.Mblog.Bid
+
+		data.CreatedAt = node.Mblog.CreatedAt
+		//data.UpdatedAt = node.Mblog
+		data.ShareCount = node.Mblog.RepostsCount
+		data.LikeCount = node.Mblog.AttitudesCount
+		data.CommentCount = node.Mblog.CommentsCount
+		//data.ViewCount
+		//data.ContentType        =
+		//data.ContentCaption	=
+		data.ContentBody = node.Mblog.Text
+		data.ContentFullPicture = node.Mblog.ThumbnailPic
+		data.PermalinkUrl = "http://m.weibo.cn/" + util.Int2Str(node.Mblog.User.ID) + "/" + node.Mblog.Bid
+		data.HasComment = true
+		data.RawData = common.Interface2String(node)
+		data.Date = common.Now()
+		p.Items = append(p.Items, data)
+	}
 	p.Status = true
 }
 
@@ -78,8 +100,8 @@ func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 		data.ContentBody = item.AppMsgExtInfo.Digest
 		data.ContentFullPicture = item.AppMsgExtInfo.Cover
 		data.PermalinkUrl = "http://mp.weixin.qq.com" + item.AppMsgExtInfo.ContentURL
-		data.RawData = util.JsonToString(json.Marshal(item))
-		data.Date = time.Now().Unix()
+		data.RawData = common.Interface2String(item)
+		data.Date = common.Now()
 
 		p.Items = append(p.Items, data)
 
@@ -95,8 +117,8 @@ func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 				data2.ContentBody = item2.Digest
 				data2.ContentFullPicture = item2.Cover
 				data2.PermalinkUrl = "http://mp.weixin.qq.com" + item2.ContentURL
-				data2.RawData = util.JsonToString(json.Marshal(item2))
-				data2.Date = time.Now().Unix()
+				data2.RawData = common.Interface2String(item2)
+				data2.Date = common.Now()
 
 				p.Items = append(p.Items, data2)
 			}

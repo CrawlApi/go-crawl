@@ -20,7 +20,6 @@ const (
 type WXRepo struct {
 	Agent          *gorequest.SuperAgent
 	Url            string
-	UserId         string
 	ProfileRawData string
 }
 
@@ -29,16 +28,13 @@ func (r *WXRepo) FetchApi() (string, error) {
 }
 
 func (r *WXRepo) ParseRawProfile(body string) models.Profile {
-	rawProfile, err := r.parseRawProfile(body)
-	var profile models.Profile
-	if err != nil {
-		profile.FetchErr(err)
-		return profile
-	}
-	profile.ParseWXProfile(rawProfile)
+	rawProfile, _ := r.parseRawProfile(body)
 
+	var profile models.Profile
+	profile.ParseWXProfile(rawProfile)
 	return profile
 }
+
 func (r *WXRepo) parseRawProfile(body string) (models.WXRawProfile, error) {
 	var data models.WXRawProfile
 
@@ -49,8 +45,6 @@ func (r *WXRepo) parseRawProfile(body string) (models.WXRawProfile, error) {
 
 func (r *WXRepo) getWXRawProfile(body string) models.WXRawProfile {
 	var data models.WXRawProfile
-	data.UserId = r.UserId
-	data.RawData = body
 	data.Name = r.getName(body)
 	data.Website = r.getWebsite(body)
 	data.Avatar = r.getAvatar(body)
@@ -107,7 +101,7 @@ func (r *WXRepo) getPostsUrl(body string) (string, error) {
 	if len(matcher) > 1 {
 		return matcher[1], nil
 	}
-	return "", errors.New(common.ERROR_MSG_JSON_ERROR)
+	return "", errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
 }
 func (r *WXRepo) getPostsStr(body string) string {
 	matcher := common.Matcher(REGEXP_WEIXIN_POSTS, body)
@@ -120,14 +114,13 @@ func (r *WXRepo) parseRawPosts(body string) (models.WXRawPosts, error) {
 	urlStr, err := r.getPostsUrl(body)
 	var data models.WXRawPosts
 	if err != nil {
-		return data, errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
+		return data, err
 	}
 
 	postsBody, err := getApi(r.Agent, urlStr)
 	if err != nil {
-		return data, errors.New(common.ERROR_MSG_WX_POSTS_API_FETCH)
+		return data, err
 	}
-
 	postsStr := r.getPostsStr(postsBody)
 	err = common.ParseJson(postsStr, &data)
 	if err != nil {

@@ -15,7 +15,7 @@ type Repo interface {
 }
 
 func getApi(agent *gorequest.SuperAgent, url string) (string, error) {
-	_, body, errs := agent.Timeout(10*time.Second).Set("accept-language", "en-US").Get(url).End()
+	_, body, errs := agent.Timeout(10 * time.Second).Set("accept-language", "en-US").Get(url).End()
 	if errs != nil {
 		return body, errors.New(common.ERROR_MSG_API_TIMEOUT)
 	}

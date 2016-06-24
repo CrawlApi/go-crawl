@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	ERROR_CODE_API_FETCH   = 4001
+	ERROR_CODE_API_FETCH = 4001
 	ERROR_CODE_API_TIMEOUT = 4002
-	ERROR_CODE_JSON_ERROR  = 4003
+	ERROR_CODE_JSON_ERROR = 4003
 	//ERROR_CODE_API_MISS_MATCHED = 4001
 	//ERROR_CODE_TIMEOUT = 4004
 	//ERROR_CODE_REGEX_MISS_MATCHED = 4005
@@ -20,8 +20,8 @@ const (
 
 	//ERROR_MSG_API_FETCH = "request api timeout"
 	//ERROR_MSG_API_MISS_MATCHED = "no api matched"
-	ERROR_MSG_API_TIMEOUT        = "request api timeout"
-	ERROR_MSG_JSON_ERROR         = "json parse error"
+	ERROR_MSG_API_TIMEOUT = "request api timeout"
+	ERROR_MSG_JSON_ERROR = "json parse error"
 	ERROR_MSG_WX_POSTS_API_FETCH = "weixin fetch api error"
 	ERROR_MSG_REGEX_MISS_MATCHED = "regex miss matched"
 	//ERROR_MSG_TIMEOUT = "request timeout"
@@ -57,11 +57,16 @@ func DecodeString(src string) string {
 	return html.UnescapeString(src)
 }
 
-func JsonToString(data []byte, err error) string {
+func Interface2String(v interface{}) string {
+	data, err := json.Marshal(v)
 	if err != nil {
 		return err.Error()
 	}
 	return string(data)
+}
+
+func Now() int64 {
+	return time.Now().Unix()
 }
 
 func Matcher(expr string, s string) []string {

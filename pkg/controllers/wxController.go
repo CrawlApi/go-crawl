@@ -11,7 +11,6 @@ func GetWXProfile(c *gin.Context) {
 	repo := &data.WXRepo{
 		Agent:  common.GetAgent(),
 		Url:    "http://weixin.sogou.com/weixin?type=1&query=" + userId + "&ie=utf8&_sug_=n&_sug_type_=",
-		UserId: userId,
 	}
 	GetProfile(c, repo)
 }

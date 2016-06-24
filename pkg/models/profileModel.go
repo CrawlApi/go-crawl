@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/llitfkitfk/cirkol/pkg/common"
-	"time"
+	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
 type Profile struct {
@@ -25,7 +25,7 @@ type Profile struct {
 func (p *Profile) FetchErr(err error) {
 	p.ErrCode = common.ERROR_CODE_API_FETCH
 	p.ErrMessage = err.Error()
-	p.Date = time.Now().Unix()
+	p.Date = common.Now()
 	p.Status = false
 }
 
@@ -37,7 +37,22 @@ func (p *Profile) ParseFBProfile(data FBRawProfile) {
 	p.Fans = data.Engagement.Count
 	p.About = data.About
 	p.Website = data.Link
-	p.Date = time.Now().Unix()
+	p.RawData = common.Interface2String(data)
+	p.Date = common.Now()
+	p.Status = true
+}
+
+func (p *Profile) ParseWBProfile(data WBRawProfile) {
+	p.UserId = util.Int2Str(data.UserInfo.ID)
+	p.Name = data.UserInfo.Name
+	p.Avatar = data.UserInfo.ProfileImageURL
+	p.PostNum = data.UserInfo.StatusesCount
+	p.FollowNum = data.UserInfo.FriendsCount
+	p.Fans = data.UserInfo.FollowersCount
+	p.About = data.UserInfo.Description
+
+	p.RawData = common.Interface2String(data)
+	p.Date = common.Now()
 	p.Status = true
 }
 
@@ -47,6 +62,7 @@ func (p *Profile) ParseWXProfile(data WXRawProfile) {
 	p.Avatar = data.Avatar
 	p.About = data.About
 	p.Website = data.Website
-	p.Date = time.Now().Unix()
+	p.RawData = common.Interface2String(data)
+	p.Date = common.Now()
 	p.Status = true
 }

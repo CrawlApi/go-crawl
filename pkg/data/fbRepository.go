@@ -1,13 +1,9 @@
 package data
 
 import (
-	"encoding/json"
+	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/parnurzeal/gorequest"
-)
-
-const (
-	ERROR_MSG_API_TIMEOUT = "request api timeout"
 )
 
 type FBRepo struct {
@@ -32,9 +28,9 @@ func (r *FBRepo) ParseRawProfile(body string) models.Profile {
 	return profile
 }
 
-func (r *FBRepo) parseRawProfile(src string) (models.FBRawProfile, error) {
+func (r *FBRepo) parseRawProfile(body string) (models.FBRawProfile, error) {
 	var data models.FBRawProfile
-	err := json.Unmarshal([]byte(src), &data)
+	err := common.ParseJson(body, &data)
 	if err != nil {
 		return data, err
 	}
@@ -53,9 +49,10 @@ func (r *FBRepo) ParseRawPosts(body string) models.Posts {
 	return posts
 }
 
-func (r *FBRepo) parseRawPosts(src string) (models.FBRawPosts, error) {
+func (r *FBRepo) parseRawPosts(body string) (models.FBRawPosts, error) {
 	var data models.FBRawPosts
-	err := json.Unmarshal([]byte(src), &data)
+
+	err := common.ParseJson(body, &data)
 	if err != nil {
 		return data, err
 	}
