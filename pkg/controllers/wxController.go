@@ -6,11 +6,16 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/data"
 )
 
+const (
+	URL_WECHAT_PROFILE = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=n&_sug_type_="
+	URL_WECHAT_POSTS =   "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=n&_sug_type_="
+)
+
 func GetWXProfile(c *gin.Context) {
 	userId := c.Param("userId")
 	repo := &data.WXRepo{
 		Agent:  common.GetAgent(),
-		Url:    "http://weixin.sogou.com/weixin?type=1&query=" + userId + "&ie=utf8&_sug_=n&_sug_type_=",
+		Url:    common.UrlString(URL_WECHAT_PROFILE, userId),
 	}
 	GetProfile(c, repo)
 }
@@ -19,7 +24,7 @@ func GetWXPosts(c *gin.Context) {
 	userId := c.Param("userId")
 	repo := &data.WXRepo{
 		Agent: common.GetAgent(),
-		Url:   "http://weixin.sogou.com/weixin?type=1&query=" + userId + "&ie=utf8&_sug_=n&_sug_type_=",
+		Url:     common.UrlString(URL_WECHAT_POSTS, userId),
 	}
 	GetPosts(c, repo)
 }

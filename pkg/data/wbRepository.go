@@ -13,6 +13,10 @@ const (
 	REGEXP_WEIBO_POSTS = `render_data (...+)mod\\/pagelist",(...+)]},'common(...+);</script><script src=`
 )
 
+const (
+	URL_WEIBO_POSTS = "http://m.weibo.cn/page/tpl?containerid=%s_-_WEIBO_SECOND_PROFILE_WEIBO&itemid=&title=全部微博"
+)
+
 type WBRepo struct {
 	Agent *gorequest.SuperAgent
 	Url   string
@@ -58,7 +62,7 @@ func (r *WBRepo) ParseRawPosts(body string) models.Posts {
 func (r *WBRepo)  getPostsUrl(body string) (string, error) {
 	matcher := common.Matcher(REGEXP_WEIBO_POSTS_ID, body)
 	if len(matcher) > 1 {
-		return "http://m.weibo.cn/page/tpl?containerid=" + common.DecodeString(matcher[1]) + "_-_WEIBO_SECOND_PROFILE_WEIBO&itemid=&title=全部微博", nil
+		return common.UrlString(URL_WEIBO_POSTS, common.DecodeString(matcher[1])), nil
 	}
 	return "", errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
 }
