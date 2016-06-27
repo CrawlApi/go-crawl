@@ -13,12 +13,29 @@ type IGRepo struct {
 	Url   string
 }
 
+func (r *IGRepo) FetchUIDApi() (string, error) {
+	return getApi(r.Agent, r.Url)
+}
+
 func (r *IGRepo) FetchProfileApi() (string, error) {
 	return getApi(r.Agent, r.Url)
 }
 
 func (r *IGRepo) FetchPostsApi() (string, error) {
 	return getApi(r.Agent, r.Url)
+}
+
+func (r *IGRepo) ParseRawUID(body string) models.UID {
+	matcher := common.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
+
+	var uid models.UID
+	uid.Media = "ig"
+	if len(matcher) > 1 {
+		uid.UserId = matcher[1]
+		uid.Status = true
+	}
+	uid.Date = common.Now()
+	return uid
 }
 
 func (r *IGRepo) ParseRawProfile(body string) models.Profile {

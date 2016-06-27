@@ -23,6 +23,10 @@ type WXRepo struct {
 	ProfileRawData string
 }
 
+func (r *WXRepo) FetchUIDApi() (string, error) {
+	return getApi(r.Agent, r.Url)
+}
+
 func (r *WXRepo) FetchProfileApi() (string, error) {
 	return getApi(r.Agent, r.Url)
 }
@@ -45,6 +49,19 @@ func (r *WXRepo) FetchPostsApi() (string, error) {
 
 	return postsBody, nil
 
+}
+
+func (r *WXRepo) ParseRawUID(body string) models.UID {
+	matcher := common.Matcher(REGEXP_WEIXIN_PROFILE_ID, body)
+
+	var uid models.UID
+	uid.Media = "wx"
+	if len(matcher) > 1 {
+		uid.UserId = matcher[1]
+		uid.Status = true
+	}
+	uid.Date = common.Now()
+	return uid
 }
 
 func (r *WXRepo) ParseRawProfile(body string) models.Profile {

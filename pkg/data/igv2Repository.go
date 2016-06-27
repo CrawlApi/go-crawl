@@ -14,7 +14,12 @@ type IGV2Repo struct {
 const (
 	URL_INSTAGRAM_API_POSTS = "https://www.instagram.com/%s/"
 	REGEX_INSTAGRAM_POSTS = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
+	REGEX_INSTAGRAM_PROFILE_ID   = `"owner": {"id": "(\d+)`
 )
+
+func (r *IGV2Repo) FetchUIDApi() (string, error) {
+	return getApi(r.Agent, r.Url)
+}
 
 func (r *IGV2Repo) FetchProfileApi() (string, error) {
 	return getApi(r.Agent, r.Url)
@@ -34,6 +39,19 @@ func (r *IGV2Repo) FetchPostsApi() (string, error) {
 		return postsBody, err
 	}
 	return postsBody, nil
+}
+
+func (r *IGV2Repo) ParseRawUID(body string) models.UID {
+	matcher := common.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
+
+	var uid models.UID
+	uid.Media = "ig"
+	if len(matcher) > 1 {
+		uid.UserId = matcher[1]
+		uid.Status = true
+	}
+	uid.Date = common.Now()
+	return uid
 }
 
 func (r *IGV2Repo) getPostsUrl(body string) (string, error) {

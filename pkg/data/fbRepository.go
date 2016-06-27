@@ -6,9 +6,15 @@ import (
 	"github.com/parnurzeal/gorequest"
 )
 
+const REGEXP_FACEBOOK_PROFILE_ID = `fb://(page|profile|group)/(\d+)`
+
 type FBRepo struct {
 	Agent *gorequest.SuperAgent
 	Url   string
+}
+
+func (r *FBRepo) FetchUIDApi() (string, error) {
+	return getApi(r.Agent, r.Url)
 }
 
 func (r *FBRepo) FetchProfileApi() (string, error) {
@@ -17,6 +23,21 @@ func (r *FBRepo) FetchProfileApi() (string, error) {
 
 func (r *FBRepo) FetchPostsApi() (string, error) {
 	return getApi(r.Agent, r.Url)
+}
+
+func (r *FBRepo) ParseRawUID(body string) models.UID {
+
+	matcher := common.Matcher(REGEXP_FACEBOOK_PROFILE_ID, body)
+
+	var uid models.UID
+	uid.Media = "fb"
+	if len(matcher) > 2 {
+		uid.Type = matcher[1]
+		uid.UserId = matcher[2]
+		uid.Status = true
+	}
+	uid.Date = common.Now()
+	return uid
 }
 
 func (r *FBRepo) ParseRawProfile(body string) models.Profile {

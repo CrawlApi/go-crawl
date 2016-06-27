@@ -8,5 +8,5 @@ func InitRouters(router *gin.Engine) {
 	setupFBRouters(router)
 	setupWBRouters(router)
 	setupWXRouters(router)
-	//setupUIDRouters(router)
+	setupUIDRouters(router)
 }

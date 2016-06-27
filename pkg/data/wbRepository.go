@@ -11,6 +11,7 @@ import (
 const (
 	REGEXP_WEIBO_POSTS_ID = `itemid":"(\d+)`
 	REGEXP_WEIBO_POSTS = `render_data (...+)mod\\/pagelist",(...+)]},'common(...+);</script><script src=`
+	REGEXP_WEIBO_PROFILE_ID = `uid=(\d+)`
 )
 
 const (
@@ -20,6 +21,10 @@ const (
 type WBRepo struct {
 	Agent *gorequest.SuperAgent
 	Url   string
+}
+
+func (r *WBRepo) FetchUIDApi() (string, error) {
+	return getApi(r.Agent, r.Url)
 }
 
 func (r *WBRepo) FetchProfileApi() (string, error) {
@@ -42,6 +47,19 @@ func (r *WBRepo) FetchPostsApi() (string, error) {
 	}
 	return postsBody, nil
 
+}
+
+func (r *WBRepo) ParseRawUID(body string) models.UID {
+	matcher := common.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
+
+	var uid models.UID
+	uid.Media = "wb"
+	if len(matcher) > 1 {
+		uid.UserId = matcher[1]
+		uid.Status = true
+	}
+	uid.Date = common.Now()
+	return uid
 }
 
 func (r *WBRepo) ParseRawProfile(body string) models.Profile {

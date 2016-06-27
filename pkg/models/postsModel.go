@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/llitfkitfk/cirkol/pkg/common"
-	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
 type post struct {
@@ -28,12 +27,10 @@ type Posts struct {
 	Date       int64  `json:"date"`
 	Status     bool   `json:"status"`
 	RawData    string `json:"raw_data"`
-	ErrCode    int    `json:"error_code"`
 	ErrMessage string `json:"error_message"`
 }
 
 func (p *Posts) FetchErr(err error) {
-	p.ErrCode = common.ERROR_CODE_API_FETCH
 	p.ErrMessage = err.Error()
 	p.Date = common.Now()
 	p.Status = false
@@ -156,7 +153,7 @@ func (p *Posts) ParseIGV2RawPosts(rawPost IGV2RawPosts) {
 	for _, node := range rawPost.Nodes {
 		var data post
 		data.ID = node.ID
-		data.CreatedAt = util.Int2Str(node.Date)
+		data.CreatedAt = common.Int2Str(node.Date)
 
 		data.LikeCount = node.Likes.Count
 		data.CommentCount = node.Comments.Count

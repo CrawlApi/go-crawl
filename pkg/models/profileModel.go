@@ -17,12 +17,10 @@ type Profile struct {
 	RawData    string `json:"raw_data"`
 	Status     bool   `json:"status"`
 	Date       int64  `json:"date"`
-	ErrCode    int    `json:"error_code"`
 	ErrMessage string `json:"error_message"`
 }
 
 func (p *Profile) FetchErr(err error) {
-	p.ErrCode = common.ERROR_CODE_API_FETCH
 	p.ErrMessage = err.Error()
 	p.Date = common.Now()
 	p.Status = false
