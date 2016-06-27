@@ -79,7 +79,7 @@ func (p *Posts) ParseWBRawPosts(data WBRawPosts) {
 		//data.ContentCaption	=
 		data.ContentBody = node.Mblog.Text
 		data.ContentFullPicture = node.Mblog.ThumbnailPic
-		data.PermalinkUrl = "http://m.weibo.cn/" + util.Int2Str(node.Mblog.User.ID) + "/" + node.Mblog.Bid
+		data.PermalinkUrl = "http://m.weibo.cn/" + common.Int2Str(node.Mblog.User.ID) + "/" + node.Mblog.Bid
 		data.HasComment = true
 		data.RawData = common.Interface2String(node)
 		data.Date = common.Now()
@@ -91,8 +91,8 @@ func (p *Posts) ParseWBRawPosts(data WBRawPosts) {
 func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 	for _, item := range data.List {
 		var data post
-		data.ID = util.Int2Str(item.AppMsgExtInfo.Fileid)
-		data.CreatedAt = util.Int2Str(item.CommMsgInfo.Datetime)
+		data.ID = common.Int2Str(item.AppMsgExtInfo.Fileid)
+		data.CreatedAt = common.Int2Str(item.CommMsgInfo.Datetime)
 
 		data.ContentFullPicture = item.AppMsgExtInfo.Cover
 
@@ -108,8 +108,8 @@ func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 		if item.AppMsgExtInfo.IsMulti == 1 {
 			for _, item2 := range item.AppMsgExtInfo.MultiAppMsgItemList {
 				var data2 post
-				data2.ID = util.Int2Str(item2.Fileid)
-				data2.CreatedAt = util.Int2Str(item.CommMsgInfo.Datetime)
+				data2.ID = common.Int2Str(item2.Fileid)
+				data2.CreatedAt = common.Int2Str(item.CommMsgInfo.Datetime)
 
 				data2.ContentFullPicture = item2.Cover
 
@@ -124,5 +124,58 @@ func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 			}
 		}
 	}
+	p.Status = true
+}
+
+func (p *Posts) ParseIGRawPosts(rawPost IGRawPosts) {
+
+	for _, item := range rawPost.Items {
+		var data post
+		data.ID = item.ID
+		data.CreatedAt = item.CreatedTime
+
+		data.LikeCount = item.Likes.Count
+		data.CommentCount = item.Comments.Count
+		data.ViewCount = item.VideoViews
+		data.ContentType = item.Type
+		data.ContentCaption = item.Caption.Text
+
+		data.ContentFullPicture = item.Images.StandardResolution.URL
+		data.PermalinkUrl = item.Link
+		data.HasComment = item.CanViewComments
+		data.RawData = common.Interface2String(item)
+		data.Date = common.Now()
+
+		p.Items = append(p.Items, data)
+	}
+
+	p.Status = true
+}
+
+func (p *Posts) ParseIGV2RawPosts(rawPost IGV2RawPosts) {
+	for _, node := range rawPost.Nodes {
+		var data post
+		data.ID = node.ID
+		data.CreatedAt = util.Int2Str(node.Date)
+
+		data.LikeCount = node.Likes.Count
+		data.CommentCount = node.Comments.Count
+		data.ViewCount = node.VideoViews
+		if node.IsVideo {
+			data.ContentType = "video"
+		} else {
+			data.ContentType = "image"
+		}
+
+		data.ContentCaption = node.Caption
+		data.ContentFullPicture = node.DisplaySrc
+		data.PermalinkUrl = "https://www.instagram.com/p/" + node.Code + "/"
+		data.HasComment = true
+		data.RawData = common.Interface2String(node)
+		data.Date = common.Now()
+
+		p.Items = append(p.Items, data)
+	}
+
 	p.Status = true
 }

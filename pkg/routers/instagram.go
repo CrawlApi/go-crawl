@@ -5,7 +5,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/controllers"
 )
 
-func SetupIGRouters(router *gin.Engine) {
+func setupIGRouters(router *gin.Engine) {
 	router.GET("/api/ig/profile/:userId", controllers.GetIGProfile)
 	router.GET("/api/ig/posts/:userId", controllers.GetIGPosts)
 }

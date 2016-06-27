@@ -11,7 +11,11 @@ type FBRepo struct {
 	Url   string
 }
 
-func (r *FBRepo) FetchApi() (string, error) {
+func (r *FBRepo) FetchProfileApi() (string, error) {
+	return getApi(r.Agent, r.Url)
+}
+
+func (r *FBRepo) FetchPostsApi() (string, error) {
 	return getApi(r.Agent, r.Url)
 }
 

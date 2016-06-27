@@ -5,7 +5,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/controllers"
 )
 
-func SetupWBRouters(router *gin.Engine) {
+func setupWBRouters(router *gin.Engine) {
 	router.GET("/api/wb/profile/:userId", controllers.GetWBProfile)
 	router.GET("/api/wb/posts/:userId", controllers.GetWBPosts)
 }

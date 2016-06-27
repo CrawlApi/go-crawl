@@ -5,7 +5,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/controllers"
 )
 
-func SetupFBRouters(router *gin.Engine) {
+func setupFBRouters(router *gin.Engine) {
 	router.GET("/api/fb/profile/:userId", controllers.GetFBProfile)
 	router.GET("/api/fb/posts/:userId", controllers.GetFBPosts)
 }

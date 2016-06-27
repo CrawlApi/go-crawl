@@ -6,7 +6,6 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"errors"
 	"strings"
-	"log"
 )
 
 const (
@@ -23,8 +22,26 @@ type WBRepo struct {
 	Url   string
 }
 
-func (r *WBRepo) FetchApi() (string, error) {
+func (r *WBRepo) FetchProfileApi() (string, error) {
 	return getApi(r.Agent, r.Url)
+}
+
+func (r *WBRepo) FetchPostsApi() (string, error) {
+	body, err := getApi(r.Agent, r.Url)
+	if err != nil {
+		return body, err
+	}
+	urlStr, err := r.getPostsUrl(body)
+	if err != nil {
+		return urlStr, err
+	}
+
+	postsBody, err := getApi(r.Agent, urlStr)
+	if err != nil {
+		return postsBody, err
+	}
+	return postsBody, nil
+
 }
 
 func (r *WBRepo) ParseRawProfile(body string) models.Profile {
@@ -78,19 +95,9 @@ func (r *WBRepo) getPostsStr(body string) string {
 
 func (r *WBRepo) parseRawPosts(body string) (models.WBRawPosts, error) {
 	var data models.WBRawPosts
-	urlStr, err := r.getPostsUrl(body)
-	if err != nil {
-		return data, err
-	}
 
-	postsBody, err := getApi(r.Agent, urlStr)
-	if err != nil {
-		return data, err
-	}
-
-	postsStr := r.getPostsStr(postsBody)
-	log.Println(postsStr)
-	err = common.ParseJson(postsStr, &data)
+	postsStr := r.getPostsStr(body)
+	err := common.ParseJson(postsStr, &data)
 
 	if err != nil {
 		return data, err

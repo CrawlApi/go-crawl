@@ -44,6 +44,10 @@ func Str2Int(src string) int {
 	return i
 }
 
+func Int2Str(src int) string {
+	return strconv.Itoa(src)
+}
+
 func DateFormat(dateStr string) string {
 	time, err := time.Parse(TIMESTAMP_LAYOUT, dateStr)
 	if err != nil {

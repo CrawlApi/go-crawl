@@ -9,7 +9,8 @@ import (
 )
 
 type Repo interface {
-	FetchApi() (string, error)
+	FetchProfileApi() (string, error)
+	FetchPostsApi() (string, error)
 	ParseRawProfile(string) models.Profile
 	ParseRawPosts(string) models.Posts
 }

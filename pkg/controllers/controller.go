@@ -28,9 +28,10 @@ func GetProfile(c *gin.Context, repo data.Repo) {
 }
 
 func fetchProfile(repo data.Repo, ch chan models.Profile) {
+	defer  close(ch)
 	var profile models.Profile
 
-	body, err := repo.FetchApi()
+	body, err := repo.FetchProfileApi()
 	if err != nil {
 		profile.FetchErr(err)
 		ch <- profile
@@ -60,9 +61,11 @@ func GetPosts(c *gin.Context, repo data.Repo) {
 }
 
 func fetchPosts(repo data.Repo, ch chan models.Posts) {
+	defer  close(ch)
+
 	var posts models.Posts
 
-	body, err := repo.FetchApi()
+	body, err := repo.FetchPostsApi()
 	if err != nil {
 		posts.FetchErr(err)
 		ch <- posts

@@ -10,11 +10,11 @@ import (
 const (
 	// WEIXIN CONST
 	REGEXP_WEIXIN_PROFILE_ID = `微信号: (\S+)</p>`
-	REGEXP_WEIXIN_LOGO       = `src="((http://img01.sogoucdn.com/app/a)\S+)"`
-	REGEXP_WEIXIN_NAME       = `<h3>(\S+)</h3>`
-	REGEXP_WEIXIN_FEATURE    = `功能介绍(...+)class="sp-txt">(...+)</span>`
-	REGEXP_WEIXIN_URL        = `href="((http://mp.weixin.qq.com/profile)\S+)"`
-	REGEXP_WEIXIN_POSTS      = `var msgList = '(\S+)';`
+	REGEXP_WEIXIN_LOGO = `src="((http://img01.sogoucdn.com/app/a)\S+)"`
+	REGEXP_WEIXIN_NAME = `<h3>(\S+)</h3>`
+	REGEXP_WEIXIN_FEATURE = `功能介绍(...+)class="sp-txt">(...+)</span>`
+	REGEXP_WEIXIN_URL = `href="((http://mp.weixin.qq.com/profile)\S+)"`
+	REGEXP_WEIXIN_POSTS = `var msgList = '(\S+)';`
 )
 
 type WXRepo struct {
@@ -23,8 +23,28 @@ type WXRepo struct {
 	ProfileRawData string
 }
 
-func (r *WXRepo) FetchApi() (string, error) {
+func (r *WXRepo) FetchProfileApi() (string, error) {
 	return getApi(r.Agent, r.Url)
+}
+
+func (r *WXRepo) FetchPostsApi() (string, error) {
+	body, err := getApi(r.Agent, r.Url)
+	if err != nil {
+		return body, err
+	}
+
+	urlStr, err := r.getPostsUrl(body)
+	if err != nil {
+		return urlStr, err
+	}
+
+	postsBody, err := getApi(r.Agent, urlStr)
+	if err != nil {
+		return postsBody, err
+	}
+
+	return postsBody, nil
+
 }
 
 func (r *WXRepo) ParseRawProfile(body string) models.Profile {
@@ -103,6 +123,7 @@ func (r *WXRepo) getPostsUrl(body string) (string, error) {
 	}
 	return "", errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
 }
+
 func (r *WXRepo) getPostsStr(body string) string {
 	matcher := common.Matcher(REGEXP_WEIXIN_POSTS, body)
 	if len(matcher) > 1 {
@@ -110,19 +131,11 @@ func (r *WXRepo) getPostsStr(body string) string {
 	}
 	return ""
 }
-func (r *WXRepo) parseRawPosts(body string) (models.WXRawPosts, error) {
-	urlStr, err := r.getPostsUrl(body)
-	var data models.WXRawPosts
-	if err != nil {
-		return data, err
-	}
 
-	postsBody, err := getApi(r.Agent, urlStr)
-	if err != nil {
-		return data, err
-	}
-	postsStr := r.getPostsStr(postsBody)
-	err = common.ParseJson(postsStr, &data)
+func (r *WXRepo) parseRawPosts(body string) (models.WXRawPosts, error) {
+	var data models.WXRawPosts
+
+	err := common.ParseJson(r.getPostsStr(body), &data)
 	if err != nil {
 		return data, err
 	}

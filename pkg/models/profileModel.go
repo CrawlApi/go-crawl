@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/llitfkitfk/cirkol/pkg/common"
-	"github.com/llitfkitfk/cirkol/pkg/util"
 )
 
 type Profile struct {
@@ -43,7 +42,7 @@ func (p *Profile) ParseFBProfile(data FBRawProfile) {
 }
 
 func (p *Profile) ParseWBProfile(data WBRawProfile) {
-	p.UserId = util.Int2Str(data.UserInfo.ID)
+	p.UserId = common.Int2Str(data.UserInfo.ID)
 	p.Name = data.UserInfo.Name
 	p.Avatar = data.UserInfo.ProfileImageURL
 	p.PostNum = data.UserInfo.StatusesCount
@@ -66,3 +65,32 @@ func (p *Profile) ParseWXProfile(data WXRawProfile) {
 	p.Date = common.Now()
 	p.Status = true
 }
+
+func (p *Profile) ParseIGProfile(data IGRawProfile) {
+	p.UserId = data.User.Username
+	p.Name = data.User.FullName
+	p.Avatar = data.User.ProfilePicURL
+	p.PostNum = data.User.Media.Count
+	p.FollowNum = data.User.Follows.Count
+	p.Fans = data.User.FollowedBy.Count
+
+	p.Website = "https://www.instagram.com/" + data.User.Username + "/"
+	p.RawData = common.Interface2String(data)
+	p.Date = common.Now()
+	p.Status = true
+}
+
+func (p *Profile) ParseIGV2Profile(data IGV2RawProfile) {
+	p.UserId = common.Int2Str(data.User.Pk)
+	p.Name = data.User.Username
+	p.Avatar = data.User.ProfilePicURL
+	p.PostNum = data.User.MediaCount
+	p.FollowNum = data.User.FollowingCount
+	p.Fans = data.User.FollowerCount
+	p.About = data.User.Biography
+	p.Website = "https://www.instagram.com/" + data.User.Username + "/"
+	p.RawData = common.Interface2String(data)
+	p.Date = common.Now()
+	p.Status = true
+}
+
