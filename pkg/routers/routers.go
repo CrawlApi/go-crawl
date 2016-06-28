@@ -12,9 +12,9 @@ func InitRouters(router *gin.Engine) {
 	setupWBRouters(router)
 	setupWXRouters(router)
 	setupUIDRouters(router)
-	//setupAPIRouters(router)
+	setupAPIRouters(router)
 }
 
 func setupAPIRouters(router *gin.Engine) {
-	router.GET("/api/help", controllers.GetAPIHelper)
+	router.POST("/api/json/:query", controllers.GetHTMLAPI)
 }
