@@ -159,5 +159,46 @@ type FBRawPosts struct {
 	} `json:"paging"`
 }
 
-type FBRawUid struct {
+type FBRawReactions struct {
+	ID             string `json:"id"`
+	ReactionsAngry struct {
+		Summary struct {
+			TotalCount int `json:"total_count"`
+		} `json:"summary"`
+	} `json:"reactions_angry"`
+	ReactionsHaha struct {
+		Summary struct {
+			TotalCount int `json:"total_count"`
+		} `json:"summary"`
+	} `json:"reactions_haha"`
+	ReactionsLike struct {
+		Summary struct {
+			TotalCount int `json:"total_count"`
+		} `json:"summary"`
+	} `json:"reactions_like"`
+	ReactionsLove struct {
+		Summary struct {
+			TotalCount int `json:"total_count"`
+		} `json:"summary"`
+	} `json:"reactions_love"`
+	ReactionsNone struct {
+		Summary struct {
+			TotalCount int `json:"total_count"`
+		} `json:"summary"`
+	} `json:"reactions_none"`
+	ReactionsSad struct {
+		Summary struct {
+			TotalCount int `json:"total_count"`
+		} `json:"summary"`
+	} `json:"reactions_sad"`
+	ReactionsThankful struct {
+		Summary struct {
+			TotalCount int `json:"total_count"`
+		} `json:"summary"`
+	} `json:"reactions_thankful"`
+	ReactionsWow struct {
+		Summary struct {
+			TotalCount int `json:"total_count"`
+		} `json:"summary"`
+	} `json:"reactions_wow"`
 }

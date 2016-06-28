@@ -1,16 +1,16 @@
 package data
 
 import (
+	"errors"
+	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/parnurzeal/gorequest"
-	"github.com/llitfkitfk/cirkol/pkg/common"
-	"errors"
 	"strings"
 )
 
 const (
-	REGEXP_WEIBO_POSTS_ID = `itemid":"(\d+)`
-	REGEXP_WEIBO_POSTS = `render_data (...+)mod\\/pagelist",(...+)]},'common(...+);</script><script src=`
+	REGEXP_WEIBO_POSTS_ID   = `itemid":"(\d+)`
+	REGEXP_WEIBO_POSTS      = `render_data (...+)mod\\/pagelist",(...+)]},'common(...+);</script><script src=`
 	REGEXP_WEIBO_PROFILE_ID = `uid=(\d+)`
 )
 
@@ -49,6 +49,14 @@ func (r *WBRepo) FetchPostsApi() (string, error) {
 
 }
 
+func (r *WBRepo) getPostsUrl(body string) (string, error) {
+	matcher := common.Matcher(REGEXP_WEIBO_POSTS_ID, body)
+	if len(matcher) > 1 {
+		return common.UrlString(URL_WEIBO_API_POSTS, common.DecodeString(matcher[1])), nil
+	}
+	return "", errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
+}
+
 func (r *WBRepo) ParseRawUID(body string) models.UID {
 	matcher := common.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
 
@@ -63,8 +71,9 @@ func (r *WBRepo) ParseRawUID(body string) models.UID {
 }
 
 func (r *WBRepo) ParseRawProfile(body string) models.Profile {
+	var rawProfile models.WBRawProfile
+	err := common.ParseJson(body, &rawProfile)
 
-	rawProfile, err := r.parseRawProfile(body)
 	var profile models.Profile
 	if err != nil {
 		profile.FetchErr(err)
@@ -75,17 +84,11 @@ func (r *WBRepo) ParseRawProfile(body string) models.Profile {
 	return profile
 }
 
-func (r *WBRepo) parseRawProfile(body string) (models.WBRawProfile, error) {
-	var data models.WBRawProfile
-	err := common.ParseJson(body, &data)
-	if err != nil {
-		return data, err
-	}
-	return data, nil
-}
-
 func (r *WBRepo) ParseRawPosts(body string) models.Posts {
-	rawPosts, err := r.parseRawPosts(body)
+	var rawPosts models.WBRawPosts
+
+	err := common.ParseJson(r.getPostsStr(body), &rawPosts)
+
 	var posts models.Posts
 	if err != nil {
 		posts.FetchErr(err)
@@ -95,13 +98,6 @@ func (r *WBRepo) ParseRawPosts(body string) models.Posts {
 
 	return posts
 }
-func (r *WBRepo)  getPostsUrl(body string) (string, error) {
-	matcher := common.Matcher(REGEXP_WEIBO_POSTS_ID, body)
-	if len(matcher) > 1 {
-		return common.UrlString(URL_WEIBO_API_POSTS, common.DecodeString(matcher[1])), nil
-	}
-	return "", errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
-}
 
 func (r *WBRepo) getPostsStr(body string) string {
 	matcher := common.Matcher(REGEXP_WEIBO_POSTS, body)
@@ -109,16 +105,4 @@ func (r *WBRepo) getPostsStr(body string) string {
 		return "{" + strings.Replace(matcher[2], "(MISSING)", "", -1)
 	}
 	return ""
-}
-
-func (r *WBRepo) parseRawPosts(body string) (models.WBRawPosts, error) {
-	var data models.WBRawPosts
-
-	postsStr := r.getPostsStr(body)
-	err := common.ParseJson(postsStr, &data)
-
-	if err != nil {
-		return data, err
-	}
-	return data, nil
 }

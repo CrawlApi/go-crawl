@@ -51,6 +51,14 @@ func (r *WXRepo) FetchPostsApi() (string, error) {
 
 }
 
+func (r *WXRepo) getPostsUrl(body string) (string, error) {
+	matcher := common.Matcher(REGEXP_WEIXIN_URL, body)
+	if len(matcher) > 1 {
+		return matcher[1], nil
+	}
+	return "", errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
+}
+
 func (r *WXRepo) ParseRawUID(body string) models.UID {
 	matcher := common.Matcher(REGEXP_WEIXIN_PROFILE_ID, body)
 
@@ -74,19 +82,11 @@ func (r *WXRepo) ParseRawProfile(body string) models.Profile {
 
 func (r *WXRepo) parseRawProfile(body string) (models.WXRawProfile, error) {
 	var data models.WXRawProfile
-
-	data = r.getWXRawProfile(body)
-
-	return data, nil
-}
-
-func (r *WXRepo) getWXRawProfile(body string) models.WXRawProfile {
-	var data models.WXRawProfile
 	data.Name = r.getName(body)
 	data.Website = r.getWebsite(body)
 	data.Avatar = r.getAvatar(body)
 	data.About = r.getAbout(body)
-	return data
+	return data, nil
 }
 
 func (r *WXRepo) getName(body string) string {
@@ -122,7 +122,9 @@ func (r *WXRepo) getAbout(body string) string {
 }
 
 func (r *WXRepo) ParseRawPosts(body string) models.Posts {
-	rawPosts, err := r.parseRawPosts(body)
+	var rawPosts models.WXRawPosts
+	err := common.ParseJson(r.getPostsStr(body), &rawPosts)
+
 	var posts models.Posts
 	if err != nil {
 		posts.FetchErr(err)
@@ -133,28 +135,10 @@ func (r *WXRepo) ParseRawPosts(body string) models.Posts {
 	return posts
 }
 
-func (r *WXRepo) getPostsUrl(body string) (string, error) {
-	matcher := common.Matcher(REGEXP_WEIXIN_URL, body)
-	if len(matcher) > 1 {
-		return matcher[1], nil
-	}
-	return "", errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
-}
-
 func (r *WXRepo) getPostsStr(body string) string {
 	matcher := common.Matcher(REGEXP_WEIXIN_POSTS, body)
 	if len(matcher) > 1 {
 		return common.DecodeString(matcher[1])
 	}
 	return ""
-}
-
-func (r *WXRepo) parseRawPosts(body string) (models.WXRawPosts, error) {
-	var data models.WXRawPosts
-
-	err := common.ParseJson(r.getPostsStr(body), &data)
-	if err != nil {
-		return data, err
-	}
-	return data, nil
 }

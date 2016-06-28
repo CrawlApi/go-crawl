@@ -17,7 +17,7 @@ func GetWBProfile(c *gin.Context) {
 		Agent:  common.GetAgent(),
 		Url:   common.UrlString(URL_WEIBO_PROFILE, userId),
 	}
-	GetProfile(c, repo)
+	getProfile(c, repo)
 }
 
 func GetWBPosts(c *gin.Context) {
@@ -26,5 +26,5 @@ func GetWBPosts(c *gin.Context) {
 		Agent: common.GetAgent(),
 		Url:    common.UrlString(URL_WEIBO_POSTS, userId),
 	}
-	GetPosts(c, repo)
+	getPosts(c, repo)
 }

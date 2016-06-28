@@ -13,7 +13,7 @@ const (
 func GetUid(c *gin.Context) {
 	rawurl := c.PostForm("url")
 
-	var repo data.Repo
+	var repo data.UID
 	switch checkUrl(rawurl) {
 	case "facebook":
 		repo = &data.FBRepo{
@@ -37,7 +37,7 @@ func GetUid(c *gin.Context) {
 		}
 	}
 
-	GetRealUid(c, repo)
+	getRealUid(c, repo)
 }
 
 func checkUrl(url string) string {

@@ -17,7 +17,7 @@ func GetWXProfile(c *gin.Context) {
 		Agent:  common.GetAgent(),
 		Url:    common.UrlString(URL_WECHAT_PROFILE, userId),
 	}
-	GetProfile(c, repo)
+	getProfile(c, repo)
 }
 
 func GetWXPosts(c *gin.Context) {
@@ -26,5 +26,5 @@ func GetWXPosts(c *gin.Context) {
 		Agent: common.GetAgent(),
 		Url:     common.UrlString(URL_WECHAT_POSTS, userId),
 	}
-	GetPosts(c, repo)
+	getPosts(c, repo)
 }

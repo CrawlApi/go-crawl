@@ -41,6 +41,16 @@ func (r *IGV2Repo) FetchPostsApi() (string, error) {
 	return postsBody, nil
 }
 
+func (r *IGV2Repo) getPostsUrl(body string) (string, error) {
+	var data models.IGV2RawProfile
+	err := common.ParseJson(body, &data)
+	postsUrl := common.UrlString(URL_INSTAGRAM_API_POSTS, data.User.Username)
+	if err != nil {
+		return postsUrl, err
+	}
+	return postsUrl, nil
+}
+
 func (r *IGV2Repo) ParseRawUID(body string) models.UID {
 	matcher := common.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
 
@@ -52,16 +62,6 @@ func (r *IGV2Repo) ParseRawUID(body string) models.UID {
 	}
 	uid.Date = common.Now()
 	return uid
-}
-
-func (r *IGV2Repo) getPostsUrl(body string) (string, error) {
-	var data models.IGV2RawProfile
-	err := common.ParseJson(body, &data)
-	postsUrl := common.UrlString(URL_INSTAGRAM_API_POSTS, data.User.Username)
-	if err != nil {
-		return postsUrl, err
-	}
-	return postsUrl, nil
 }
 
 func (r *IGV2Repo) ParseRawProfile(body string) models.Profile {

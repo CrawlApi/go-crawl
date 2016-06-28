@@ -25,6 +25,10 @@ func (r *FBRepo) FetchPostsApi() (string, error) {
 	return getApi(r.Agent, r.Url)
 }
 
+func (r *FBRepo) FetchReactionsApi() (string, error) {
+	return getApi(r.Agent, r.Url)
+}
+
 func (r *FBRepo) ParseRawUID(body string) models.UID {
 
 	matcher := common.Matcher(REGEXP_FACEBOOK_PROFILE_ID, body)
@@ -41,8 +45,9 @@ func (r *FBRepo) ParseRawUID(body string) models.UID {
 }
 
 func (r *FBRepo) ParseRawProfile(body string) models.Profile {
+	var rawProfile models.FBRawProfile
+	err := common.ParseJson(body, &rawProfile)
 
-	rawProfile, err := r.parseRawProfile(body)
 	var profile models.Profile
 	if err != nil {
 		profile.FetchErr(err)
@@ -53,17 +58,9 @@ func (r *FBRepo) ParseRawProfile(body string) models.Profile {
 	return profile
 }
 
-func (r *FBRepo) parseRawProfile(body string) (models.FBRawProfile, error) {
-	var data models.FBRawProfile
-	err := common.ParseJson(body, &data)
-	if err != nil {
-		return data, err
-	}
-	return data, nil
-}
-
 func (r *FBRepo) ParseRawPosts(body string) models.Posts {
-	rawPosts, err := r.parseRawPosts(body)
+	var rawPosts models.FBRawPosts
+	err := common.ParseJson(body, &rawPosts)
 	var posts models.Posts
 	if err != nil {
 		posts.FetchErr(err)
@@ -74,12 +71,16 @@ func (r *FBRepo) ParseRawPosts(body string) models.Posts {
 	return posts
 }
 
-func (r *FBRepo) parseRawPosts(body string) (models.FBRawPosts, error) {
-	var data models.FBRawPosts
-
+func (r *FBRepo) ParseRawReactions(body string)  models.FBReactions {
+	var data models.FBRawReactions
 	err := common.ParseJson(body, &data)
+
+	var reactions models.FBReactions
 	if err != nil {
-		return data, err
+		reactions.FetchErr(err)
+		return reactions
 	}
-	return data, nil
+	reactions.ParseFBReactions(data)
+
+	return reactions
 }

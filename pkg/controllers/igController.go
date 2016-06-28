@@ -18,7 +18,7 @@ func GetIGProfile(c *gin.Context) {
 	userId := c.Param("userId")
 	v := c.DefaultQuery("version", "v2")
 
-	var repo data.Repo
+	var repo data.Profile
 	switch v {
 	case "v2":
 		repo = &data.IGV2Repo{
@@ -34,14 +34,14 @@ func GetIGProfile(c *gin.Context) {
 		}
 	}
 
-	GetProfile(c, repo)
+	getProfile(c, repo)
 }
 
 func GetIGPosts(c *gin.Context) {
 	userId := c.Param("userId")
 	v := c.DefaultQuery("version", "v2")
 
-	var repo data.Repo
+	var repo data.Posts
 	switch v {
 	case "v2":
 		repo = &data.IGV2Repo{
@@ -57,5 +57,5 @@ func GetIGPosts(c *gin.Context) {
 		}
 	}
 
-	GetPosts(c, repo)
+	getPosts(c, repo)
 }

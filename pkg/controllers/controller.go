@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func GetRealUid(c *gin.Context, repo data.Repo) {
+func getRealUid(c *gin.Context, repo data.UID) {
 	var uid models.UID
 	if repo == nil {
 		uid.FetchErr(nil)
@@ -33,7 +33,8 @@ func GetRealUid(c *gin.Context, repo data.Repo) {
 		"uid": uid,
 	})
 }
-func fetchUID(repo data.Repo, ch chan models.UID) {
+
+func fetchUID(repo data.UID, ch chan models.UID) {
 	defer close(ch)
 	var uid models.UID
 
@@ -48,7 +49,7 @@ func fetchUID(repo data.Repo, ch chan models.UID) {
 	ch <- uid
 }
 
-func GetProfile(c *gin.Context, repo data.Repo) {
+func getProfile(c *gin.Context, repo data.Profile) {
 	timeout := c.DefaultQuery("timeout", "5")
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.Profile)
@@ -66,7 +67,7 @@ func GetProfile(c *gin.Context, repo data.Repo) {
 	})
 }
 
-func fetchProfile(repo data.Repo, ch chan models.Profile) {
+func fetchProfile(repo data.Profile, ch chan models.Profile) {
 	defer close(ch)
 	var profile models.Profile
 
@@ -81,7 +82,7 @@ func fetchProfile(repo data.Repo, ch chan models.Profile) {
 	ch <- profile
 }
 
-func GetPosts(c *gin.Context, repo data.Repo) {
+func getPosts(c *gin.Context, repo data.Posts) {
 	timeout := c.DefaultQuery("timeout", "5")
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.Posts)
@@ -99,7 +100,7 @@ func GetPosts(c *gin.Context, repo data.Repo) {
 	})
 }
 
-func fetchPosts(repo data.Repo, ch chan models.Posts) {
+func fetchPosts(repo data.Posts, ch chan models.Posts) {
 	defer close(ch)
 
 	var posts models.Posts

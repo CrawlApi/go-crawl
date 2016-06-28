@@ -8,13 +8,19 @@ import (
 	"time"
 )
 
-type Repo interface {
-	FetchUIDApi() (string, error)
+type Profile interface {
 	FetchProfileApi() (string, error)
-	FetchPostsApi() (string, error)
-	ParseRawUID(string) models.UID
 	ParseRawProfile(string) models.Profile
+}
+
+type Posts interface {
+	FetchPostsApi() (string, error)
 	ParseRawPosts(string) models.Posts
+}
+
+type UID interface {
+	FetchUIDApi() (string, error)
+	ParseRawUID(string) models.UID
 }
 
 func getApi(agent *gorequest.SuperAgent, url string) (string, error) {
