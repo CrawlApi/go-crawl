@@ -38,8 +38,8 @@ func GetHTMLAPI(c *gin.Context) {
 		item := make(map[string]string)
 		for k, v := range api.Datas {
 			item[k] = filterValue(v, s)
-			result.Datas = append(result.Datas, item)
 		}
+		result.Datas = append(result.Datas, item)
 	})
 
 	c.JSON(http.StatusOK, gin.H{
