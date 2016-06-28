@@ -6,5 +6,5 @@ import (
 )
 
 func setupUIDRouters(router *gin.Engine) {
-	router.POST("/uid", controllers.GetUid)
+	router.POST("/api/uid", controllers.GetUid)
 }
