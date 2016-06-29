@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"github.com/PuerkitoBio/goquery"
 	"strings"
+	"fmt"
 )
 
 func GetHTMLAPI(c *gin.Context) {
@@ -15,7 +16,7 @@ func GetHTMLAPI(c *gin.Context) {
 	err := c.BindJSON(&api)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"api": "json data error",
+			"message": "json data error",
 		})
 		return
 	}
@@ -24,14 +25,14 @@ func GetHTMLAPI(c *gin.Context) {
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"api": "url fetch error",
+			"message": "url fetch error",
 		})
 		return
 	}
 
 	var result data.ResultJson
 
-	result.Url = api.Url + query
+	result.Url = fmt.Sprintf(api.Url, query)
 
 	doc.Find(api.StartSelector).Each(func(i int, s *goquery.Selection) {
 
@@ -41,6 +42,33 @@ func GetHTMLAPI(c *gin.Context) {
 		}
 		result.Datas = append(result.Datas, item)
 	})
+
+	if len(api.NextPage) > 0 {
+		for i := 0; i < api.Limit; i++ {
+			url := filterValue(api.NextPage, doc.Selection)
+			if !strings.Contains(url, "http") {
+				url = api.Domain + url
+			}
+			doc, err = goquery.NewDocument(url)
+			if err != nil {
+				c.JSON(http.StatusOK, gin.H{
+					"message": "url fetch error",
+					"api":result,
+				})
+				return
+			}
+
+			doc.Find(api.StartSelector).Each(func(i int, s *goquery.Selection) {
+
+				item := make(map[string]string)
+				for k, v := range api.Datas {
+					item[k] = filterValue(v, s)
+				}
+				result.Datas = append(result.Datas, item)
+			})
+
+		}
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"api": result,
