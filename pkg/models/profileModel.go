@@ -29,7 +29,7 @@ func (p *Profile) FetchErr(err error) {
 func (p *Profile) ParseFBProfile(data FBRawProfile) {
 	p.UserId = data.ID
 	p.Name = data.Name
-	p.Avatar = data.Cover.Source
+	p.Avatar = common.UrlString("https://graph.facebook.com/%s/picture?type=normal", data.ID)
 
 	p.Fans = data.Engagement.Count
 	p.About = data.About
