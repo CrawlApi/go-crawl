@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+	"strings"
 )
 
 const (
@@ -16,19 +17,19 @@ const (
 	ERROR_MSG_JSON_ERROR = "json parse error"
 	ERROR_MSG_WX_POSTS_API_FETCH = "weixin fetch api error"
 	ERROR_MSG_REGEX_MISS_MATCHED = "regex miss matched"
-	ERROR_MSG_URL_NOT_MATCHED  = "Url not matched"
+	ERROR_MSG_URL_NOT_MATCHED = "Url not matched"
 	//ERROR_MSG_TIMEOUT = "request timeout"
 	//ERROR_MSG_URL_MISS_MATCHED = "url miss matched"
 )
 
 const (
 	TIMESTAMP_LAYOUT = "2006-01-02T15:04:05+0000"
+	TIMESTAMP_LAYOUT_WB = "2006-01-02 15:04"
 )
 
 func UrlString(format string, a ...interface{}) string {
 	return fmt.Sprintf(format, a...)
 }
-
 
 func Int2Str(src int) string {
 	return strconv.Itoa(src)
@@ -80,4 +81,19 @@ func query2Int(src string) int {
 		return 5
 	}
 	return i
+}
+
+func ParseWBCreatedAt(dateStr string) string {
+	today := time.Now()
+	if strings.Contains(dateStr, "今天") {
+		dateStr = fmt.Sprint(today.Year(), "-", int(today.Month()), "-", today.Day(), " ", dateStr[len(dateStr) - 5:len(dateStr)])
+	} else {
+		dateStr = fmt.Sprint(today.Year(), "-", dateStr)
+	}
+
+	time, err := time.Parse(TIMESTAMP_LAYOUT_WB, dateStr)
+	if err != nil {
+		return ""
+	}
+	return fmt.Sprintf("%d", time.Unix())
 }

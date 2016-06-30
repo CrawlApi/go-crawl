@@ -66,7 +66,7 @@ func (p *Posts) ParseWBRawPosts(data WBRawPosts) {
 		var data post
 		data.ID = node.Mblog.Bid
 
-		data.CreatedAt = node.Mblog.CreatedAt
+		data.CreatedAt = common.ParseWBCreatedAt(node.Mblog.CreatedAt)
 		//data.UpdatedAt = node.Mblog
 		data.ShareCount = node.Mblog.RepostsCount
 		data.LikeCount = node.Mblog.AttitudesCount
