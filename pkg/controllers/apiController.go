@@ -21,7 +21,7 @@ func GetHTMLAPI(c *gin.Context) {
 		return
 	}
 
-	url := api.Url + query
+	url := fmt.Sprintf(api.Url, query)
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
