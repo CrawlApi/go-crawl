@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 	"strings"
-	"log"
 )
 
 const (
@@ -91,7 +90,7 @@ func ParseWBCreatedAt(dateStr string) string {
 		if int(today.Month()) < 10 {
 			monthPref = "0"
 		}
-		dateStr = fmt.Sprint(today.Year(), "-", monthPref, int(today.Month()) , "-", today.Day(), " ", dateStr[len(dateStr) - 5:len(dateStr)])
+		dateStr = fmt.Sprint(today.Year(), "-", monthPref, int(today.Month()), "-", today.Day(), " ", dateStr[len(dateStr) - 5:len(dateStr)])
 
 	} else {
 		dateStr = fmt.Sprint(today.Year(), "-", dateStr)
