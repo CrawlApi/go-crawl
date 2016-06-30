@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 	"strings"
+	"log"
 )
 
 const (
@@ -86,7 +87,12 @@ func query2Int(src string) int {
 func ParseWBCreatedAt(dateStr string) string {
 	today := time.Now()
 	if strings.Contains(dateStr, "今天") {
-		dateStr = fmt.Sprint(today.Year(), "-", int(today.Month()), "-", today.Day(), " ", dateStr[len(dateStr) - 5:len(dateStr)])
+		var monthPref string
+		if int(today.Month()) < 10 {
+			monthPref = "0"
+		}
+		dateStr = fmt.Sprint(today.Year(), "-", monthPref, int(today.Month()) , "-", today.Day(), " ", dateStr[len(dateStr) - 5:len(dateStr)])
+
 	} else {
 		dateStr = fmt.Sprint(today.Year(), "-", dateStr)
 	}
