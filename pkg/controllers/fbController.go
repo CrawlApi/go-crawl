@@ -20,7 +20,7 @@ const (
 
 const (
 	URL_FACEBOOK_PROFILE = "https://graph.facebook.com/v2.6/%s?fields=%s&access_token=%s"
-	URL_FACEBOOK_POSTS = "https://graph.facebook.com/v2.6/%s/feed?fields=%s,%s&limit=%s&access_token=%s"
+	URL_FACEBOOK_POSTS = "https://graph.facebook.com/v2.6/%s/posts?fields=%s,%s&limit=%s&access_token=%s"
 	URL_FACEBOOK_POST_REACTIONS = "https://graph.facebook.com/v2.6/%s?fields=%s&access_token=%s"
 )
 
