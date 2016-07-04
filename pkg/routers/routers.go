@@ -5,7 +5,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/controllers"
 )
 
-func InitRouters(router *gin.Engine) {
+func InitRouters(router *gin.RouterGroup) {
 
 	setupIGRouters(router)
 	setupFBRouters(router)
@@ -13,8 +13,9 @@ func InitRouters(router *gin.Engine) {
 	setupWXRouters(router)
 	setupUIDRouters(router)
 	setupAPIRouters(router)
+	setupYTBRouters(router)
 }
 
-func setupAPIRouters(router *gin.Engine) {
+func setupAPIRouters(router *gin.RouterGroup) {
 	router.POST("/api/json/:query", controllers.GetHTMLAPI)
 }

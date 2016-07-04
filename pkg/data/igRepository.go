@@ -6,23 +6,43 @@ import (
 	"github.com/parnurzeal/gorequest"
 )
 
+const (
+	URL_INSTAGRAM_PROFILE = "https://www.instagram.com/%s/"
+	URL_INSTAGRAM_POSTS = "https://www.instagram.com/%s/media/"
+)
+
 const REGEX_INSTAGRAM_PROFILE = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
 
 type IGRepo struct {
-	Agent *gorequest.SuperAgent
-	Url   string
+	Agent  *gorequest.SuperAgent
+	UserId string
+	RawUrl string
+}
+
+func NewIGRepoWithUid(userId string) *IGRepo {
+	return &IGRepo{
+		Agent:  common.GetAgent(),
+		UserId: userId,
+	}
+}
+
+func NewIGRepoWithUrl(rawUrl string) *IGRepo {
+	return &IGRepo{
+		Agent:  common.GetAgent(),
+		RawUrl: rawUrl,
+	}
 }
 
 func (r *IGRepo) FetchUIDApi() (string, error) {
-	return getApi(r.Agent, r.Url)
+	return getApi(r.Agent, r.RawUrl)
 }
 
 func (r *IGRepo) FetchProfileApi() (string, error) {
-	return getApi(r.Agent, r.Url)
+	return getApi(r.Agent, common.UrlString(URL_INSTAGRAM_PROFILE, r.UserId))
 }
 
 func (r *IGRepo) FetchPostsApi() (string, error) {
-	return getApi(r.Agent, r.Url)
+	return getApi(r.Agent, common.UrlString(URL_INSTAGRAM_POSTS, r.UserId))
 }
 
 func (r *IGRepo) ParseRawUID(body string) models.UID {

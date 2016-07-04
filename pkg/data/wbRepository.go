@@ -9,30 +9,47 @@ import (
 )
 
 const (
+	URL_WEIBO_PROFILE   = "http://mapi.weibo.com/2/profile?gsid=_&c=&s=&user_domain=%s"
+	URL_WEIBO_POSTS     = "http://m.weibo.cn/%s"
+	URL_WEIBO_API_POSTS = "http://m.weibo.cn/page/tpl?containerid=%s_-_WEIBO_SECOND_PROFILE_WEIBO&itemid=&title=全部微博"
+)
+
+const (
 	REGEXP_WEIBO_POSTS_ID   = `itemid":"(\d+)`
 	REGEXP_WEIBO_POSTS      = `render_data (...+)mod\\/pagelist",(...+)]},'common(...+);</script><script src=`
 	REGEXP_WEIBO_PROFILE_ID = `uid=(\d+)`
 )
 
-const (
-	URL_WEIBO_API_POSTS = "http://m.weibo.cn/page/tpl?containerid=%s_-_WEIBO_SECOND_PROFILE_WEIBO&itemid=&title=全部微博"
-)
-
 type WBRepo struct {
-	Agent *gorequest.SuperAgent
-	Url   string
+	Agent  *gorequest.SuperAgent
+	UserId string
+	RawUrl string
+}
+
+func NewWBRepoWithUid(userId string) *WBRepo {
+	return &WBRepo{
+		Agent:  common.GetAgent(),
+		UserId: userId,
+	}
+}
+
+func NewWBRepoWithUrl(rawUrl string) *WBRepo {
+	return &WBRepo{
+		Agent:  common.GetAgent(),
+		RawUrl: rawUrl,
+	}
 }
 
 func (r *WBRepo) FetchUIDApi() (string, error) {
-	return getApi(r.Agent, r.Url)
+	return getApi(r.Agent, r.RawUrl)
 }
 
 func (r *WBRepo) FetchProfileApi() (string, error) {
-	return getApi(r.Agent, r.Url)
+	return getApi(r.Agent, common.UrlString(URL_WEIBO_PROFILE, r.UserId))
 }
 
 func (r *WBRepo) FetchPostsApi() (string, error) {
-	body, err := getApi(r.Agent, r.Url)
+	body, err := getApi(r.Agent, common.UrlString(URL_WEIBO_POSTS, r.UserId))
 	if err != nil {
 		return body, err
 	}

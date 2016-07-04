@@ -5,14 +5,16 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/data"
 )
 
-func GetWXProfile(c *gin.Context) {
+
+
+func GetYTBProfile(c *gin.Context) {
 	userId := c.Param("userId")
-	repo := data.NewWXRepoWithUid(userId)
+	repo := data.NewYTBRepoWithUid(userId)
 	getProfile(c, repo)
 }
 
-func GetWXPosts(c *gin.Context) {
+func GetYTBPosts(c *gin.Context) {
 	userId := c.Param("userId")
-	repo := data.NewWXRepoWithUid(userId)
+	repo := data.NewYTBRepoWithUid(userId)
 	getPosts(c, repo)
 }

@@ -12,7 +12,7 @@ func main() {
 	common.StartUp()
 
 	engine := gin.Default()
-	routers.InitRouters(engine)
+	routers.InitRouters(&engine.RouterGroup)
 
 	addr := common.AppConfig.Server
 	log.Println("Start Server...")

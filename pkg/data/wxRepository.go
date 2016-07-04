@@ -8,6 +8,11 @@ import (
 )
 
 const (
+	URL_WECHAT_PROFILE = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=n&_sug_type_="
+	URL_WECHAT_POSTS = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=n&_sug_type_="
+)
+
+const (
 	// WEIXIN CONST
 	REGEXP_WEIXIN_PROFILE_ID = `微信号: (\S+)</p>`
 	REGEXP_WEIXIN_LOGO = `src="((http://img01.sogoucdn.com/app/a)\S+)"`
@@ -18,21 +23,35 @@ const (
 )
 
 type WXRepo struct {
-	Agent          *gorequest.SuperAgent
-	Url            string
-	ProfileRawData string
+	Agent  *gorequest.SuperAgent
+	UserId string
+	RawUrl string
+}
+
+func NewWXRepoWithUid(userId string) *WXRepo {
+	return &WXRepo{
+		Agent:  common.GetAgent(),
+		UserId: userId,
+	}
+}
+
+func NewWXRepoWithUrl(rawUrl string) *WXRepo {
+	return &WXRepo{
+		Agent:  common.GetAgent(),
+		RawUrl: rawUrl,
+	}
 }
 
 func (r *WXRepo) FetchUIDApi() (string, error) {
-	return getApi(r.Agent, r.Url)
+	return getApi(r.Agent, r.RawUrl)
 }
 
 func (r *WXRepo) FetchProfileApi() (string, error) {
-	return getApi(r.Agent, r.Url)
+	return getApi(r.Agent, common.UrlString(URL_WECHAT_PROFILE, r.UserId))
 }
 
 func (r *WXRepo) FetchPostsApi() (string, error) {
-	body, err := getApi(r.Agent, r.Url)
+	body, err := getApi(r.Agent, common.UrlString(URL_WECHAT_POSTS, r.UserId))
 	if err != nil {
 		return body, err
 	}

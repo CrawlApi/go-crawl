@@ -3,15 +3,6 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/data"
-	"github.com/llitfkitfk/cirkol/pkg/common"
-)
-
-const (
-	URL_INSTAGRAM_PROFILE = "https://www.instagram.com/%s/"
-	URL_INSTAGRAM_PROFILE_V2 = "https://i.instagram.com/api/v1/users/%s/info/"
-	URL_INSTAGRAM_POSTS = "https://www.instagram.com/%s/media/"
-	URL_INSTAGRAM_POSTS_V2 = "https://i.instagram.com/api/v1/users/%s/info/"
-
 )
 
 func GetIGProfile(c *gin.Context) {
@@ -21,17 +12,9 @@ func GetIGProfile(c *gin.Context) {
 	var repo data.Profile
 	switch v {
 	case "v2":
-		repo = &data.IGV2Repo{
-			Agent:  common.GetAgent(),
-			Url:    common.UrlString(URL_INSTAGRAM_PROFILE_V2, userId),
-
-		}
+		repo = data.NewIGV2RepoWithUid(userId)
 	default:
-		repo = &data.IGRepo{
-			Agent:  common.GetAgent(),
-			Url:    common.UrlString(URL_INSTAGRAM_PROFILE, userId),
-
-		}
+		repo = data.NewIGRepoWithUid(userId)
 	}
 
 	getProfile(c, repo)
@@ -44,17 +27,9 @@ func GetIGPosts(c *gin.Context) {
 	var repo data.Posts
 	switch v {
 	case "v2":
-		repo = &data.IGV2Repo{
-			Agent:  common.GetAgent(),
-			Url:    common.UrlString(URL_INSTAGRAM_POSTS_V2, userId),
-
-		}
+		repo = data.NewIGV2RepoWithUid(userId)
 	default:
-		repo = &data.IGRepo{
-			Agent:  common.GetAgent(),
-			Url:    common.UrlString(URL_INSTAGRAM_POSTS, userId),
-
-		}
+		repo = data.NewIGRepoWithUid(userId)
 	}
 
 	getPosts(c, repo)

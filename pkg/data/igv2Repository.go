@@ -6,27 +6,47 @@ import (
 	"github.com/parnurzeal/gorequest"
 )
 
-type IGV2Repo struct {
-	Agent *gorequest.SuperAgent
-	Url   string
-}
-
 const (
-	URL_INSTAGRAM_API_POSTS = "https://www.instagram.com/%s/"
-	REGEX_INSTAGRAM_POSTS = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
-	REGEX_INSTAGRAM_PROFILE_ID   = `"owner": {"id": "(\d+)`
+	URL_INSTAGRAM_PROFILE_V2 = "https://i.instagram.com/api/v1/users/%s/info/"
+	URL_INSTAGRAM_POSTS_V2 = "https://i.instagram.com/api/v1/users/%s/info/"
 )
 
+const (
+	URL_INSTAGRAM_API_POSTS    = "https://www.instagram.com/%s/"
+	REGEX_INSTAGRAM_POSTS      = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
+	REGEX_INSTAGRAM_PROFILE_ID = `"owner": {"id": "(\d+)`
+)
+
+type IGV2Repo struct {
+	Agent *gorequest.SuperAgent
+	UserId   string
+	RawUrl   string
+}
+
+func NewIGV2RepoWithUid(userId string) *IGV2Repo {
+	return &IGV2Repo{
+		Agent:  common.GetAgent(),
+		UserId: userId,
+	}
+}
+
+func NewIGV2RepoWithUrl(rawUrl string) *IGV2Repo {
+	return &IGV2Repo{
+		Agent:  common.GetAgent(),
+		RawUrl: rawUrl,
+	}
+}
+
 func (r *IGV2Repo) FetchUIDApi() (string, error) {
-	return getApi(r.Agent, r.Url)
+	return getApi(r.Agent, r.RawUrl)
 }
 
 func (r *IGV2Repo) FetchProfileApi() (string, error) {
-	return getApi(r.Agent, r.Url)
+	return getApi(r.Agent, common.UrlString(URL_INSTAGRAM_PROFILE_V2, r.UserId))
 }
 
 func (r *IGV2Repo) FetchPostsApi() (string, error) {
-	body, err := getApi(r.Agent, r.Url)
+	body, err := getApi(r.Agent, common.UrlString(URL_INSTAGRAM_POSTS_V2, r.UserId))
 	if err != nil {
 		return body, err
 	}

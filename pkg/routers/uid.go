@@ -5,6 +5,6 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/controllers"
 )
 
-func setupUIDRouters(router *gin.Engine) {
+func setupUIDRouters(router *gin.RouterGroup) {
 	router.POST("/api/uid", controllers.GetUid)
 }

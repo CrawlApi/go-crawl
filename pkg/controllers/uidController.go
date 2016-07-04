@@ -16,25 +16,13 @@ func GetUid(c *gin.Context) {
 	var repo data.UID
 	switch checkUrl(rawurl) {
 	case "facebook":
-		repo = &data.FBRepo{
-			Agent:  common.GetAgent(),
-			Url:   rawurl,
-		}
+		repo = data.NewFBRepoWithUrl(rawurl)
 	case "instagram":
-		repo = &data.IGV2Repo{
-			Agent:  common.GetAgent(),
-			Url:   rawurl,
-		}
+		repo = data.NewIGV2RepoWithUrl(rawurl)
 	case "weixin":
-		repo = &data.WXRepo{
-			Agent:  common.GetAgent(),
-			Url:   rawurl,
-		}
+		repo = data.NewWXRepoWithUrl(rawurl)
 	case "weibo":
-		repo = &data.WBRepo{
-			Agent:  common.GetAgent(),
-			Url:   rawurl,
-		}
+		repo = data.NewWBRepoWithUrl(rawurl)
 	}
 
 	getRealUid(c, repo)
