@@ -5,7 +5,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"strings"
 	"sync"
-	"log"
 	"github.com/llitfkitfk/cirkol/pkg/common"
 )
 
@@ -36,7 +35,6 @@ func findDocWithSelect(selection *goquery.Selection, selector, domain string) *g
 	if !strings.Contains(url, "http") {
 		url = domain + url
 	}
-	log.Println("select url: ", url)
 
 	doc, _ := goquery.NewDocument(url)
 	return doc
