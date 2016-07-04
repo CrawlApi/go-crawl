@@ -27,6 +27,20 @@ func GetFBPostReactions(c *gin.Context) {
 	getReactions(c, repo)
 }
 
+func GetFBPostInfo(c *gin.Context) {
+	var api models.APIJson
+	err := c.BindJSON(&api)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status": false,
+			"message": "json data error",
+		})
+		return
+	}
+	//getPostInfo()
+}
+
+
 func getReactions(c *gin.Context, repo *data.FBRepo) {
 	timeout := c.DefaultQuery("timeout", "5")
 	timer := common.Timeout(timeout)

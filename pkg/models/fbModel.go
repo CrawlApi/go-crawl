@@ -1,5 +1,6 @@
 package models
 
+
 type FBRawProfile struct {
 	About    string `json:"about"`
 	AppLinks struct {

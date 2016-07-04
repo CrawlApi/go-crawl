@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/data"
+	"github.com/llitfkitfk/cirkol/pkg/models"
+	"net/http"
 )
 
 const (
@@ -11,18 +13,27 @@ const (
 )
 
 func GetUid(c *gin.Context) {
-	rawurl := c.PostForm("url")
+
+	var api models.APIJson
+	err := c.BindJSON(&api)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status": false,
+			"message": "post json data error",
+		})
+		return
+	}
 
 	var repo data.UID
-	switch checkUrl(rawurl) {
+	switch checkUrl(api.Url) {
 	case "facebook":
-		repo = data.NewFBRepoWithUrl(rawurl)
+		repo = data.NewFBRepoWithUrl(api.Url)
 	case "instagram":
-		repo = data.NewIGV2RepoWithUrl(rawurl)
+		repo = data.NewIGV2RepoWithUrl(api.Url)
 	case "weixin":
-		repo = data.NewWXRepoWithUrl(rawurl)
+		repo = data.NewWXRepoWithUrl(api.Url)
 	case "weibo":
-		repo = data.NewWBRepoWithUrl(rawurl)
+		repo = data.NewWBRepoWithUrl(api.Url)
 	}
 
 	getRealUid(c, repo)

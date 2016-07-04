@@ -3,13 +3,13 @@ package data
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/llitfkitfk/cirkol/pkg/common"
 	"strings"
 	"sync"
-	"github.com/llitfkitfk/cirkol/pkg/common"
 )
 
 type ApiJson struct {
-	Domain        string `json:"domain"`
+	Domain        string            `json:"domain"`
 	Url           string            `json:"url"`
 	StartSelector string            `json:"start_selector"`
 	Datas         map[string]string `json:"datas"`
@@ -20,8 +20,8 @@ type ApiJson struct {
 type ResultJson struct {
 	Url    string        `json:"url"`
 	Datas  []interface{} `json:"datas"`
-	Status bool   `json:"status"`
-	Date   int64  `json:"date"`
+	Status bool          `json:"status"`
+	Date   int64         `json:"date"`
 }
 
 func findDocWithUrl(url, query string) *goquery.Document {
@@ -112,7 +112,7 @@ func parseSelector(src string) (string, string) {
 func parseConfig(selector string) Config {
 	var config Config
 	if strings.Contains(selector, "@") {
-		config.Attr = selector[strings.Index(selector, "@") + 1: len(selector)]
+		config.Attr = selector[strings.Index(selector, "@")+1 : len(selector)]
 		selector = selector[0:strings.Index(selector, "@")]
 	}
 
@@ -159,7 +159,7 @@ func filterValue(selection *goquery.Selection, selector string) string {
 		if len(res) > common.Str2Int(splitor[0]) {
 			if len(splitor[1]) > 0 {
 				if len(res) > common.Str2Int(splitor[1]) {
-					res = res[common.Str2Int(splitor[0]): common.Str2Int(splitor[1])]
+					res = res[common.Str2Int(splitor[0]):common.Str2Int(splitor[1])]
 				}
 			} else {
 				res = res[common.Str2Int(splitor[0]):]
