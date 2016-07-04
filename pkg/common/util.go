@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 	"strings"
-	"log"
 )
 
 const (
