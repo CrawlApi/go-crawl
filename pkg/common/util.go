@@ -24,7 +24,7 @@ const (
 
 const (
 	TIMESTAMP_LAYOUT = "2006-01-02T15:04:05+0000"
-	TIMESTAMP_LAYOUT_WB = "2006-01-02 15:04"
+	TIMESTAMP_LAYOUT_WB = "2006-1-2 15:04"
 )
 
 func UrlString(format string, a ...interface{}) string {
@@ -35,12 +35,20 @@ func Int2Str(src int) string {
 	return strconv.Itoa(src)
 }
 
-func DateFormat(dateStr string) string {
+func Str2Int(src string) int64 {
+	i, err := strconv.Atoi(src)
+	if err != nil {
+		return 0
+	}
+	return int64(i)
+}
+
+func DateFormat(dateStr string) int64 {
 	time, err := time.Parse(TIMESTAMP_LAYOUT, dateStr)
 	if err != nil {
-		return ""
+		return 0
 	}
-	return fmt.Sprintf("%d", time.Unix())
+	return time.Unix()
 
 }
 
@@ -83,22 +91,17 @@ func query2Int(src string) int {
 	return i
 }
 
-func ParseWBCreatedAt(dateStr string) string {
+func ParseWBCreatedAt(dateStr string) int64 {
 	today := time.Now()
+	var resultStr string
 	if strings.Contains(dateStr, "今天") {
-		var monthPref string
-		if int(today.Month()) < 10 {
-			monthPref = "0"
-		}
-		dateStr = fmt.Sprint(today.Year(), "-", monthPref, int(today.Month()), "-", today.Day(), " ", dateStr[len(dateStr) - 5:len(dateStr)])
-
+		resultStr = fmt.Sprint(today.Year(), "-", int(today.Month()), "-", today.Day(), " ", dateStr[len(dateStr) - 5:len(dateStr)])
 	} else {
-		dateStr = fmt.Sprint(today.Year(), "-", dateStr)
+		resultStr = fmt.Sprint(today.Year(), "-", dateStr)
 	}
-
-	time, err := time.Parse(TIMESTAMP_LAYOUT_WB, dateStr)
+	time, err := time.Parse(TIMESTAMP_LAYOUT_WB, resultStr)
 	if err != nil {
-		return ""
+		return 0
 	}
-	return fmt.Sprintf("%d", time.Unix())
+	return time.Unix()
 }
