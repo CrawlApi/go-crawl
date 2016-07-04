@@ -140,11 +140,6 @@ func filterValue(selection *goquery.Selection, selector string) string {
 	config := parseConfig(selector)
 
 	s := selection.Find(config.Selector)
-	var res string
-	if len(config.ChildSelector) > 0 {
-		log.Println(s.Find(config.ChildSelector).Nodes)
-		s.Find(config.ChildSelector)
-	}
 
 	if config.First {
 		s = s.First()
@@ -154,6 +149,7 @@ func filterValue(selection *goquery.Selection, selector string) string {
 		s = s.Last()
 	}
 
+	var res string
 	if len(config.Attr) > 0 {
 		res, _ = s.Attr(config.Attr)
 	} else {
@@ -162,12 +158,15 @@ func filterValue(selection *goquery.Selection, selector string) string {
 
 	if len(config.Limit) > 0 {
 		splitor := strings.Split(config.Limit, "-")
-		if len(splitor[1]) == 0 {
-			res = res[common.Str2Int(splitor[0]):]
-		} else {
-			res = res[common.Str2Int(splitor[0]): common.Str2Int(splitor[1])]
+		if len(res) > common.Str2Int(splitor[0]) {
+			if len(splitor[1]) > 0 {
+				if len(res) > common.Str2Int(splitor[1]) {
+					res = res[common.Str2Int(splitor[0]): common.Str2Int(splitor[1])]
+				}
+			} else {
+				res = res[common.Str2Int(splitor[0]):]
+			}
 		}
 	}
-
 	return res
 }
