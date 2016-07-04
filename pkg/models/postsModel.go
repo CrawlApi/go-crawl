@@ -6,8 +6,8 @@ import (
 
 type post struct {
 	ID                 string `json:"id"`
-	CreatedAt          string `json:"created_at"`
-	UpdatedAt          string `json:"updated_at"`
+	CreatedAt          int64 `json:"created_at"`
+	UpdatedAt          int64 `json:"updated_at"`
 	ShareCount         int    `json:"share_count"`
 	LikeCount          int    `json:"like_count"`
 	CommentCount       int    `json:"comment_count"`
@@ -89,7 +89,7 @@ func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 	for _, item := range data.List {
 		var data post
 		data.ID = common.Int2Str(item.AppMsgExtInfo.Fileid)
-		data.CreatedAt = common.Int2Str(item.CommMsgInfo.Datetime)
+		data.CreatedAt = int64(item.CommMsgInfo.Datetime)
 
 		data.ContentFullPicture = item.AppMsgExtInfo.Cover
 
@@ -106,7 +106,7 @@ func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 			for _, item2 := range item.AppMsgExtInfo.MultiAppMsgItemList {
 				var data2 post
 				data2.ID = common.Int2Str(item2.Fileid)
-				data2.CreatedAt = common.Int2Str(item.CommMsgInfo.Datetime)
+				data2.CreatedAt = int64(item.CommMsgInfo.Datetime)
 
 				data2.ContentFullPicture = item2.Cover
 
@@ -129,7 +129,7 @@ func (p *Posts) ParseIGRawPosts(rawPost IGRawPosts) {
 	for _, item := range rawPost.Items {
 		var data post
 		data.ID = item.ID
-		data.CreatedAt = item.CreatedTime
+		data.CreatedAt = common.Str2Int(item.CreatedTime)
 
 		data.LikeCount = item.Likes.Count
 		data.CommentCount = item.Comments.Count
@@ -153,7 +153,7 @@ func (p *Posts) ParseIGV2RawPosts(rawPost IGV2RawPosts) {
 	for _, node := range rawPost.Nodes {
 		var data post
 		data.ID = node.ID
-		data.CreatedAt = common.Int2Str(node.Date)
+		data.CreatedAt = int64(node.Date)
 
 		data.LikeCount = node.Likes.Count
 		data.CommentCount = node.Comments.Count

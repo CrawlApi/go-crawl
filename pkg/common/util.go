@@ -35,12 +35,20 @@ func Int2Str(src int) string {
 	return strconv.Itoa(src)
 }
 
-func DateFormat(dateStr string) string {
+func Str2Int(src string) int64 {
+	i, err := strconv.Atoi(src)
+	if err != nil {
+		return 0
+	}
+	return int64(i)
+}
+
+func DateFormat(dateStr string) int64 {
 	time, err := time.Parse(TIMESTAMP_LAYOUT, dateStr)
 	if err != nil {
-		return ""
+		return 0
 	}
-	return fmt.Sprintf("%d", time.Unix())
+	return time.Unix()
 
 }
 
@@ -83,7 +91,7 @@ func query2Int(src string) int {
 	return i
 }
 
-func ParseWBCreatedAt(dateStr string) string {
+func ParseWBCreatedAt(dateStr string) int64 {
 	today := time.Now()
 	var resultStr string
 	if strings.Contains(dateStr, "今天") {
@@ -93,7 +101,7 @@ func ParseWBCreatedAt(dateStr string) string {
 	}
 	time, err := time.Parse(TIMESTAMP_LAYOUT_WB, resultStr)
 	if err != nil {
-		return ""
+		return 0
 	}
-	return fmt.Sprintf("%d", time.Unix())
+	return time.Unix()
 }
