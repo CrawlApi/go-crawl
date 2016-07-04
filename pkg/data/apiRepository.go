@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"strings"
+	"sync"
 )
 
 type ApiJson struct {
-	Domain	string `json:"domain"`
+	Domain        string `json:"domain"`
 	Url           string            `json:"url"`
 	StartSelector string            `json:"start_selector"`
 	Datas         map[string]string `json:"datas"`
@@ -16,61 +17,83 @@ type ApiJson struct {
 }
 
 type ResultJson struct {
-	Url   string        `json:"url"`
-	Datas []interface{} `json:"datas"`
+	Url    string        `json:"url"`
+	Datas  []interface{} `json:"datas"`
+	Status bool   `json:"status"`
+	Date   int64  `json:"date"`
 }
 
-func ParseHTMLAPI(api ApiJson, query string) ResultJson {
-	var result ResultJson
-	url := fmt.Sprintf(api.Url, query)
-	doc, err := goquery.NewDocument(url)
+func findDocWithUrl(url, query string) *goquery.Document {
+	rawUrl := fmt.Sprintf(url, query)
+	doc, _ := goquery.NewDocument(rawUrl)
+	return doc
+}
 
-	if err != nil {
-		return result
+func findDocWithSelect(selection *goquery.Selection, selector, domain string) *goquery.Document {
+	url := filterValue(selection, selector)
+	if !strings.Contains(url, "http") {
+		url = domain + url
 	}
+	doc, _ := goquery.NewDocument(url)
+	return doc
+}
 
+func findItems(selection *goquery.Selection, selector string, config map[string]string) []interface{} {
+	var items []interface{}
+
+	selection.Find(selector).Each(func(i int, s *goquery.Selection) {
+		item := make(map[string]string)
+		for k, v := range config {
+			item[k] = filterValue(s, v)
+		}
+		items = append(items, item)
+	})
+	return items
+}
+
+func ParseHTMLAPI(api ApiJson, query string, ch chan ResultJson) {
+
+	var wg sync.WaitGroup
+
+	var result ResultJson
 	result.Url = fmt.Sprintf(api.Url, query)
 
-	doc.Find(api.StartSelector).Each(func(i int, s *goquery.Selection) {
+	doc := findDocWithUrl(api.Url, query)
+	wg.Add(1)
+	go func() {
+		items := findItems(doc.Selection, api.StartSelector, api.Datas)
 
-		item := make(map[string]string)
-		for k, v := range api.Datas {
-			item[k] = filterValue(v, s)
-		}
-		result.Datas = append(result.Datas, item)
-	})
+		result.Datas = append(result.Datas, items)
+		wg.Done()
+	}()
 
 	if len(api.NextPage) > 0 {
 		for i := 0; i < api.Limit; i++ {
-			url := filterValue(api.NextPage, doc.Selection)
-			if !strings.Contains(url, "http") {
-				url = api.Domain + url
-			}
-			doc, err = goquery.NewDocument(url)
-			if err != nil {
-				return result
-			}
+			wg.Add(1)
+			go func() {
+				docN := findDocWithSelect(doc.Selection, api.NextPage, api.Domain)
 
-			doc.Find(api.StartSelector).Each(func(i int, s *goquery.Selection) {
+				itemsN := findItems(docN.Selection, api.StartSelector, api.Datas)
 
-				item := make(map[string]string)
-				for k, v := range api.Datas {
-					item[k] = filterValue(v, s)
-				}
-				result.Datas = append(result.Datas, item)
-			})
+				result.Datas = append(result.Datas, itemsN)
+				wg.Done()
+			}()
 		}
 	}
-	return result
+
+	wg.Wait()
+
+	ch <- result
+
 }
 
-func filterValue(value string, s *goquery.Selection) string {
-	if strings.Contains(value, "@") {
-		i := strings.Index(value, "@")
-		result, _ := s.Find(value[0:i]).Attr(value[i + 1: len(value)])
+func filterValue(selection *goquery.Selection, selector string) string {
+	if strings.Contains(selector, "@") {
+		i := strings.Index(selector, "@")
+		result, _ := selection.Find(selector[0:i]).Attr(selector[i + 1: len(selector)])
 		return result
 	} else {
-		return s.Find(value).Text()
+		return selection.Find(selector).Text()
 	}
 
 }

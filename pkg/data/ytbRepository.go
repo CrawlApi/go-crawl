@@ -50,20 +50,21 @@ func (r *YTBRepo) FetchPostsApi() (string, error) {
 }
 
 func (r *YTBRepo) ParseRawUID(body string) models.UID {
-	matcher := common.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
+	//matcher := common.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
 
 	var uid models.UID
-	uid.Media = "wb"
-	if len(matcher) > 1 {
-		uid.UserId = matcher[1]
-		uid.Status = true
-	}
-	uid.Date = common.Now()
+	//uid.Media = "wb"
+	//if len(matcher) > 1 {
+	//	uid.UserId = matcher[1]
+	//	uid.Status = true
+	//}
+	//uid.Date = common.Now()
 	return uid
 }
 
 func (r *YTBRepo) ParseRawProfile(body string) models.Profile {
 	var rawProfile models.WBRawProfile
+
 	err := common.ParseJson(body, &rawProfile)
 
 	var profile models.Profile
