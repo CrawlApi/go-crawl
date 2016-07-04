@@ -35,7 +35,15 @@ func Int2Str(src int) string {
 	return strconv.Itoa(src)
 }
 
-func Str2Int(src string) int64 {
+func Str2Int(src string) int {
+	i, err := strconv.Atoi(src)
+	if err != nil {
+		return 0
+	}
+	return i
+}
+
+func Str2Int64(src string) int64 {
 	i, err := strconv.Atoi(src)
 	if err != nil {
 		return 0

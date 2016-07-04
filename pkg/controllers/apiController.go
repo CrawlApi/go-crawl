@@ -8,7 +8,7 @@ import (
 )
 
 func GetHTMLAPI(c *gin.Context) {
-	timeout := c.DefaultQuery("timeout", "5")
+	timeout := c.DefaultQuery("timeout", "10")
 	timer := common.Timeout(timeout)
 	query := c.Param("query")
 
@@ -30,7 +30,10 @@ func GetHTMLAPI(c *gin.Context) {
 		result = TimeOutResult()
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data": result,
+		"datas": result.Datas,
+		"url":result.Url,
+		"date":result.Date,
+		"status":result.Status,
 	})
 
 }

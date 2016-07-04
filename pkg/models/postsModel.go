@@ -129,7 +129,7 @@ func (p *Posts) ParseIGRawPosts(rawPost IGRawPosts) {
 	for _, item := range rawPost.Items {
 		var data post
 		data.ID = item.ID
-		data.CreatedAt = common.Str2Int(item.CreatedTime)
+		data.CreatedAt = common.Str2Int64(item.CreatedTime)
 
 		data.LikeCount = item.Likes.Count
 		data.CommentCount = item.Comments.Count
