@@ -15,6 +15,9 @@ func main() {
 	routers.InitRouters(&engine.RouterGroup)
 
 	addr := common.AppConfig.Server
+
 	log.Println("Start Server...")
+	log.Println("Server Version: ", common.AppConfig.Version)
+
 	engine.Run(addr)
 }
