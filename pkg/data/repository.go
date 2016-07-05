@@ -18,13 +18,18 @@ type Posts interface {
 	ParseRawPosts(string) models.Posts
 }
 
+type Post interface {
+	FetchPostInfo() (string, error)
+	ParsePostInfo(string) models.Post
+}
+
 type UID interface {
 	FetchUIDApi() (string, error)
 	ParseRawUID(string) models.UID
 }
 
 func getApi(agent *gorequest.SuperAgent, url string) (string, error) {
-	_, body, errs := agent.Timeout(10 * time.Second).Set("accept-language", "en-US").Get(url).End()
+	_, body, errs := agent.Timeout(10*time.Second).Set("accept-language", "en-US").Get(url).End()
 	if errs != nil {
 		return body, errors.New(common.ERROR_MSG_API_TIMEOUT)
 	}

@@ -4,10 +4,10 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/common"
 )
 
-type post struct {
+type Post struct {
 	ID                 string `json:"id"`
-	CreatedAt          int64 `json:"created_at"`
-	UpdatedAt          int64 `json:"updated_at"`
+	CreatedAt          int64  `json:"created_at"`
+	UpdatedAt          int64  `json:"updated_at"`
 	ShareCount         int    `json:"share_count"`
 	LikeCount          int    `json:"like_count"`
 	CommentCount       int    `json:"comment_count"`
@@ -20,10 +20,35 @@ type post struct {
 	HasComment         bool   `json:"has_comment"`
 	RawData            string `json:"raw_data"`
 	Date               int64  `json:"date"`
+	Status             bool   `json:"status"`
+	ErrMessage         string `json:"error_message"`
+}
+
+func (p *Post) FetchErr(err error) {
+	p.ErrMessage = err.Error()
+	p.Date = common.Now()
+	p.Status = false
+}
+
+func (p *Post) ParseFBRawPost(data FBRawPost) {
+	p.ID = data.ID
+	p.CreatedAt = data.CreatedAt
+	p.UpdatedAt = data.UpdatedAt
+	p.ShareCount = data.ShareCount
+	p.LikeCount = data.LikeCount
+	p.CommentCount = data.CommentCount
+	p.ContentType = data.ContentType
+	p.ContentBody = data.ContentBody
+	p.ContentFullPicture = data.ContentFullPicture
+	p.PermalinkUrl = data.PermalinkUrl
+	p.HasComment = data.HasComment
+	p.RawData = common.Interface2String(data)
+	p.Date = common.Now()
+	p.Status = true
 }
 
 type Posts struct {
-	Items      []post `json:"data"`
+	Items      []Post `json:"data"`
 	Date       int64  `json:"date"`
 	Status     bool   `json:"status"`
 	RawData    string `json:"raw_data"`
@@ -38,7 +63,7 @@ func (p *Posts) FetchErr(err error) {
 
 func (p *Posts) ParseFBRawPosts(data FBRawPosts) {
 	for _, item := range data.Data {
-		var data post
+		var data Post
 		data.ID = item.ID
 		data.CreatedAt = common.DateFormat(item.CreatedTime)
 		data.UpdatedAt = common.DateFormat(item.UpdatedTime)
@@ -63,7 +88,7 @@ func (p *Posts) ParseFBRawPosts(data FBRawPosts) {
 
 func (p *Posts) ParseWBRawPosts(data WBRawPosts) {
 	for _, node := range data.CardGroup {
-		var data post
+		var data Post
 		data.ID = node.Mblog.Bid
 
 		data.CreatedAt = common.ParseWBCreatedAt(node.Mblog.CreatedAt)
@@ -87,7 +112,7 @@ func (p *Posts) ParseWBRawPosts(data WBRawPosts) {
 
 func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 	for _, item := range data.List {
-		var data post
+		var data Post
 		data.ID = common.Int2Str(item.AppMsgExtInfo.Fileid)
 		data.CreatedAt = int64(item.CommMsgInfo.Datetime)
 
@@ -104,7 +129,7 @@ func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 
 		if item.AppMsgExtInfo.IsMulti == 1 {
 			for _, item2 := range item.AppMsgExtInfo.MultiAppMsgItemList {
-				var data2 post
+				var data2 Post
 				data2.ID = common.Int2Str(item2.Fileid)
 				data2.CreatedAt = int64(item.CommMsgInfo.Datetime)
 
@@ -127,7 +152,7 @@ func (p *Posts) ParseWXRawPosts(data WXRawPosts) {
 func (p *Posts) ParseIGRawPosts(rawPost IGRawPosts) {
 
 	for _, item := range rawPost.Items {
-		var data post
+		var data Post
 		data.ID = item.ID
 		data.CreatedAt = common.Str2Int64(item.CreatedTime)
 
@@ -151,7 +176,7 @@ func (p *Posts) ParseIGRawPosts(rawPost IGRawPosts) {
 
 func (p *Posts) ParseIGV2RawPosts(rawPost IGV2RawPosts) {
 	for _, node := range rawPost.Nodes {
-		var data post
+		var data Post
 		data.ID = node.ID
 		data.CreatedAt = int64(node.Date)
 

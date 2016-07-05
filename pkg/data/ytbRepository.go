@@ -2,13 +2,13 @@ package data
 
 import (
 	"github.com/llitfkitfk/cirkol/pkg/common"
-	"github.com/parnurzeal/gorequest"
 	"github.com/llitfkitfk/cirkol/pkg/models"
+	"github.com/parnurzeal/gorequest"
 )
 
 const (
 	URL_YOUTUBE_PROFILE = "https://www.youtube.com/user/%s/about"
-	URL_YOUTUBE_POSTS = "https://www.youtube.com/user/%s/videos"
+	URL_YOUTUBE_POSTS   = "https://www.youtube.com/user/%s/videos"
 )
 
 type YTBRepo struct {

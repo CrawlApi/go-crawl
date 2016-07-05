@@ -2,7 +2,6 @@ package models
 
 import "github.com/llitfkitfk/cirkol/pkg/common"
 
-
 type UID struct {
 	Type       string `json:"type"`
 	UserId     string `json:"user_id"`

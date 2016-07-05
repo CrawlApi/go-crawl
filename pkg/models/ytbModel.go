@@ -6,5 +6,5 @@ type YTBModel struct {
 		URL        string `json:"url"`
 		ViewCounts string `json:"view_counts"`
 	} `json:"datas"`
-	URL   string `json:"url"`
+	URL string `json:"url"`
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/parnurzeal/gorequest"
+	"strings"
 )
 
 const (
@@ -22,7 +23,17 @@ const (
 	URL_FACEBOOK_POST_REACTIONS = "https://graph.facebook.com/v2.6/%s?fields=%s&access_token=%s"
 )
 
-const REGEXP_FACEBOOK_PROFILE_ID = `fb://(page|profile|group)/(\d+)`
+const (
+	REGEXP_FACEBOOK_PROFILE_ID         = `fb://(page|profile|group)/(\d+)`
+	REGEXP_FACEBOOK_POST_ID            = `posts/(\d+)`
+	REGEXP_FACEBOOK_POST_CREATED_AT    = `data-utime="(\d+)"`
+	REGEXP_FACEBOOK_POST_COMMENT_COUNT = `"commentcount":(\d+)`
+	REGEXP_FACEBOOK_POST_LIKE_COUNT    = `"likecount":(\d+)`
+	REGEXP_FACEBOOK_POST_SHARE_COUNT   = `"sharecount":(\d+)`
+	REGEXP_FACEBOOK_POST_CONTENT       = `<meta name="description" content="(...+)" /><meta name="robots"`
+	REGEXP_FACEBOOK_POST_PIC           = `<img class="scaledImageFitWidth img" src="(...+)" alt="`
+	REGEXP_FACEBOOK_POST_PERMALINK     = `"permalink":"(...+)","permalinkcommentid"`
+)
 
 type FBRepo struct {
 	Agent  *gorequest.SuperAgent
@@ -76,6 +87,10 @@ func (r *FBRepo) FetchReactionsApi() (string, error) {
 	return getApi(r.Agent, common.UrlString(URL_FACEBOOK_POST_REACTIONS, r.PostId, PAGE_REACTIONS_FIELDS_ENABLE, common.GetFBToken()))
 }
 
+func (r *FBRepo) FetchPostInfo() (string, error) {
+	return getApi(r.Agent, r.RawUrl)
+}
+
 func (r *FBRepo) ParseRawUID(body string) models.UID {
 
 	matcher := common.Matcher(REGEXP_FACEBOOK_PROFILE_ID, body)
@@ -116,6 +131,39 @@ func (r *FBRepo) ParseRawPosts(body string) models.Posts {
 	posts.ParseFBRawPosts(rawPosts)
 
 	return posts
+}
+
+func (r *FBRepo) ParsePostInfo(body string) models.Post {
+
+	data, _ := r.parseRawPost(body)
+
+	var post models.Post
+	post.ParseFBRawPost(data)
+	return post
+}
+
+func (r *FBRepo) parseRawPost(body string) (models.FBRawPost, error) {
+	var data models.FBRawPost
+	data.ID = common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_ID, r.RawUrl)
+	data.CreatedAt = common.Str2Int64(common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_CREATED_AT, body))
+	//data.UpdatedAt = common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_ID, body)
+	data.ShareCount = common.Str2Int(common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_SHARE_COUNT, body))
+	data.LikeCount = common.Str2Int(common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_LIKE_COUNT, body))
+	data.CommentCount = common.Str2Int(common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_COMMENT_COUNT, body))
+	//data.ViewCount = common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_ID, body)
+	//data.ContentType = common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_ID, body)
+	//data.ContentCaption = common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_ID, body)
+	data.ContentBody = common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_CONTENT, body)
+	data.ContentFullPicture = common.DecodeString(common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_PIC, body))
+	data.PermalinkUrl = r.getPermalink(common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_PERMALINK, body))
+	//data.HasComment = common.GetMatcherValue(1, REGEXP_FACEBOOK_POST_ID, body)
+	return data, nil
+}
+
+func (r *FBRepo) getPermalink(src string) string {
+	src = strings.Replace(src, `\`, "", -1)
+	src = "https://www.facebook.com" + src
+	return src
 }
 
 func (r *FBRepo) ParseRawReactions(body string) models.FBReactions {

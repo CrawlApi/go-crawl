@@ -9,17 +9,17 @@ import (
 
 const (
 	URL_WECHAT_PROFILE = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=n&_sug_type_="
-	URL_WECHAT_POSTS = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=n&_sug_type_="
+	URL_WECHAT_POSTS   = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=n&_sug_type_="
 )
 
 const (
 	// WEIXIN CONST
 	REGEXP_WEIXIN_PROFILE_ID = `微信号: (\S+)</p>`
-	REGEXP_WEIXIN_LOGO = `src="((http://img01.sogoucdn.com/app/a)\S+)"`
-	REGEXP_WEIXIN_NAME = `<h3>(\S+)</h3>`
-	REGEXP_WEIXIN_FEATURE = `功能介绍(...+)class="sp-txt">(...+)</span>`
-	REGEXP_WEIXIN_URL = `href="((http://mp.weixin.qq.com/profile)\S+)"`
-	REGEXP_WEIXIN_POSTS = `var msgList = '(\S+)';`
+	REGEXP_WEIXIN_LOGO       = `src="((http://img01.sogoucdn.com/app/a)\S+)"`
+	REGEXP_WEIXIN_NAME       = `<h3>(\S+)</h3>`
+	REGEXP_WEIXIN_FEATURE    = `功能介绍(...+)class="sp-txt">(...+)</span>`
+	REGEXP_WEIXIN_URL        = `href="((http://mp.weixin.qq.com/profile)\S+)"`
+	REGEXP_WEIXIN_POSTS      = `var msgList = '(\S+)';`
 )
 
 type WXRepo struct {

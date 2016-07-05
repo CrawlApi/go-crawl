@@ -8,6 +8,7 @@ type WXRawProfile struct {
 	Avatar  string
 	About   string
 }
+
 type WXRawPosts struct {
 	List []struct {
 		AppMsgExtInfo struct {

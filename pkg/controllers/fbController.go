@@ -32,14 +32,14 @@ func GetFBPostInfo(c *gin.Context) {
 	err := c.BindJSON(&api)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": false,
+			"status":  false,
 			"message": "json data error",
 		})
 		return
 	}
-	//getPostInfo()
+	repo := data.NewFBRepoWithUrl(api.Url)
+	getPostInfo(c, repo)
 }
-
 
 func getReactions(c *gin.Context, repo *data.FBRepo) {
 	timeout := c.DefaultQuery("timeout", "5")

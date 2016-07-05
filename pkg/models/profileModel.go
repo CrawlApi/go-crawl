@@ -91,4 +91,3 @@ func (p *Profile) ParseIGV2Profile(data IGV2RawProfile) {
 	p.Date = common.Now()
 	p.Status = true
 }
-

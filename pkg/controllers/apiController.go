@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/data"
 	"net/http"
-	"github.com/llitfkitfk/cirkol/pkg/common"
 )
 
 func GetHTMLAPI(c *gin.Context) {
@@ -30,10 +30,10 @@ func GetHTMLAPI(c *gin.Context) {
 		result = TimeOutResult()
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"datas": result.Datas,
-		"url":result.Url,
-		"date":result.Date,
-		"status":result.Status,
+		"datas":  result.Datas,
+		"url":    result.Url,
+		"date":   result.Date,
+		"status": result.Status,
 	})
 
 }

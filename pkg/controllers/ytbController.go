@@ -5,8 +5,6 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/data"
 )
 
-
-
 func GetYTBProfile(c *gin.Context) {
 	userId := c.Param("userId")
 	repo := data.NewYTBRepoWithUid(userId)

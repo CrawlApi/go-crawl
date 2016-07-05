@@ -1,6 +1,5 @@
 package models
 
-
 type FBRawProfile struct {
 	About    string `json:"about"`
 	AppLinks struct {
@@ -202,4 +201,20 @@ type FBRawReactions struct {
 			TotalCount int `json:"total_count"`
 		} `json:"summary"`
 	} `json:"reactions_wow"`
+}
+
+type FBRawPost struct {
+	ID                 string
+	CreatedAt          int64
+	UpdatedAt          int64
+	ShareCount         int
+	LikeCount          int
+	CommentCount       int
+	ViewCount          int
+	ContentType        string
+	ContentCaption     string
+	ContentBody        string
+	ContentFullPicture string
+	PermalinkUrl       string
+	HasComment         bool
 }

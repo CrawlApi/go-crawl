@@ -8,7 +8,7 @@ import (
 
 const (
 	URL_INSTAGRAM_PROFILE_V2 = "https://i.instagram.com/api/v1/users/%s/info/"
-	URL_INSTAGRAM_POSTS_V2 = "https://i.instagram.com/api/v1/users/%s/info/"
+	URL_INSTAGRAM_POSTS_V2   = "https://i.instagram.com/api/v1/users/%s/info/"
 )
 
 const (
@@ -18,9 +18,9 @@ const (
 )
 
 type IGV2Repo struct {
-	Agent *gorequest.SuperAgent
-	UserId   string
-	RawUrl   string
+	Agent  *gorequest.SuperAgent
+	UserId string
+	RawUrl string
 }
 
 func NewIGV2RepoWithUid(userId string) *IGV2Repo {

@@ -116,6 +116,40 @@ func fetchPosts(repo data.Posts, ch chan models.Posts) {
 	ch <- posts
 }
 
+func getPostInfo(c *gin.Context, repo data.Post) {
+	timeout := c.DefaultQuery("timeout", "5")
+	timer := common.Timeout(timeout)
+	pCh := make(chan models.Post)
+
+	go fetchPostInfo(repo, pCh)
+
+	var post models.Post
+	select {
+	case post = <-pCh:
+	case <-timer:
+		post = TimeOutPost()
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"post": post,
+	})
+}
+
+func fetchPostInfo(repo data.Post, ch chan models.Post) {
+	defer close(ch)
+
+	var post models.Post
+
+	body, err := repo.FetchPostInfo()
+	if err != nil {
+		post.FetchErr(err)
+		ch <- post
+		return
+	}
+	post = repo.ParsePostInfo(body)
+
+	ch <- post
+}
+
 func TimeOutProfile() models.Profile {
 	var p models.Profile
 	p.ErrMessage = common.ERROR_MSG_API_TIMEOUT
@@ -127,6 +161,14 @@ func TimeOutProfile() models.Profile {
 
 func TimeOutPosts() models.Posts {
 	var p models.Posts
+	p.ErrMessage = common.ERROR_MSG_API_TIMEOUT
+	p.Date = common.Now()
+	p.Status = false
+	return p
+}
+
+func TimeOutPost() models.Post {
+	var p models.Post
 	p.ErrMessage = common.ERROR_MSG_API_TIMEOUT
 	p.Date = common.Now()
 	p.Status = false

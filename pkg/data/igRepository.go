@@ -8,7 +8,7 @@ import (
 
 const (
 	URL_INSTAGRAM_PROFILE = "https://www.instagram.com/%s/"
-	URL_INSTAGRAM_POSTS = "https://www.instagram.com/%s/media/"
+	URL_INSTAGRAM_POSTS   = "https://www.instagram.com/%s/media/"
 )
 
 const REGEX_INSTAGRAM_PROFILE = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`

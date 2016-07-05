@@ -18,7 +18,7 @@ func GetUid(c *gin.Context) {
 	err := c.BindJSON(&api)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status": false,
+			"status":  false,
 			"message": "post json data error",
 		})
 		return
