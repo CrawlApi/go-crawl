@@ -150,6 +150,15 @@ func fetchPostInfo(repo data.Post, ch chan models.Post) {
 	ch <- post
 }
 
+func getUrlFromJson(c *gin.Context) (string, error) {
+	var api models.APIJson
+	err := c.BindJSON(&api)
+	if err != nil {
+		return "", err
+	}
+	return api.Url, nil
+}
+
 func TimeOutProfile() models.Profile {
 	var p models.Profile
 	p.ErrMessage = common.ERROR_MSG_API_TIMEOUT

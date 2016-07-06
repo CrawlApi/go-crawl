@@ -28,16 +28,15 @@ func GetFBPostReactions(c *gin.Context) {
 }
 
 func GetFBPostInfo(c *gin.Context) {
-	var api models.APIJson
-	err := c.BindJSON(&api)
+	url, err := getUrlFromJson(c)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  false,
-			"message": "json data error",
+			"message": err,
 		})
 		return
 	}
-	repo := data.NewFBRepoWithUrl(api.Url)
+	repo := data.NewFBRepoWithUrl(url)
 	getPostInfo(c, repo)
 }
 

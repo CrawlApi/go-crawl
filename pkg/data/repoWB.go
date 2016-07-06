@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+	"fmt"
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/parnurzeal/gorequest"
@@ -9,15 +10,19 @@ import (
 )
 
 const (
-	URL_WEIBO_PROFILE   = "http://mapi.weibo.com/2/profile?gsid=_&c=&s=&user_domain=%s"
-	URL_WEIBO_POSTS     = "http://m.weibo.cn/%s"
-	URL_WEIBO_API_POSTS = "http://m.weibo.cn/page/tpl?containerid=%s_-_WEIBO_SECOND_PROFILE_WEIBO&itemid=&title=全部微博"
+	URL_WEIBO_PROFILE    = "http://mapi.weibo.com/2/profile?gsid=_&c=&s=&user_domain=%s"
+	URL_WEIBO_POSTS      = "http://m.weibo.cn/%s"
+	URL_WEIBO_API_POSTS  = "http://m.weibo.cn/page/tpl?containerid=%s_-_WEIBO_SECOND_PROFILE_WEIBO&itemid=&title=全部微博"
+	WEIBO_POST_LINK_PREF = "http://m.weibo.cn/%s"
 )
 
 const (
 	REGEXP_WEIBO_POSTS_ID   = `itemid":"(\d+)`
 	REGEXP_WEIBO_POSTS      = `render_data (...+)mod\\/pagelist",(...+)]},'common(...+);</script><script src=`
 	REGEXP_WEIBO_PROFILE_ID = `uid=(\d+)`
+
+	REGEXP_WEIBO_POST_LINK = `(http://|)(www.|)weibo.com`
+	REGEXP_WEIBO_POST_INFO = `}}},(...+),{"mod_type":`
 )
 
 type WBRepo struct {
@@ -74,6 +79,24 @@ func (r *WBRepo) getPostsUrl(body string) (string, error) {
 	return "", errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
 }
 
+func (r *WBRepo) FetchPostInfo() (string, error) {
+	url, err := r.getPostInfoUrl(r.RawUrl)
+	if err != nil {
+		return "", err
+	}
+	return getApi(r.Agent, url)
+}
+
+func (r *WBRepo) getPostInfoUrl(rawUrl string) (string, error) {
+	matcher := common.Matcher(REGEXP_WEIBO_POST_LINK, rawUrl)
+	if len(matcher) > 0 {
+		i := strings.Index(rawUrl, "com")
+		url := fmt.Sprintf(WEIBO_POST_LINK_PREF, rawUrl[i+4:])
+		return url, nil
+	}
+	return "", errors.New(common.ERROR_MSG_REGEX_MISS_MATCHED)
+}
+
 func (r *WBRepo) ParseRawUID(body string) models.UID {
 	matcher := common.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
 
@@ -122,4 +145,19 @@ func (r *WBRepo) getPostsStr(body string) string {
 		return "{" + strings.Replace(matcher[2], "(MISSING)", "", -1)
 	}
 	return ""
+}
+
+func (r *WBRepo) ParsePostInfo(body string) models.Post {
+
+	data := r.parseRawPost(body)
+	var post models.Post
+	post.ParseWBRawPost(data)
+	return post
+}
+
+func (r *WBRepo) parseRawPost(body string) models.WBRawPost {
+	str := common.GetMatcherValue(1, REGEXP_WEIBO_POST_INFO, body)
+	var result models.WBRawPost
+	common.ParseJson(str, &result)
+	return result
 }

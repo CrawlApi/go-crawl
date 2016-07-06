@@ -47,6 +47,23 @@ func (p *Post) ParseFBRawPost(data FBRawPost) {
 	p.Status = true
 }
 
+func (p *Post) ParseWBRawPost(data WBRawPost) {
+	p.ID = data.Mblog.Bid
+	p.CreatedAt = common.ParseWBCreatedAt(data.Mblog.CreatedAt)
+	//p.UpdatedAt = data.Mblog
+	p.ShareCount = data.Mblog.RepostsCount
+	p.LikeCount = data.Mblog.LikeCount
+	p.CommentCount = data.Mblog.CommentsCount
+	p.ContentType = data.Mblog.PageInfo.ObjectType
+	p.ContentBody = data.Mblog.RawText
+	p.ContentFullPicture = data.Mblog.PageInfo.PagePic
+	p.PermalinkUrl = data.Mblog.PageInfo.PageURL
+	//p.HasComment = data
+	p.RawData = common.Interface2String(data)
+	p.Date = common.Now()
+	p.Status = true
+}
+
 type Posts struct {
 	Items      []Post `json:"data"`
 	Date       int64  `json:"date"`
