@@ -54,6 +54,7 @@ func (p *Post) ParseWBRawPost(data WBRawPost) {
 	p.ShareCount = data.Mblog.RepostsCount
 	p.LikeCount = data.Mblog.LikeCount
 	p.CommentCount = data.Mblog.CommentsCount
+	p.ViewCount = data.Mblog.ReadsCount
 	p.ContentType = data.Mblog.PageInfo.ObjectType
 	p.ContentBody = data.Mblog.RawText
 	p.ContentFullPicture = data.Mblog.PageInfo.PagePic
