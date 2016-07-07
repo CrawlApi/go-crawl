@@ -7,9 +7,10 @@ import (
 )
 
 type Configuration struct {
-	Server  string `json:"server"`
-	FBToken string `json:"fb_token"`
-	Version string `json:"version"`
+	Server    string `json:"server"`
+	FBToken   string `json:"fb_token"`
+	Version   string `json:"version"`
+	DebugMode bool   `json:"debug_mode"`
 }
 
 var AppConfig Configuration

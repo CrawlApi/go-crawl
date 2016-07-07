@@ -156,6 +156,7 @@ func (r *WBRepo) ParsePostInfo(body string) models.Post {
 }
 
 func (r *WBRepo) parseRawPost(body string) models.WBRawPost {
+	common.Info(body)
 	str := common.GetMatcherValue(1, REGEXP_WEIBO_POST_INFO, body)
 	var result models.WBRawPost
 	common.ParseJson(str, &result)

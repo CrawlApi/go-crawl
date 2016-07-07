@@ -12,6 +12,11 @@ func main() {
 	common.StartUp()
 
 	engine := gin.Default()
+
+	if !common.AppConfig.DebugMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	routers.InitRouters(&engine.RouterGroup)
 
 	addr := common.AppConfig.Server
