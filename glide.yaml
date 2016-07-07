@@ -2,3 +2,6 @@ package: github.com/llitfkitfk/cirkol
 import:
 - package: github.com/gin-gonic/gin
 - package: github.com/parnurzeal/gorequest
+  version: ^0.2.13
+- package: github.com/Sirupsen/logrus
+  version: ^0.10.0
