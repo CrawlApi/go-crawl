@@ -89,13 +89,14 @@ func (r *FBRepo) FetchReactionsApi() (string, error) {
 }
 
 func (r *FBRepo) FetchPostInfo() (string, error) {
-	uidUrl := common.ParseUIDLink(r.RawUrl)
-	postSuffId := common.ParsePostSuffId(r.RawUrl)
-	uidBody, _ := getApi(r.Agent, uidUrl)
+	p := common.NewParser(r.RawUrl)
+	uidUrl := p.ParseUIDLink()
+	postSuffId := p.ParsePostSuffId()
 
+	uidBody, _ := getApi(r.Agent, uidUrl)
 	uid := r.ParseRawUID(uidBody)
+
 	postInfoUrl := common.UrlString(URL_FACEBOOK_POST_INFO, uid.UserId, "_", postSuffId, PAGE_POST_INFO_FIELDS, common.GetFBToken())
-	common.Info(postInfoUrl)
 	return getApi(r.Agent, postInfoUrl)
 }
 

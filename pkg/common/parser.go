@@ -5,27 +5,28 @@ import (
 )
 
 type Parser struct {
-	RawUrl string
+	RawUrl   string
+	PostType string
 }
 
 func NewParser(rawUrl string) *Parser {
-	return &Parser{RawUrl: strings.TrimSpace(rawUrl)}
+	pt := GetMatcherValue(2, `facebook.com/(\S+)/(photos|videos|posts)/`, rawUrl)
+	return &Parser{RawUrl: strings.TrimSpace(rawUrl), PostType: pt}
 }
 
-func (p *Parser) parseUIDLink() string {
-	return UrlString(`https://www.facebook.com/%s`, GetMatcherValue(1, `facebook.com/(\S+)/posts`, p.RawUrl))
+func (p *Parser) ParseUIDLink() string {
+	return UrlString(`https://www.facebook.com/%s`, GetMatcherValue(1, `facebook.com/(\S+)/(photos|videos|posts)`, p.RawUrl))
 }
 
-func (p *Parser) parsePostSuffId() string {
-	return GetMatcherValue(2, `facebook.com/(\S+)/posts/(\d+)`, p.RawUrl)
-}
+func (p *Parser) ParsePostSuffId() string {
+	switch p.PostType {
+	case "videos":
+		return GetMatcherValue(3, `facebook.com/(\S+)/videos/(...+)/(\d+)`, p.RawUrl)
+	case "photos":
+		return GetMatcherValue(3, `facebook.com/(\S+)/photos/(...+)/(\d+)`, p.RawUrl)
+	case "posts":
+		return GetMatcherValue(2, `facebook.com/(\S+)/posts/(\d+)`, p.RawUrl)
+	}
+	return ""
 
-func ParseUIDLink(rawUrl string) string {
-	p := NewParser(rawUrl)
-	return p.parseUIDLink()
-}
-
-func ParsePostSuffId(rawUrl string) string {
-	p := NewParser(rawUrl)
-	return p.parsePostSuffId()
 }

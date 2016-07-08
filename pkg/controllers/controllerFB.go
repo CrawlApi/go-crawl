@@ -36,6 +36,7 @@ func GetFBPostInfo(c *gin.Context) {
 		})
 		return
 	}
+
 	repo := data.NewFBRepoWithUrl(url)
 	getPostInfo(c, repo)
 }
