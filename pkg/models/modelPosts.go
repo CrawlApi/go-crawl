@@ -6,6 +6,7 @@ import (
 
 type Post struct {
 	ID                 string `json:"id"`
+	UID                string `json:"uid"`
 	CreatedAt          int64  `json:"created_at"`
 	UpdatedAt          int64  `json:"updated_at"`
 	ShareCount         int    `json:"share_count"`
@@ -32,16 +33,17 @@ func (p *Post) FetchErr(err error) {
 
 func (p *Post) ParseFBRawPost(data FBRawPost) {
 	p.ID = data.ID
-	p.CreatedAt = data.CreatedAt
-	p.UpdatedAt = data.UpdatedAt
-	p.ShareCount = data.ShareCount
-	p.LikeCount = data.LikeCount
-	p.CommentCount = data.CommentCount
-	p.ContentType = data.ContentType
-	p.ContentBody = data.ContentBody
-	p.ContentFullPicture = data.ContentFullPicture
-	p.PermalinkUrl = data.PermalinkUrl
-	p.HasComment = data.HasComment
+	p.UID = data.From.ID
+	p.CreatedAt = common.DateFormat(data.CreatedTime)
+	p.UpdatedAt = common.DateFormat(data.UpdatedTime)
+	p.ShareCount = data.Shares.Count
+	p.LikeCount = data.Likes.Summary.TotalCount
+	p.CommentCount = data.Comments.Summary.TotalCount
+	p.ContentType = data.Type
+	p.ContentBody = data.Message
+	p.ContentFullPicture = data.FullPicture
+	p.PermalinkUrl = data.PermalinkURL
+	p.HasComment = data.Comments.Summary.CanComment
 	p.RawData = common.Interface2String(data)
 	p.Date = common.Now()
 	p.Status = true
