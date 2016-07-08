@@ -31,6 +31,31 @@ func (p *Post) FetchErr(err error) {
 	p.Status = false
 }
 
+func (p *Post) ParseIGRawPost(data IGRawPost)  {
+	p.ID = data.EntryData.PostPage[0].Media.Code
+	p.UID = data.EntryData.PostPage[0].Media.Owner.ID
+	p.CreatedAt = int64(data.EntryData.PostPage[0].Media.Date)
+
+	p.LikeCount = data.EntryData.PostPage[0].Media.Likes.Count
+	p.CommentCount = data.EntryData.PostPage[0].Media.Comments.Count
+
+	p.ViewCount = data.EntryData.PostPage[0].Media.VideoViews
+
+	if data.EntryData.PostPage[0].Media.IsVideo {
+		p.ContentType = "video"
+	} else {
+		p.ContentType = "image"
+	}
+
+	p.ContentCaption = data.EntryData.PostPage[0].Media.Caption
+
+	p.ContentFullPicture = data.EntryData.PostPage[0].Media.DisplaySrc
+	p.RawData = common.Interface2String(data)
+	p.Date = common.Now()
+	p.Status = true
+}
+
+
 func (p *Post) ParseFBRawPost(data FBRawPost) {
 	p.ID = data.ID
 	p.UID = data.From.ID
@@ -51,6 +76,7 @@ func (p *Post) ParseFBRawPost(data FBRawPost) {
 
 func (p *Post) ParseWBRawPost(data WBRawPost) {
 	p.ID = data.Mblog.Bid
+	p.UID = common.Int2Str(data.Mblog.User.ID)
 	p.CreatedAt = common.ParseWBCreatedAt(data.Mblog.CreatedAt)
 	//p.UpdatedAt = data.Mblog
 	p.ShareCount = data.Mblog.RepostsCount

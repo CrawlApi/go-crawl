@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/data"
+	"net/http"
 )
 
 func GetIGProfile(c *gin.Context) {
@@ -33,4 +34,17 @@ func GetIGPosts(c *gin.Context) {
 	}
 
 	getPosts(c, repo)
+}
+
+func GetIGPostInfo(c *gin.Context) {
+	url, err := getUrlFromJson(c)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  false,
+			"message": err,
+		})
+		return
+	}
+	repo := data.NewIGRepoWithUrl(url)
+	getPostInfo(c, repo)
 }

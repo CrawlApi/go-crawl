@@ -11,7 +11,10 @@ const (
 	URL_INSTAGRAM_POSTS   = "https://www.instagram.com/%s/media/"
 )
 
-const REGEX_INSTAGRAM_PROFILE = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
+const (
+	REGEX_INSTAGRAM_PROFILE   = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
+	REGEX_INSTAGRAM_POST_INFO = `_sharedData =(...+);</script>`
+)
 
 type IGRepo struct {
 	Agent  *gorequest.SuperAgent
@@ -43,6 +46,10 @@ func (r *IGRepo) FetchProfileApi() (string, error) {
 
 func (r *IGRepo) FetchPostsApi() (string, error) {
 	return getApi(r.Agent, common.UrlString(URL_INSTAGRAM_POSTS, r.UserId))
+}
+
+func (r *IGRepo) FetchPostInfo() (string, error) {
+	return getApi(r.Agent, r.RawUrl)
 }
 
 func (r *IGRepo) ParseRawUID(body string) models.UID {
@@ -92,4 +99,18 @@ func (r *IGRepo) ParseRawPosts(body string) models.Posts {
 	posts.ParseIGRawPosts(data)
 
 	return posts
+}
+
+func (r *IGRepo) ParsePostInfo(body string) models.Post {
+	var data models.IGRawPost
+
+	err := common.ParseJson(common.GetMatcherValue(1, REGEX_INSTAGRAM_POST_INFO, body), &data)
+	var post models.Post
+	if err != nil {
+		post.FetchErr(err)
+
+	} else {
+		post.ParseIGRawPost(data)
+	}
+	return post
 }

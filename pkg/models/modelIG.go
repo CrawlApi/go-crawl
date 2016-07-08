@@ -177,3 +177,107 @@ type IGV2RawPosts struct {
 		VideoViews   int    `json:"video_views,omitempty"`
 	} `json:"nodes"`
 }
+
+type IGRawPost struct {
+	Config struct {
+		CsrfToken string      `json:"csrf_token"`
+		Viewer    interface{} `json:"viewer"`
+	} `json:"config"`
+	CountryCode                  string `json:"country_code"`
+	DisplayPropertiesServerGuess struct {
+		PixelRatio    float64 `json:"pixel_ratio"`
+		ViewportWidth int     `json:"viewport_width"`
+	} `json:"display_properties_server_guess"`
+	EntryData struct {
+		PostPage []struct {
+			Media struct {
+				Caption         string `json:"caption"`
+				CaptionIsEdited bool   `json:"caption_is_edited"`
+				Code            string `json:"code"`
+				Comments        struct {
+					Count int `json:"count"`
+					Nodes []struct {
+						ID        string `json:"id"`
+						Text      string `json:"text"`
+						User      struct {
+							ID            string `json:"id"`
+							ProfilePicURL string `json:"profile_pic_url"`
+							Username      string `json:"username"`
+						} `json:"user"`
+					} `json:"nodes"`
+					PageInfo struct {
+						EndCursor       interface{} `json:"end_cursor"`
+						HasNextPage     bool        `json:"has_next_page"`
+						HasPreviousPage bool        `json:"has_previous_page"`
+						StartCursor     string      `json:"start_cursor"`
+					} `json:"page_info"`
+				} `json:"comments"`
+				Date       int `json:"date"`
+				Dimensions struct {
+					Height int `json:"height"`
+					Width  int `json:"width"`
+				} `json:"dimensions"`
+				DisplaySrc string `json:"display_src"`
+				ID         string `json:"id"`
+				IsAd       bool   `json:"is_ad"`
+				IsVideo    bool   `json:"is_video"`
+				Likes      struct {
+					Count int `json:"count"`
+					Nodes []struct {
+						User struct {
+							ID            string `json:"id"`
+							ProfilePicURL string `json:"profile_pic_url"`
+							Username      string `json:"username"`
+						} `json:"user"`
+					} `json:"nodes"`
+					ViewerHasLiked bool `json:"viewer_has_liked"`
+				} `json:"likes"`
+				Location interface{} `json:"location"`
+				Owner    struct {
+					BlockedByViewer   bool   `json:"blocked_by_viewer"`
+					FollowedByViewer  bool   `json:"followed_by_viewer"`
+					FullName          string `json:"full_name"`
+					HasBlockedViewer  bool   `json:"has_blocked_viewer"`
+					ID                string `json:"id"`
+					IsPrivate         bool   `json:"is_private"`
+					IsUnpublished     bool   `json:"is_unpublished"`
+					ProfilePicURL     string `json:"profile_pic_url"`
+					RequestedByViewer bool   `json:"requested_by_viewer"`
+					Username          string `json:"username"`
+				} `json:"owner"`
+				Usertags struct {
+					Nodes []interface{} `json:"nodes"`
+				} `json:"usertags"`
+				VideoURL   string `json:"video_url"`
+				VideoViews int    `json:"video_views"`
+			} `json:"media"`
+		} `json:"PostPage"`
+	} `json:"entry_data"`
+	EnvironmentSwitcherVisibleServerGuess bool `json:"environment_switcher_visible_server_guess"`
+	Gatekeepers                           struct {
+		Sulgin bool `json:"sulgin"`
+		Vvc    bool `json:"vvc"`
+	} `json:"gatekeepers"`
+	Hostname     string `json:"hostname"`
+	LanguageCode string `json:"language_code"`
+	Platform     string `json:"platform"`
+	Qe           struct {
+		Discovery struct {
+			G string   `json:"g"`
+			P struct{} `json:"p"`
+		} `json:"discovery"`
+		Su struct {
+			G string `json:"g"`
+			P struct {
+				Enabled string `json:"enabled"`
+			} `json:"p"`
+		} `json:"su"`
+		SuUniverse struct {
+			G string   `json:"g"`
+			P struct{} `json:"p"`
+		} `json:"su_universe"`
+	} `json:"qe"`
+	Qs             string `json:"qs"`
+	ShowAppInstall bool   `json:"show_app_install"`
+	StaticRoot     string `json:"static_root"`
+}
