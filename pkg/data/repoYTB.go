@@ -1,93 +1,59 @@
 package data
 
 import (
-	"github.com/llitfkitfk/cirkol/pkg/common"
+	"github.com/llitfkitfk/cirkol/pkg/client"
 	"github.com/llitfkitfk/cirkol/pkg/models"
-	"github.com/parnurzeal/gorequest"
-)
-
-const (
-	URL_YOUTUBE_PROFILE = "https://www.youtube.com/user/%s/about"
-	URL_YOUTUBE_POSTS   = "https://www.youtube.com/user/%s/videos"
 )
 
 type YTBRepo struct {
-	Agent  *gorequest.SuperAgent
 	UserId string
 	RawUrl string
 }
 
 func NewYTBRepoWithUid(userId string) *YTBRepo {
 	return &YTBRepo{
-		Agent:  common.GetAgent(),
 		UserId: userId,
 	}
 }
 
 func NewYTBRepoWithUrl(rawUrl string) *YTBRepo {
 	return &YTBRepo{
-		Agent:  common.GetAgent(),
 		RawUrl: rawUrl,
 	}
 }
 
-func (r *YTBRepo) FetchUIDApi() (string, error) {
-	return getApi(r.Agent, r.RawUrl)
+func (r *YTBRepo) FetchUIDApi() client.Result {
+	return GR().GetYTBUIDResult(r.RawUrl)
 }
 
-func (r *YTBRepo) FetchProfileApi() (string, error) {
-	return getApi(r.Agent, common.UrlString(URL_YOUTUBE_PROFILE, r.UserId))
+func (r *YTBRepo) FetchProfileApi() client.Result {
+	return GR().GetYTBProfileResult(r.UserId)
 }
 
-func (r *YTBRepo) FetchPostsApi() (string, error) {
-	body, err := getApi(r.Agent, common.UrlString(URL_YOUTUBE_POSTS, r.UserId))
+func (r *YTBRepo) FetchPostsApi() client.Result {
+	return GR().GetYTBPostsResult(r.UserId)
+}
+
+func (r *YTBRepo) ParseRawUID(result client.Result) models.UID {
+	data, err := result.GetYTBUID()
 	if err != nil {
-		return body, err
+		return FetchUIDErr(err)
 	}
-
-	return body, nil
-
+	return data
 }
 
-func (r *YTBRepo) ParseRawUID(body string) models.UID {
-	//matcher := common.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
-
-	var uid models.UID
-	//uid.Media = "wb"
-	//if len(matcher) > 1 {
-	//	uid.UserId = matcher[1]
-	//	uid.Status = true
-	//}
-	//uid.Date = common.Now()
-	return uid
-}
-
-func (r *YTBRepo) ParseRawProfile(body string) models.Profile {
-	var rawProfile models.WBRawProfile
-
-	err := common.ParseJson(body, &rawProfile)
-
-	var profile models.Profile
+func (r *YTBRepo) ParseRawProfile(result client.Result) models.Profile {
+	data, err := result.GetYTBProfile()
 	if err != nil {
-		profile.FetchErr(err)
-		return profile
+		return FetchProfileErr(err)
 	}
-	profile.ParseWBProfile(rawProfile)
-
-	return profile
+	return data
 }
 
-func (r *YTBRepo) ParseRawPosts(body string) models.Posts {
-	var rawPosts models.WBRawPosts
-
-	err := common.ParseJson(body, &rawPosts)
-
-	var posts models.Posts
+func (r *YTBRepo) ParseRawPosts(result client.Result) models.Posts {
+	data, err := result.GetYTBPosts()
 	if err != nil {
-		posts.FetchErr(err)
-		return posts
+		return FetchPostsErr(err)
 	}
-	posts.ParseWBRawPosts(rawPosts)
-
-	return posts
+	return data
 }

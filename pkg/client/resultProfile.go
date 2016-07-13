@@ -76,9 +76,67 @@ func (r *Result) GetIGV2Profile() (models.Profile, error) {
 }
 
 func (r *Result) GetWXProfile() (models.Profile, error) {
+	//rawProfile, _ := r.parseRawProfile(body)
+	//
+	//var profile models.Profile
+	//profile.ParseWXProfile(rawProfile)
+	//return profile
 	return models.Profile{}, nil
+
 }
+//func (r *WXRepo) parseRawProfile(body string) (models.WXRawProfile, error) {
+//	var data models.WXRawProfile
+//	data.Name = r.getName(body)
+//	data.Website = r.getWebsite(body)
+//	data.Avatar = r.getAvatar(body)
+//	data.About = r.getAbout(body)
+//	return data, nil
+//}
+//
+//func (r *WXRepo) getName(body string) string {
+//	matcher := common.Matcher(REGEXP_WEIXIN_NAME, body)
+//	if len(matcher) > 1 {
+//		return matcher[1]
+//	}
+//	return ""
+//}
+//
+//func (r *WXRepo) getWebsite(body string) string {
+//	matcher := common.Matcher(REGEXP_WEIXIN_URL, body)
+//	if len(matcher) > 1 {
+//		return common.DecodeString(matcher[1])
+//	}
+//	return ""
+//}
+//
+//func (r *WXRepo) getAvatar(body string) string {
+//	matcher := common.Matcher(REGEXP_WEIXIN_LOGO, body)
+//	if len(matcher) > 1 {
+//		return matcher[1]
+//	}
+//	return ""
+//}
+//
+//func (r *WXRepo) getAbout(body string) string {
+//	matcher := common.Matcher(REGEXP_WEIXIN_FEATURE, body)
+//	if len(matcher) > 2 {
+//		return matcher[2]
+//	}
+//	return ""
+//}
 
 func (r *Result) GetYTBProfile() (models.Profile, error) {
+	//var rawProfile models.WBRawProfile
+	//
+	//err := common.ParseJson(body, &rawProfile)
+	//
+	//var profile models.Profile
+	//if err != nil {
+	//	profile.FetchErr(err)
+	//	return profile
+	//}
+	//profile.ParseWBProfile(rawProfile)
+	//
+	//return profile
 	return models.Profile{}, nil
 }

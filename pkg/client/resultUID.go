@@ -62,8 +62,28 @@ func (r *Result) GetIGV2UID() (models.UID, error) {
 }
 
 func (r *Result) GetWXUID() (models.UID, error) {
+	//matcher := common.Matcher(REGEXP_WEIXIN_PROFILE_ID, body)
+	//
+	//var uid models.UID
+	//uid.Media = "wx"
+	//if len(matcher) > 1 {
+	//	uid.UserId = matcher[1]
+	//	uid.Status = true
+	//}
+	//uid.Date = common.Now()
+	//return uid
 	return models.UID{}, nil
 }
 func (r *Result) GetYTBUID() (models.UID, error) {
+	////matcher := common.Matcher(REGEXP_WEIBO_PROFILE_ID, body)
+	//
+	//var uid models.UID
+	////uid.Media = "wb"
+	////if len(matcher) > 1 {
+	////	uid.UserId = matcher[1]
+	////	uid.Status = true
+	////}
+	////uid.Date = common.Now()
+	//return uid
 	return models.UID{}, nil
 }

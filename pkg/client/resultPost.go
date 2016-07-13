@@ -74,10 +74,43 @@ func (r *Result) GetIGV2Posts() (models.Posts, error) {
 //}
 
 func (r *Result) GetWXPosts() (models.Posts, error) {
+	//var rawPosts models.WXRawPosts
+	//err := common.ParseJson(r.getPostsStr(body), &rawPosts)
+	//
+	//var posts models.Posts
+	//if err != nil {
+	//	posts.FetchErr(err)
+	//	return posts
+	//}
+	//posts.ParseWXRawPosts(rawPosts)
+	//
+	//return posts
 	return models.Posts{}, nil
 }
 
+
+//func (r *WXRepo) getPostsStr(body string) string {
+//	matcher := common.Matcher(REGEXP_WEIXIN_POSTS, body)
+//	if len(matcher) > 1 {
+//		return common.DecodeString(matcher[1])
+//	}
+//	return ""
+//}
+
+
 func (r *Result) GetYTBPosts() (models.Posts, error) {
+	//var rawPosts models.WBRawPosts
+	//
+	//err := common.ParseJson(body, &rawPosts)
+	//
+	//var posts models.Posts
+	//if err != nil {
+	//	posts.FetchErr(err)
+	//	return posts
+	//}
+	//posts.ParseWBRawPosts(rawPosts)
+	//
+	//return posts
 	return models.Posts{}, nil
 }
 
