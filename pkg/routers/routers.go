@@ -8,10 +8,10 @@ import (
 func InitRouters(router *gin.RouterGroup) {
 
 	setupFBRouters(router)
-	//setupIGRouters(router)
-	//setupWBRouters(router)
+	setupIGRouters(router)
+	setupWBRouters(router)
 	//setupWXRouters(router)
-	//setupUIDRouters(router)
+	setupUIDRouters(router)
 	//setupAPIRouters(router)
 	//setupYTBRouters(router)
 	setupSwaggerRouters(router)

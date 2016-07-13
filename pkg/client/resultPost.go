@@ -35,12 +35,43 @@ func (r *Result) GetWBPosts() (models.Posts, error) {
 }
 
 func (r *Result) GetIGPosts() (models.Posts, error) {
+	//var data models.IGRawPosts
+	//err := common.ParseJson(body, &data)
+	//
+	//var posts models.Posts
+	//if err != nil {
+	//	posts.FetchErr(err)
+	//	return posts
+	//}
+	//posts.ParseIGRawPosts(data)
+	//
+	//return posts
 	return models.Posts{}, nil
 }
 
 func (r *Result) GetIGV2Posts() (models.Posts, error) {
+	//var data models.IGV2RawPosts
+	//
+	//err := common.ParseJson(r.getRawPostsStr(body), &data)
+	//
+	//var posts models.Posts
+	//if err != nil {
+	//	posts.FetchErr(err)
+	//	return posts
+	//}
+	//posts.ParseIGV2RawPosts(data)
+	//
+	//return posts
 	return models.Posts{}, nil
 }
+//
+//func (r *IGV2Repo) getRawPostsStr(body string) string {
+//	matcher := common.Matcher(REGEX_INSTAGRAM_POSTS, body)
+//	if len(matcher) > 2 {
+//		return `{ "nodes": ` + matcher[2] + "]}"
+//	}
+//	return ""
+//}
 
 func (r *Result) GetWXPosts() (models.Posts, error) {
 	return models.Posts{}, nil
@@ -91,6 +122,17 @@ func (r *Result) GetWBPost() (models.Post, error) {
 }
 
 func (r *Result) GetIGPost() (models.Post, error) {
+	//var data models.IGRawPost
+	//
+	//err := common.ParseJson(common.GetMatcherValue(1, REGEX_INSTAGRAM_POST_INFO, body), &data)
+	//var post models.Post
+	//if err != nil {
+	//	post.FetchErr(err)
+	//
+	//} else {
+	//	post.ParseIGRawPost(data)
+	//}
+	//return post
 	return models.Post{}, nil
 }
 

@@ -41,7 +41,7 @@ func NewFBRepoWithUrl(rawUrl string) *FBRepo {
 }
 
 func (r *FBRepo) FetchUIDApi() client.Result {
-	return GR().GetUIDResult(r.RawUrl)
+	return GR().GetFBUIDResult(r.RawUrl)
 }
 
 func (r *FBRepo) FetchProfileApi() client.Result {
@@ -53,7 +53,7 @@ func (r *FBRepo) FetchPostsApi() client.Result {
 }
 
 func (r *FBRepo) FetchReactionsApi() client.Result {
-	return GR().GetReactionsResult(r.PostId)
+	return GR().GetFBReactionsResult(r.PostId)
 }
 
 func (r *FBRepo) FetchPostInfo() client.Result {

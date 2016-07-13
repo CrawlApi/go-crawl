@@ -23,7 +23,7 @@ func NewWBRepoWithUrl(rawUrl string) *WBRepo {
 }
 
 func (r *WBRepo) FetchUIDApi() client.Result {
-	return GR().GetUIDResult(r.RawUrl)
+	return GR().GetWBUIDResult(r.RawUrl)
 }
 
 func (r *WBRepo) FetchProfileApi() client.Result {

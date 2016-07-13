@@ -34,6 +34,30 @@ func (r *Result) GetFBUID() (models.UID, error) {
 
 
 func (r *Result) GetIGUID() (models.UID, error) {
+	//matcher := common.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
+	//
+	//var uid models.UID
+	//uid.Media = "ig"
+	//if len(matcher) > 1 {
+	//	uid.UserId = matcher[1]
+	//	uid.Status = true
+	//}
+	//uid.Date = common.Now()
+	//return uid
+	return models.UID{}, nil
+}
+
+func (r *Result) GetIGV2UID() (models.UID, error) {
+	//matcher := common.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
+	//
+	//var uid models.UID
+	//uid.Media = "ig"
+	//if len(matcher) > 1 {
+	//	uid.UserId = matcher[1]
+	//	uid.Status = true
+	//}
+	//uid.Date = common.Now()
+	//return uid
 	return models.UID{}, nil
 }
 

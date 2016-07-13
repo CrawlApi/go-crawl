@@ -39,10 +39,39 @@ func (r *Result) GetWBProfile() (models.Profile, error) {
 }
 
 func (r *Result) GetIGProfile() (models.Profile, error) {
+	//var data models.IGRawProfile
+	//err := common.ParseJson(r.getRawProfileStr(body), &data)
+	//
+	//var profile models.Profile
+	//if err != nil {
+	//	profile.FetchErr(err)
+	//	return profile
+	//}
+	//profile.ParseIGProfile(data)
+	//
+	//return profile
 	return models.Profile{}, nil
 }
 
+//func (r *IGRepo) getRawProfileStr(body string) string {
+//	matcher := common.Matcher(REGEX_INSTAGRAM_PROFILE, body)
+//	if len(matcher) > 3 {
+//		return matcher[1] + matcher[3]
+//	}
+//	return ""
+//}
+
 func (r *Result) GetIGV2Profile() (models.Profile, error) {
+	//var profile models.Profile
+	//var data models.IGV2RawProfile
+	//err := common.ParseJson(body, &data)
+	//if err != nil {
+	//	profile.FetchErr(err)
+	//	return profile
+	//}
+	//profile.ParseIGV2Profile(data)
+	//
+	//return profile
 	return models.Profile{}, nil
 }
 

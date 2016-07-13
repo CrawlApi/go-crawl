@@ -1,116 +1,72 @@
 package data
 
 import (
-	"github.com/llitfkitfk/cirkol/pkg/common"
+	"github.com/llitfkitfk/cirkol/pkg/client"
 	"github.com/llitfkitfk/cirkol/pkg/models"
-	"github.com/parnurzeal/gorequest"
-)
-
-const (
-	URL_INSTAGRAM_PROFILE = "https://www.instagram.com/%s/"
-	URL_INSTAGRAM_POSTS   = "https://www.instagram.com/%s/media/"
-)
-
-const (
-	REGEX_INSTAGRAM_PROFILE   = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
-	REGEX_INSTAGRAM_POST_INFO = `_sharedData =(...+);</script>`
 )
 
 type IGRepo struct {
-	Agent  *gorequest.SuperAgent
 	UserId string
 	RawUrl string
 }
 
 func NewIGRepoWithUid(userId string) *IGRepo {
 	return &IGRepo{
-		Agent:  common.GetAgent(),
 		UserId: userId,
 	}
 }
 
 func NewIGRepoWithUrl(rawUrl string) *IGRepo {
 	return &IGRepo{
-		Agent:  common.GetAgent(),
 		RawUrl: rawUrl,
 	}
 }
 
-func (r *IGRepo) FetchUIDApi() (string, error) {
-	return getApi(r.Agent, r.RawUrl)
+func (r *IGRepo) FetchUIDApi() client.Result {
+	return GR().GetIGUIDResult(r.RawUrl)
 }
 
-func (r *IGRepo) FetchProfileApi() (string, error) {
-	return getApi(r.Agent, common.UrlString(URL_INSTAGRAM_PROFILE, r.UserId))
+func (r *IGRepo) FetchProfileApi() client.Result {
+	return GR().GetIGProfileResult(r.UserId)
 }
 
-func (r *IGRepo) FetchPostsApi() (string, error) {
-	return getApi(r.Agent, common.UrlString(URL_INSTAGRAM_POSTS, r.UserId))
+func (r *IGRepo) FetchPostsApi() client.Result {
+	return GR().GetIGPostsResult(r.UserId)
 }
 
-func (r *IGRepo) FetchPostInfo() (string, error) {
-	return getApi(r.Agent, r.RawUrl)
+func (r *IGRepo) FetchPostInfo() client.Result {
+	return GR().GetIGPostResult(r.RawUrl)
 }
 
-func (r *IGRepo) ParseRawUID(body string) models.UID {
-	matcher := common.Matcher(REGEX_INSTAGRAM_PROFILE_ID, body)
-
-	var uid models.UID
-	uid.Media = "ig"
-	if len(matcher) > 1 {
-		uid.UserId = matcher[1]
-		uid.Status = true
-	}
-	uid.Date = common.Now()
-	return uid
-}
-
-func (r *IGRepo) ParseRawProfile(body string) models.Profile {
-	var data models.IGRawProfile
-	err := common.ParseJson(r.getRawProfileStr(body), &data)
-
-	var profile models.Profile
+func (r *IGRepo) ParseRawUID(result client.Result) models.UID {
+	data, err := result.GetIGUID()
 	if err != nil {
-		profile.FetchErr(err)
-		return profile
+		return FetchUIDErr(err)
 	}
-	profile.ParseIGProfile(data)
+	return data
 
-	return profile
 }
 
-func (r *IGRepo) getRawProfileStr(body string) string {
-	matcher := common.Matcher(REGEX_INSTAGRAM_PROFILE, body)
-	if len(matcher) > 3 {
-		return matcher[1] + matcher[3]
-	}
-	return ""
-}
-
-func (r *IGRepo) ParseRawPosts(body string) models.Posts {
-	var data models.IGRawPosts
-	err := common.ParseJson(body, &data)
-
-	var posts models.Posts
+func (r *IGRepo) ParseRawProfile(result client.Result) models.Profile {
+	data, err := result.GetIGProfile()
 	if err != nil {
-		posts.FetchErr(err)
-		return posts
+		return FetchProfileErr(err)
 	}
-	posts.ParseIGRawPosts(data)
-
-	return posts
+	return data
 }
 
-func (r *IGRepo) ParsePostInfo(body string) models.Post {
-	var data models.IGRawPost
-
-	err := common.ParseJson(common.GetMatcherValue(1, REGEX_INSTAGRAM_POST_INFO, body), &data)
-	var post models.Post
+func (r *IGRepo) ParseRawPosts(result client.Result) models.Posts {
+	data, err := result.GetIGPosts()
 	if err != nil {
-		post.FetchErr(err)
-
-	} else {
-		post.ParseIGRawPost(data)
+		return FetchPostsErr(err)
 	}
-	return post
+	return data
+}
+
+func (r *IGRepo) ParsePostInfo(result client.Result) models.Post {
+	data, err := result.GetIGPost()
+	if err != nil {
+		return FetchPostErr(err)
+	}
+	return data
 }

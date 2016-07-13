@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/parser"
 	"github.com/parnurzeal/gorequest"
@@ -33,12 +32,27 @@ const (
 	WEIBO_POST_LINK_PREF = "http://m.weibo.cn/%s"
 )
 
+const (
+	URL_INSTAGRAM_PROFILE = "https://www.instagram.com/%s/"
+	URL_INSTAGRAM_POSTS   = "https://www.instagram.com/%s/media/"
+
+	URL_INSTAGRAM_PROFILE_V2 = "https://i.instagram.com/api/v1/users/%s/info/"
+	URL_INSTAGRAM_POSTS_V2   = "https://i.instagram.com/api/v1/users/%s/info/"
+)
+
+const (
+	REGEX_INSTAGRAM_PROFILE   = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
+	REGEX_INSTAGRAM_POST_INFO = `_sharedData =(...+);</script>`
+)
+
+const (
+	URL_INSTAGRAM_API_POSTS    = "https://www.instagram.com/%s/"
+	REGEX_INSTAGRAM_POSTS      = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
+	REGEX_INSTAGRAM_PROFILE_ID = `"owner": {"id": "(\d+)`
+)
+
 type Client struct {
 	agent *gorequest.SuperAgent
-}
-
-func url2Str(format string, a ...interface{}) string {
-	return fmt.Sprintf(format, a...)
 }
 
 func New() *Client {
@@ -53,7 +67,8 @@ func (c *Client) sendRequest(url string) Result {
 	return Result{Body: body, err: common.Errs2Error(errs)}
 }
 
-func (c *Client) GetUIDResult(url string) Result {
+// facebook
+func (c *Client) GetFBUIDResult(url string) Result {
 	return c.sendRequest(url)
 }
 
@@ -66,21 +81,26 @@ func (c *Client) GetFBPostsResult(uid, limit string) Result {
 	return c.sendRequest(common.UrlString(URL_FACEBOOK_POSTS, uid, PAGE_FEED_FIELDS_ENABLE, PAGE_FEED_CONNECTIONS, limit, common.GetFBToken()))
 }
 
-func (c *Client) GetReactionsResult(postId string) Result {
-	return c.sendRequest(common.UrlString(URL_FACEBOOK_POST_REACTIONS, postId, PAGE_REACTIONS_FIELDS_ENABLE, common.GetFBToken()))
-}
-
 func (c *Client) GetFBPostResult(url string) Result {
 
 	uidStr := parser.ParseFBUIDFromUrl(url)
 	postSuffId := parser.ParseFBPostSuffId(url)
 
-	uidResult := c.GetUIDResult(common.UrlString(`https://www.facebook.com/%s`, uidStr))
+	uidResult := c.GetFBUIDResult(common.UrlString(`https://www.facebook.com/%s`, uidStr))
 	uid, err := uidResult.GetFBUID()
 	if err != nil {
 		return Result{err: common.ParseUIDError()}
 	}
 	return c.sendRequest(common.UrlString(URL_FACEBOOK_POST_INFO, uid, "_", postSuffId, PAGE_POST_INFO_FIELDS, common.GetFBToken()))
+}
+
+func (c *Client) GetFBReactionsResult(postId string) Result {
+	return c.sendRequest(common.UrlString(URL_FACEBOOK_POST_REACTIONS, postId, PAGE_REACTIONS_FIELDS_ENABLE, common.GetFBToken()))
+}
+
+// weibo
+func (c *Client) GetWBUIDResult(url string) Result {
+	return c.sendRequest(url)
 }
 
 func (c *Client) GetWBProfileResult(userId string) Result {
@@ -96,6 +116,66 @@ func (c *Client) GetWBPostsResult(userId string) Result {
 func (c *Client) GetWBPostResult(url string) Result {
 	postSuffUrl := parser.ParseWBPostUrl(url)
 	return c.sendRequest(common.UrlString(WEIBO_POST_LINK_PREF, postSuffUrl))
+}
+
+// instagram
+func (c *Client) GetIGUIDResult(url string) Result {
+	return c.sendRequest(url)
+}
+
+func (c *Client) GetIGProfileResult(userId string) Result {
+	return c.sendRequest(common.UrlString(URL_INSTAGRAM_PROFILE, userId))
+}
+
+func (c *Client) GetIGPostsResult(userId string) Result {
+	return c.sendRequest(common.UrlString(URL_INSTAGRAM_POSTS, userId))
+}
+
+func (c *Client) GetIGPostResult(url string) Result {
+	return c.sendRequest(url)
+
+}
+
+// instagram v2
+func (c *Client) GetIGV2UIDResult(url string) Result {
+	return c.sendRequest(url)
+}
+
+func (c *Client) GetIGV2ProfileResult(userId string) Result {
+	return c.sendRequest(common.UrlString(URL_INSTAGRAM_PROFILE_V2, userId))
+}
+
+func (c *Client) GetIGV2PostsResult(userId string) Result {
+	//body, err := getApi(r.Agent, common.UrlString(URL_INSTAGRAM_POSTS_V2, r.UserId))
+	//if err != nil {
+	//	return body, err
+	//}
+	//urlStr, err := r.getPostsUrl(body)
+	//if err != nil {
+	//	return urlStr, err
+	//}
+	//postsBody, err := getApi(r.Agent, urlStr)
+	//if err != nil {
+	//	return postsBody, err
+	//}
+	//return postsBody, nil
+	return c.sendRequest(userId)
+
+}
+
+//func (r *IGV2Repo) getPostsUrl(body string) (string, error) {
+//	var data models.IGV2RawProfile
+//	err := common.ParseJson(body, &data)
+//	postsUrl := common.UrlString(URL_INSTAGRAM_API_POSTS, data.User.Username)
+//	if err != nil {
+//		return postsUrl, err
+//	}
+//	return postsUrl, nil
+//}
+
+func (c *Client) GetIGV2PostResult(url string) Result {
+	return c.sendRequest(url)
+
 }
 
 func (c *Client) GetResult() Result {
