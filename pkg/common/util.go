@@ -4,26 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
 
 const (
-	//ERROR_MSG_API_FETCH = "request api timeout"
-	//ERROR_MSG_API_MISS_MATCHED = "no api matched"
-	ERROR_MSG_API_TIMEOUT        = "request api timeout"
-	ERROR_MSG_JSON_ERROR         = "json parse error"
-	ERROR_MSG_WX_POSTS_API_FETCH = "weixin fetch api error"
-	ERROR_MSG_REGEX_MISS_MATCHED = "regex miss matched"
-	ERROR_MSG_URL_NOT_MATCHED    = "Url not matched"
-	//ERROR_MSG_TIMEOUT = "request timeout"
-	//ERROR_MSG_URL_MISS_MATCHED = "url miss matched"
-)
-
-const (
-	TIMESTAMP_LAYOUT    = "2006-01-02T15:04:05+0000"
+	TIMESTAMP_LAYOUT = "2006-01-02T15:04:05+0000"
 	TIMESTAMP_LAYOUT_WB = "2006-1-2 15:4"
 )
 
@@ -80,12 +67,6 @@ func Now() int64 {
 	return time.Now().Unix()
 }
 
-func Matcher(expr string, s string) []string {
-	r, _ := regexp.Compile(expr)
-	return r.FindStringSubmatch(s)
-
-}
-
 func Timeout(d string) <-chan time.Time {
 	i := time.Duration(query2Int(d))
 	return time.After(i * time.Second)
@@ -103,7 +84,7 @@ func ParseWBCreatedAt(dateStr string) int64 {
 	today := time.Now()
 	var resultStr string
 	if strings.Contains(dateStr, "分钟前") {
-		mAgo := Str2Int(dateStr[:len(dateStr)-9])
+		mAgo := Str2Int(dateStr[:len(dateStr) - 9])
 		var h int
 		var m int
 		if today.Minute() >= mAgo {
@@ -115,7 +96,7 @@ func ParseWBCreatedAt(dateStr string) int64 {
 		}
 		resultStr = fmt.Sprint(today.Year(), "-", int(today.Month()), "-", today.Day(), " ", h, ":", m)
 	} else if strings.Contains(dateStr, "今天") {
-		resultStr = fmt.Sprint(today.Year(), "-", int(today.Month()), "-", today.Day(), " ", dateStr[len(dateStr)-5:len(dateStr)])
+		resultStr = fmt.Sprint(today.Year(), "-", int(today.Month()), "-", today.Day(), " ", dateStr[len(dateStr) - 5:len(dateStr)])
 	} else {
 		resultStr = fmt.Sprint(today.Year(), "-", dateStr)
 	}
@@ -124,12 +105,4 @@ func ParseWBCreatedAt(dateStr string) int64 {
 		return 0
 	}
 	return date.Unix()
-}
-
-func GetMatcherValue(length int, expr, body string) string {
-	matcher := Matcher(expr, body)
-	if len(matcher) > length {
-		return matcher[length]
-	}
-	return ""
 }

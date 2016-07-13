@@ -7,15 +7,22 @@ import (
 
 func InitRouters(router *gin.RouterGroup) {
 
-	setupIGRouters(router)
 	setupFBRouters(router)
-	setupWBRouters(router)
-	setupWXRouters(router)
-	setupUIDRouters(router)
-	setupAPIRouters(router)
-	setupYTBRouters(router)
+	//setupIGRouters(router)
+	//setupWBRouters(router)
+	//setupWXRouters(router)
+	//setupUIDRouters(router)
+	//setupAPIRouters(router)
+	//setupYTBRouters(router)
+	setupSwaggerRouters(router)
 }
 
-func setupAPIRouters(router *gin.RouterGroup) {
-	router.POST("/api/json/:query", controllers.GetHTMLAPI)
+
+func setupSwaggerRouters(router *gin.RouterGroup) {
+	router.GET("/v2/swagger.json", controllers.GetSwagger)
 }
+
+
+//func setupAPIRouters(router *gin.RouterGroup) {
+//	router.POST("/api/json/:query", controllers.GetHTMLAPI)
+//}

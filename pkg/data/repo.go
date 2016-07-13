@@ -1,37 +1,65 @@
 package data
 
 import (
-	"errors"
-	"github.com/llitfkitfk/cirkol/pkg/common"
+	"github.com/llitfkitfk/cirkol/pkg/client"
 	"github.com/llitfkitfk/cirkol/pkg/models"
-	"github.com/parnurzeal/gorequest"
-	"time"
+	"github.com/llitfkitfk/cirkol/pkg/common"
 )
 
+var Agent *client.Client
+
+func GR() *client.Client {
+	return Agent
+}
+
+func FetchProfileErr(err error) models.Profile {
+	return models.Profile{
+		ErrMessage: err.Error(),
+		Date:       common.Now(),
+		Status:     false,
+	}
+}
+
+func FetchPostsErr(err error) models.Posts {
+	return models.Posts{
+		ErrMessage: err.Error(),
+		Date:       common.Now(),
+		Status:     false,
+	}
+}
+
+func FetchPostErr(err error) models.Post {
+	return models.Post{
+		ErrMessage: err.Error(),
+		Date:       common.Now(),
+		Status:     false,
+	}
+}
+
+func FetchUIDErr(err error) models.UID {
+	return models.UID{
+		ErrMessage: err.Error(),
+		Date:       common.Now(),
+		Status:     false,
+	}
+}
+
 type Profile interface {
-	FetchProfileApi() (string, error)
-	ParseRawProfile(string) models.Profile
+	FetchProfileApi() client.Result
+	ParseRawProfile(client.Result) models.Profile
 }
 
 type Posts interface {
-	FetchPostsApi() (string, error)
-	ParseRawPosts(string) models.Posts
+	FetchPostsApi() client.Result
+	ParseRawPosts(client.Result) models.Posts
 }
 
 type Post interface {
-	FetchPostInfo() (string, error)
-	ParsePostInfo(string) models.Post
+	FetchPostInfo() client.Result
+	ParsePostInfo(client.Result) models.Post
 }
 
 type UID interface {
-	FetchUIDApi() (string, error)
-	ParseRawUID(string) models.UID
-}
-
-func getApi(agent *gorequest.SuperAgent, url string) (string, error) {
-	_, body, errs := agent.Timeout(10*time.Second).Set("accept-language", "en-US").Get(url).End()
-	if errs != nil {
-		return body, errors.New(common.ERROR_MSG_API_TIMEOUT)
-	}
-	return body, nil
+	FetchUIDApi() client.Result
+	ParseRawUID(client.Result) models.UID
 }

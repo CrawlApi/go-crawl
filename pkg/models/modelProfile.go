@@ -27,6 +27,11 @@ func (p *Profile) FetchErr(err error) {
 }
 
 func (p *Profile) ParseFBProfile(data FBRawProfile) {
+	if data.ID == "" {
+		p.Status = false
+	} else {
+		p.Status = true
+	}
 	p.UserId = data.ID
 	p.Name = data.Name
 	p.Avatar = common.UrlString("https://graph.facebook.com/%s/picture?type=normal", data.ID)
@@ -36,7 +41,6 @@ func (p *Profile) ParseFBProfile(data FBRawProfile) {
 	p.Website = data.Link
 	p.RawData = common.Interface2String(data)
 	p.Date = common.Now()
-	p.Status = true
 }
 
 func (p *Profile) ParseWBProfile(data WBRawProfile) {

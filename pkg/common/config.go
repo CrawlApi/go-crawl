@@ -13,13 +13,11 @@ type Configuration struct {
 	DebugMode bool   `json:"debug_mode"`
 }
 
-var AppConfig Configuration
+var (
+	AppConfig Configuration
+)
 
 func initConfig() {
-	loadAppConfig()
-}
-
-func loadAppConfig() {
 
 	data, err := ioutil.ReadFile("pkg/common/config.json")
 	if err != nil {

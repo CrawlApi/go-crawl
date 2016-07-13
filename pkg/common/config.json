@@ -2,5 +2,5 @@
   "server": ":10086",
   "fb_token": "490895874437565|3ce74d840577a6d598af56cd46fd0450",
   "version": "1.1.2",
-  "debug_mode": false
+  "debug_mode": true
 }

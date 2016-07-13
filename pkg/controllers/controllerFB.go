@@ -9,6 +9,7 @@ import (
 )
 
 func GetFBProfile(c *gin.Context) {
+
 	userId := c.Param("userId")
 	repo := data.NewFBRepoWithUid(userId)
 	getProfile(c, repo)
@@ -46,38 +47,18 @@ func getReactions(c *gin.Context, repo *data.FBRepo) {
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.FBReactions)
 
-	go fetchReactions(repo, pCh)
+	go func() {
+		defer close(pCh)
+		pCh <- repo.ParseRawReactions(repo.FetchReactionsApi())
+	}()
 
 	var reactions models.FBReactions
 	select {
 	case reactions = <-pCh:
 	case <-timer:
-		reactions = TimeOutReactions()
+		reactions = data.FetchReactionsError(common.TimeOutError())
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"like_counts": reactions,
 	})
-}
-
-func fetchReactions(repo *data.FBRepo, ch chan models.FBReactions) {
-	defer close(ch)
-	var reactions models.FBReactions
-
-	body, err := repo.FetchReactionsApi()
-	if err != nil {
-		reactions.FetchErr(err)
-		ch <- reactions
-		return
-	}
-	reactions = repo.ParseRawReactions(body)
-
-	ch <- reactions
-}
-
-func TimeOutReactions() models.FBReactions {
-	var r models.FBReactions
-	r.ErrMessage = common.ERROR_MSG_API_TIMEOUT
-	r.Date = common.Now()
-	r.Status = false
-	return r
 }

@@ -9,11 +9,9 @@ import (
 )
 
 func getRealUid(c *gin.Context, repo data.UID) {
-	var uid models.UID
 	if repo == nil {
-		uid.FetchErr(nil)
 		c.JSON(http.StatusOK, gin.H{
-			"uid": uid,
+			"uid": data.FetchUIDErr(common.EmptyRepoError()),
 		})
 		return
 	}
@@ -22,31 +20,20 @@ func getRealUid(c *gin.Context, repo data.UID) {
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.UID)
 
-	go fetchUID(repo, pCh)
+	go func() {
+		defer close(pCh)
+		pCh <- repo.ParseRawUID(repo.FetchUIDApi())
+	}()
 
+	var uid models.UID
 	select {
 	case uid = <-pCh:
 	case <-timer:
-		uid = TimeOutUID()
+		uid = data.FetchUIDErr(common.TimeOutError())
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"uid": uid,
 	})
-}
-
-func fetchUID(repo data.UID, ch chan models.UID) {
-	defer close(ch)
-	var uid models.UID
-
-	body, err := repo.FetchUIDApi()
-	if err != nil {
-		uid.FetchErr(err)
-		ch <- uid
-		return
-	}
-	uid = repo.ParseRawUID(body)
-
-	ch <- uid
 }
 
 func getProfile(c *gin.Context, repo data.Profile) {
@@ -54,32 +41,20 @@ func getProfile(c *gin.Context, repo data.Profile) {
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.Profile)
 
-	go fetchProfile(repo, pCh)
+	go func() {
+		defer close(pCh)
+		pCh <- repo.ParseRawProfile(repo.FetchProfileApi())
+	}()
 
 	var profile models.Profile
 	select {
 	case profile = <-pCh:
 	case <-timer:
-		profile = TimeOutProfile()
+		profile = data.FetchProfileErr(common.TimeOutError())
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"profile": profile,
 	})
-}
-
-func fetchProfile(repo data.Profile, ch chan models.Profile) {
-	defer close(ch)
-	var profile models.Profile
-
-	body, err := repo.FetchProfileApi()
-	if err != nil {
-		profile.FetchErr(err)
-		ch <- profile
-		return
-	}
-	profile = repo.ParseRawProfile(body)
-
-	ch <- profile
 }
 
 func getPosts(c *gin.Context, repo data.Posts) {
@@ -87,33 +62,20 @@ func getPosts(c *gin.Context, repo data.Posts) {
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.Posts)
 
-	go fetchPosts(repo, pCh)
+	go func() {
+		defer close(pCh)
+		pCh <- repo.ParseRawPosts(repo.FetchPostsApi())
+	}()
 
 	var posts models.Posts
 	select {
 	case posts = <-pCh:
 	case <-timer:
-		posts = TimeOutPosts()
+		posts = data.FetchPostsErr(common.TimeOutError())
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"posts": posts,
 	})
-}
-
-func fetchPosts(repo data.Posts, ch chan models.Posts) {
-	defer close(ch)
-
-	var posts models.Posts
-
-	body, err := repo.FetchPostsApi()
-	if err != nil {
-		posts.FetchErr(err)
-		ch <- posts
-		return
-	}
-	posts = repo.ParseRawPosts(body)
-
-	ch <- posts
 }
 
 func getPostInfo(c *gin.Context, repo data.Post) {
@@ -121,33 +83,20 @@ func getPostInfo(c *gin.Context, repo data.Post) {
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.Post)
 
-	go fetchPostInfo(repo, pCh)
+	go func() {
+		defer close(pCh)
+		pCh <- repo.ParsePostInfo(repo.FetchPostInfo())
+	}()
 
 	var post models.Post
 	select {
 	case post = <-pCh:
 	case <-timer:
-		post = TimeOutPost()
+		post = data.FetchPostErr(common.TimeOutError())
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"post": post,
 	})
-}
-
-func fetchPostInfo(repo data.Post, ch chan models.Post) {
-	defer close(ch)
-
-	var post models.Post
-
-	body, err := repo.FetchPostInfo()
-	if err != nil {
-		post.FetchErr(err)
-		ch <- post
-		return
-	}
-	post = repo.ParsePostInfo(body)
-
-	ch <- post
 }
 
 func getUrlFromJson(c *gin.Context) (string, error) {
@@ -157,37 +106,4 @@ func getUrlFromJson(c *gin.Context) (string, error) {
 		return "", err
 	}
 	return api.Url, nil
-}
-
-func TimeOutProfile() models.Profile {
-	var p models.Profile
-	p.ErrMessage = common.ERROR_MSG_API_TIMEOUT
-	p.Date = common.Now()
-	p.Status = false
-
-	return p
-}
-
-func TimeOutPosts() models.Posts {
-	var p models.Posts
-	p.ErrMessage = common.ERROR_MSG_API_TIMEOUT
-	p.Date = common.Now()
-	p.Status = false
-	return p
-}
-
-func TimeOutPost() models.Post {
-	var p models.Post
-	p.ErrMessage = common.ERROR_MSG_API_TIMEOUT
-	p.Date = common.Now()
-	p.Status = false
-	return p
-}
-
-func TimeOutUID() models.UID {
-	var u models.UID
-	u.ErrMessage = common.ERROR_MSG_API_TIMEOUT
-	u.Date = common.Now()
-	u.Status = false
-	return u
 }

@@ -44,3 +44,4 @@ func TimeOutResult() data.ResultJson {
 	r.Status = false
 	return r
 }
+

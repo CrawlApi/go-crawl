@@ -12,7 +12,7 @@ func initLogger() {
 	if AppConfig.DebugMode {
 		logger.Level = logrus.DebugLevel
 	} else {
-		logger.Level = logrus.WarnLevel
+		logger.Level = logrus.InfoLevel
 	}
 
 }
