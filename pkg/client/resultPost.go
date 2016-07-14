@@ -1,21 +1,24 @@
 package client
 
 import (
+	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/models"
 )
 
 func (r *Result) GetFBPosts() (models.Posts, error) {
-	//var rawPosts models.FBRawPosts
-	//err := common.ParseJson(result.Body, &rawPosts)
-	//var posts models.Posts
-	//if err != nil {
-	//	posts.FetchErr(err)
-	//	return posts
-	//}
-	//posts.ParseFBRawPosts(rawPosts)
-	//
-	//return posts
-	return models.Posts{}, nil
+	var posts models.Posts
+	if r.err != nil {
+		return posts, r.err
+	}
+
+	var rawPosts models.FBRawPosts
+	err := common.ParseJson(r.Body, &rawPosts)
+	if err != nil {
+		return posts, err
+	}
+
+	posts.ParseFBRawPosts(rawPosts)
+	return posts, nil
 }
 
 func (r *Result) GetWBPosts() (models.Posts, error) {
@@ -64,6 +67,7 @@ func (r *Result) GetIGV2Posts() (models.Posts, error) {
 	//return posts
 	return models.Posts{}, nil
 }
+
 //
 //func (r *IGV2Repo) getRawPostsStr(body string) string {
 //	matcher := common.Matcher(REGEX_INSTAGRAM_POSTS, body)
@@ -88,7 +92,6 @@ func (r *Result) GetWXPosts() (models.Posts, error) {
 	return models.Posts{}, nil
 }
 
-
 //func (r *WXRepo) getPostsStr(body string) string {
 //	matcher := common.Matcher(REGEXP_WEIXIN_POSTS, body)
 //	if len(matcher) > 1 {
@@ -96,7 +99,6 @@ func (r *Result) GetWXPosts() (models.Posts, error) {
 //	}
 //	return ""
 //}
-
 
 func (r *Result) GetYTBPosts() (models.Posts, error) {
 	//var rawPosts models.WBRawPosts
@@ -115,19 +117,20 @@ func (r *Result) GetYTBPosts() (models.Posts, error) {
 }
 
 func (r *Result) GetFBPost() (models.Post, error) {
-	//var data models.FBRawPost
-	//err := common.ParseJson(result.Body, &data)
-	//var post models.Post
-	//if err != nil {
-	//	post.FetchErr(err)
-	//
-	//} else {
-	//	post.ParseFBRawPost(data)
-	//}
-	//return post
-	return models.Post{}, nil
-}
+	var post models.Post
+	if r.err != nil {
+		return post, r.err
+	}
 
+	var data models.FBRawPost
+	err := common.ParseJson(r.Body, &data)
+	if err != nil {
+		return post, err
+	}
+
+	post.ParseFBRawPost(data)
+	return post, nil
+}
 
 //func (r *WBRepo) getPostsStr(body string) string {
 //	matcher := common.Matcher(REGEXP_WEIBO_POSTS, body)
@@ -144,7 +147,6 @@ func (r *Result) GetFBPost() (models.Post, error) {
 //	return result
 //}
 //
-
 
 func (r *Result) GetWBPost() (models.Post, error) {
 	//data := r.parseRawPost(body)

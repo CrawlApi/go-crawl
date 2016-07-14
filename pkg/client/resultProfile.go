@@ -8,7 +8,7 @@ import (
 func (r *Result) GetFBProfile() (models.Profile, error) {
 	var profile models.Profile
 
-	if r.err == nil {
+	if r.err != nil {
 		return profile, r.err
 	}
 
@@ -84,6 +84,7 @@ func (r *Result) GetWXProfile() (models.Profile, error) {
 	return models.Profile{}, nil
 
 }
+
 //func (r *WXRepo) parseRawProfile(body string) (models.WXRawProfile, error) {
 //	var data models.WXRawProfile
 //	data.Name = r.getName(body)

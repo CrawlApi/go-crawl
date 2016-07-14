@@ -78,7 +78,10 @@ func New() *Client {
 
 func (c *Client) sendRequest(url string) Result {
 	_, body, errs := c.agent.Timeout(10 * time.Second).Set("accept-language", "en-US").Get(url).End()
-	return Result{Body: body, err: common.Errs2Error(errs)}
+	if errs != nil {
+		return Result{Body: body, err:common.Errs2Error(errs)}
+	}
+	return Result{Body: body}
 }
 
 // facebook
@@ -101,11 +104,14 @@ func (c *Client) GetFBPostResult(url string) Result {
 	postSuffId := parser.ParseFBPostSuffId(url)
 
 	uidResult := c.GetFBUIDResult(common.UrlString(`https://www.facebook.com/%s`, uidStr))
+	common.Debug(uidStr)
+	common.Debug(postSuffId)
 	uid, err := uidResult.GetFBUID()
+	common.Debug(uid)
 	if err != nil {
 		return Result{err: common.ParseUIDError()}
 	}
-	return c.sendRequest(common.UrlString(URL_FACEBOOK_POST_INFO, uid, "_", postSuffId, PAGE_POST_INFO_FIELDS, common.GetFBToken()))
+	return c.sendRequest(common.UrlString(URL_FACEBOOK_POST_INFO, uid.UserId, "_", postSuffId, PAGE_POST_INFO_FIELDS, common.GetFBToken()))
 }
 
 func (c *Client) GetFBReactionsResult(postId string) Result {
