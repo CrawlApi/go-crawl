@@ -80,20 +80,14 @@ func (r *Result) GetWXProfile() (models.Profile, error) {
 	if r.err != nil {
 		return profile, r.err
 	}
-
-	data, _ := r.parseWXRawProfile(r.Body)
+	var data models.WXRawProfile
+	data.Name =  parser.ParseWXName(r.Body)
+	data.Website = common.DecodeString(parser.ParseWXWeb(r.Body))
+	data.Avatar = parser.ParseWXAvatar(r.Body)
+	data.About = parser.ParseWXAbout(r.Body)
 
 	profile.ParseWXProfile(data)
 	return profile, nil
-}
-
-func (r *Result) parseWXRawProfile(body string) (models.WXRawProfile, error) {
-	var data models.WXRawProfile
-	data.Name =  parser.ParseWXName(body)
-	data.Website = common.DecodeString(parser.ParseWXWeb(body))
-	data.Avatar = parser.ParseWXAvatar(body)
-	data.About = parser.ParseWXAbout(body)
-	return data, nil
 }
 
 func (r *Result) GetYTBProfile() (models.Profile, error) {

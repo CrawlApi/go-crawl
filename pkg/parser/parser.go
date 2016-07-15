@@ -56,8 +56,20 @@ func ParseWBPostUrl(rawUrl string) string {
 	return ""
 }
 
+func ParseWBPostsStr(body string) string {
+	matcher := matcher(regexp_wb_posts, body)
+	if len(matcher) > 2 {
+		return "{" + strings.Replace(matcher[2], "(MISSING)", "", -1)
+	}
+	return ""
+}
+
 func ParseWBPostsUrl(src string) string {
 	return getMatcherValue(1, regexp_wb_posts_id, src)
+}
+
+func ParseWBPostStr(body string) string {
+	return getMatcherValue(1, regexp_wb_post_info, body)
 }
 
 // facebook
@@ -98,8 +110,17 @@ func ParseWXWeb(body string) string {
 func ParseWXAvatar(body string) string {
 	return getMatcherValue(1, regexp_wx_logo, body)
 }
+
 func ParseWXAbout(body string) string {
 	return getMatcherValue(2, regexp_wx_feature, body)
+}
+
+func ParseWXPostsStr(body string) string {
+	return getMatcherValue(1, regexp_wx_posts, body)
+}
+
+func ParseWXPostsUrl(body string) string {
+	return getMatcherValue(1, regexp_wx_url, body)
 }
 
 // instagram
@@ -114,8 +135,21 @@ func ParseIGProfile(body string) string {
 func ParseIGUID(body string) []string {
 	return matcher(regexp_ig_profile_id, body)
 }
+
+func ParseIGPostStr(body string) string {
+	return getMatcherValue(1, regexp_ig_post_info, body)
+}
+
 func ParseIGV2UID(body string) []string {
 	return matcher(regexp_ig_profile_id, body)
+}
+
+func ParseIGV2PostsStr(body string) string {
+	matcher := matcher(regexp_ig_posts, body)
+	if len(matcher) > 2 {
+		return `{ "nodes": ` + matcher[2] + "]}"
+	}
+	return ""
 }
 
 func getMatcherValue(length int, expr, body string) string {
