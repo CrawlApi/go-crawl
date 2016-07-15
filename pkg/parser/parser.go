@@ -6,30 +6,49 @@ import (
 )
 
 const (
-	REGEXP_FACEBOOK_PROFILE_ID         = `fb://(page|profile|group)/(\d+)`
-	REGEXP_FACEBOOK_POST_ID            = `posts/(\d+)`
-	REGEXP_FACEBOOK_POST_CREATED_AT    = `data-utime="(\d+)"`
-	REGEXP_FACEBOOK_POST_COMMENT_COUNT = `"commentcount":(\d+)`
-	REGEXP_FACEBOOK_POST_LIKE_COUNT    = `"likecount":(\d+)`
-	REGEXP_FACEBOOK_POST_SHARE_COUNT   = `"sharecount":(\d+)`
-	REGEXP_FACEBOOK_POST_CONTENT       = `<meta name="description" content="(...+)" /><meta name="robots"`
-	REGEXP_FACEBOOK_POST_PIC           = `<img class="scaledImageFitWidth img" src="(...+)" alt="`
-	REGEXP_FACEBOOK_POST_PERMALINK     = `"permalink":"(...+)","permalinkcommentid"`
+	// facebook
+	regexp_fb_profile_id         = `fb://(page|profile|group)/(\d+)`
+	regexp_fb_post_id            = `posts/(\d+)`
+	regexp_fb_post_create        = `data-utime="(\d+)"`
+	regexp_fb_post_comment_count = `"commentcount":(\d+)`
+	regexp_fb_post_like_count    = `"likecount":(\d+)`
+	regexp_fb_post_share_count   = `"sharecount":(\d+)`
+	regexp_fb_post_content       = `<meta name="description" content="(...+)" /><meta name="robots"`
+	regexp_fb_post_pic           = `<img class="scaledImageFitWidth img" src="(...+)" alt="`
+	regexp_fb_post_permalink     = `"permalink":"(...+)","permalinkcommentid"`
+
+	// weibo
+	regexp_wb_posts_id   = `itemid":"(\d+)`
+	regexp_wb_posts      = `render_data (...+)mod\\/pagelist",(...+)]},'common(...+);</script><script src=`
+	regexp_wb_profile_id = `uid=(\d+)`
+	regexp_wb_post_link  = `(http://|)(www.|)weibo.com`
+	regexp_wb_post_info  = `}}},(...+),{"mod_type":`
+
+	// instagram
+	regexp_ig_profile    = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
+	regexp_ig_post_info  = `_sharedData =(...+);</script>`
+	regexp_ig_posts      = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
+	regexp_ig_profile_id = `"owner": {"id": "(\d+)`
+
+	// wechat
+	regexp_wx_profile_id = `微信号: (\S+)</p>`
+	regexp_wx_logo       = `src="((http://img01.sogoucdn.com/app/a)\S+)"`
+	regexp_wx_name       = `<h3>(\S+)</h3>`
+	regexp_wx_feature    = `功能介绍(...+)class="sp-txt">(...+)</span>`
+	regexp_wx_url        = `href="((http://mp.weixin.qq.com/profile)\S+)"`
+	regexp_wx_posts      = `var msgList = '(\S+)';`
+
+	// url
+	regexp_url_type = `(facebook|instagram|weixin|weibo|youtube)`
 )
 
-const (
-	REGEXP_WEIBO_POSTS_ID   = `itemid":"(\d+)`
-	REGEXP_WEIBO_POSTS      = `render_data (...+)mod\\/pagelist",(...+)]},'common(...+);</script><script src=`
-	REGEXP_WEIBO_PROFILE_ID = `uid=(\d+)`
-
-	REGEXP_WEIBO_POST_LINK = `(http://|)(www.|)weibo.com`
-	REGEXP_WEIBO_POST_INFO = `}}},(...+),{"mod_type":`
-)
-
-const REGEX_URL_TYPE = `(facebook|instagram|weixin|weibo)`
+// weibo
+func ParseWBUID(body string) []string {
+	return matcher(regexp_wb_profile_id, body)
+}
 
 func ParseWBPostUrl(rawUrl string) string {
-	matcher := matcher(REGEXP_WEIBO_POST_LINK, rawUrl)
+	matcher := matcher(regexp_wb_post_link, rawUrl)
 	if len(matcher) > 0 {
 		i := strings.Index(rawUrl, "com")
 		return rawUrl[i+4:]
@@ -38,19 +57,16 @@ func ParseWBPostUrl(rawUrl string) string {
 }
 
 func ParseWBPostsUrl(src string) string {
-	return getMatcherValue(1, REGEXP_WEIBO_POSTS_ID, src)
+	return getMatcherValue(1, regexp_wb_posts_id, src)
 }
 
+// facebook
 func ParseFBUIDFromUrl(url string) string {
 	return getMatcherValue(1, `facebook.com/(\S+)/(photos|videos|posts)`, url)
 }
 
 func ParseFBUIDFromBody(body string) []string {
-	return matcher(REGEXP_FACEBOOK_PROFILE_ID, body)
-}
-
-func ParseWBUID(body string) []string {
-	return matcher(REGEXP_WEIBO_PROFILE_ID, body)
+	return matcher(regexp_fb_profile_id, body)
 }
 
 func ParseFBPostSuffId(url string) string {
@@ -64,6 +80,42 @@ func ParseFBPostSuffId(url string) string {
 	}
 	return ""
 
+}
+
+// wechat
+func ParseWXUID(body string) []string {
+	return matcher(regexp_wx_profile_id, body)
+}
+
+func ParseWXName(body string) string {
+	return getMatcherValue(1, regexp_wx_name, body)
+}
+
+func ParseWXWeb(body string) string {
+	return getMatcherValue(1, regexp_wx_url, body)
+}
+
+func ParseWXAvatar(body string) string {
+	return getMatcherValue(1, regexp_wx_logo, body)
+}
+func ParseWXAbout(body string) string {
+	return getMatcherValue(2, regexp_wx_feature, body)
+}
+
+// instagram
+func ParseIGProfile(body string) string {
+	matcher := matcher(regexp_ig_profile, body)
+	if len(matcher) > 3 {
+		return matcher[1] + matcher[3]
+	}
+	return ""
+}
+
+func ParseIGUID(body string) []string {
+	return matcher(regexp_ig_profile_id, body)
+}
+func ParseIGV2UID(body string) []string {
+	return matcher(regexp_ig_profile_id, body)
 }
 
 func getMatcherValue(length int, expr, body string) string {
@@ -81,7 +133,7 @@ func matcher(expr string, s string) []string {
 }
 
 func CheckUrl(url string) string {
-	matcher := matcher(REGEX_URL_TYPE, url)
+	matcher := matcher(regexp_url_type, url)
 	if len(matcher) > 0 {
 		return matcher[0]
 	}

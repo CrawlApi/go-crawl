@@ -24,12 +24,14 @@ func GetUid(c *gin.Context) {
 	switch parser.CheckUrl(api.Url) {
 	case "facebook":
 		repo = data.NewFBRepoWithUrl(api.Url)
-	//case "instagram":
-	//	repo = data.NewIGV2RepoWithUrl(api.Url)
-	//case "weixin":
-	//	repo = data.NewWXRepoWithUrl(api.Url)
-	//case "weibo":
-	//	repo = data.NewWBRepoWithUrl(api.Url)
+	case "instagram":
+		repo = data.NewIGV2RepoWithUrl(api.Url)
+	case "weixin":
+		repo = data.NewWXRepoWithUrl(api.Url)
+	case "weibo":
+		repo = data.NewWBRepoWithUrl(api.Url)
+	case "youtube":
+		repo = data.NewYTBRepoWithUrl(api.Url)
 	}
 
 	getRealUid(c, repo)

@@ -39,24 +39,12 @@ const (
 	URL_INSTAGRAM_PROFILE_V2 = "https://i.instagram.com/api/v1/users/%s/info/"
 	URL_INSTAGRAM_POSTS_V2 = "https://i.instagram.com/api/v1/users/%s/info/"
 
-	REGEX_INSTAGRAM_PROFILE = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
-	REGEX_INSTAGRAM_POST_INFO = `_sharedData =(...+);</script>`
-
 	URL_INSTAGRAM_API_POSTS = "https://www.instagram.com/%s/"
-	REGEX_INSTAGRAM_POSTS = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
-	REGEX_INSTAGRAM_PROFILE_ID = `"owner": {"id": "(\d+)`
 )
 
 const (
 	URL_WECHAT_PROFILE = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=n&_sug_type_="
 	URL_WECHAT_POSTS = "http://weixin.sogou.com/weixin?type=1&query=%s&ie=utf8&_sug_=n&_sug_type_="
-
-	REGEXP_WEIXIN_PROFILE_ID = `微信号: (\S+)</p>`
-	REGEXP_WEIXIN_LOGO = `src="((http://img01.sogoucdn.com/app/a)\S+)"`
-	REGEXP_WEIXIN_NAME = `<h3>(\S+)</h3>`
-	REGEXP_WEIXIN_FEATURE = `功能介绍(...+)class="sp-txt">(...+)</span>`
-	REGEXP_WEIXIN_URL = `href="((http://mp.weixin.qq.com/profile)\S+)"`
-	REGEXP_WEIXIN_POSTS = `var msgList = '(\S+)';`
 )
 
 const (
