@@ -22,8 +22,8 @@ func main() {
 
 	addr := common.AppConfig.Server
 
-	common.Info("Start Server...")
-	common.Info("Server Version: ", common.AppConfig.Version)
+	common.Log.Info("Start Server...")
+	common.Log.Info("Server Version: ", common.AppConfig.Version)
 
 	engine.Run(addr)
 }

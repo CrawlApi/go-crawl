@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"github.com/PuerkitoBio/goquery"
+	"github.com/llitfkitfk/cirkol/pkg/common"
 	"regexp"
 	"strings"
 )
@@ -38,6 +40,8 @@ const (
 	regexp_wx_url        = `href="((http://mp.weixin.qq.com/profile)\S+)"`
 	regexp_wx_posts      = `var msgList = '(\S+)';`
 
+	// youtube
+	regexp_ytb_profile_id = `微信号: (\S+)</p>`
 	// url
 	regexp_url_type = `(facebook|instagram|weixin|weibo|youtube)`
 )
@@ -94,7 +98,18 @@ func ParseFBPostSuffId(url string) string {
 
 }
 
+func ParseYTBUID(body string) string {
+	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(body))
+	uid, _ := doc.Selection.Find("#watch7-user-header").Find("a").Attr("href")
+	common.Log.Info(uid)
+	if len(uid) > 6 {
+		return uid[6:]
+	}
+	return uid
+}
+
 // wechat
+
 func ParseWXUID(body string) []string {
 	return matcher(regexp_wx_profile_id, body)
 }

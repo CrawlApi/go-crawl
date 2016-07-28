@@ -94,6 +94,20 @@ func (r *Result) GetWXUID() (models.UID, error) {
 	}
 	return uid, common.MissMatchError()
 }
+
 func (r *Result) GetYTBUID() (models.UID, error) {
-	return models.UID{}, nil
+	var uid models.UID
+	if r.err != nil {
+		return uid, r.err
+	}
+
+	matcher := parser.ParseYTBUID(r.Body)
+	uid.Media = "ytb"
+	uid.Date = common.Now()
+	if len(matcher) > 0 {
+		uid.UserId = matcher
+		uid.Status = true
+		return uid, nil
+	}
+	return uid, common.MissMatchError()
 }

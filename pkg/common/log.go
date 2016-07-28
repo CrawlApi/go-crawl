@@ -4,27 +4,30 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-var logger *logrus.Logger
+type logger struct {
+	logger *logrus.Logger
+}
+
+var Log logger
 
 func initLogger() {
-	logger = logrus.New()
-	logger.Formatter = new(logrus.TextFormatter)
+	Log.logger = logrus.New()
+	Log.logger.Formatter = new(logrus.TextFormatter)
 	if AppConfig.DebugMode {
-		logger.Level = logrus.DebugLevel
+		Log.logger.Level = logrus.DebugLevel
 	} else {
-		logger.Level = logrus.InfoLevel
+		Log.logger.Level = logrus.InfoLevel
 	}
-
 }
 
-func Info(args ...interface{}) {
-	logger.Info(args)
+func (l *logger) Info(args ...interface{}) {
+	l.logger.Info(args)
 }
 
-func Debug(args ...interface{}) {
-	logger.Debug(args)
+func (l *logger) Debug(args ...interface{}) {
+	l.logger.Debug(args)
 }
 
-func Warn(args ...interface{}) {
-	logger.Warn(args)
+func (l *logger) Warn(args ...interface{}) {
+	l.logger.Warn(args)
 }

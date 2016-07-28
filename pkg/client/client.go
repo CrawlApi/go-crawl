@@ -78,7 +78,7 @@ func (c *Client) GetFBUIDResult(url string) Result {
 }
 
 func (c *Client) GetFBProfileResult(uid string) Result {
-	common.Info("Fetch Facebook Profile: ", uid)
+	common.Log.Info("Fetch Facebook Profile: ", uid)
 	return c.sendRequest(common.UrlString(URL_FACEBOOK_PROFILE, uid, PAGE_PROFILE_FIELDS_ENABLE, common.GetFBToken()))
 }
 
@@ -92,10 +92,10 @@ func (c *Client) GetFBPostResult(url string) Result {
 	postSuffId := parser.ParseFBPostSuffId(url)
 
 	uidResult := c.GetFBUIDResult(common.UrlString(`https://www.facebook.com/%s`, uidStr))
-	common.Debug(uidStr)
-	common.Debug(postSuffId)
+	common.Log.Debug(uidStr)
+	common.Log.Debug(postSuffId)
 	uid, err := uidResult.GetFBUID()
-	common.Debug(uid)
+	common.Log.Debug(uid)
 	if err != nil {
 		return Result{err: common.ParseUIDError()}
 	}
@@ -196,6 +196,7 @@ func (c *Client) GetWXPostResult(url string) Result {
 
 // youtube
 func (c *Client) GetYTBUIDResult(url string) Result {
+	common.Log.Info(url)
 	return c.sendRequest(url)
 }
 
