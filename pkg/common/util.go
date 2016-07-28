@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	TIMESTAMP_LAYOUT    = "2006-01-02T15:04:05+0000"
-	TIMESTAMP_LAYOUT_WB = "2006-1-2 15:4"
+	TIMESTAMP_LAYOUT     = "2006-01-02T15:04:05+0000"
+	TIMESTAMP_LAYOUT_WB  = "2006-1-2 15:4"
 	TIMESTAMP_LAYOUT_YTB = "Jan _2, 2006"
 )
 
@@ -43,7 +43,7 @@ func Str2Int64(src string) int64 {
 	return int64(i)
 }
 
-func DateFormatYTB(dateStr string) int64  {
+func DateFormatYTB(dateStr string) int64 {
 	time, err := time.Parse(TIMESTAMP_LAYOUT_YTB, dateStr)
 	if err != nil {
 		return 0
@@ -90,6 +90,28 @@ func query2Int(src string) int {
 		return 5
 	}
 	return i
+}
+
+func ParseYTBCreatedAt(dateStr string) int64 {
+	today := time.Now()
+	var then time.Time
+	s := strings.Split(dateStr, " ")
+	switch s[1] {
+	case "minutes", "minute":
+		then = today.Add(time.Duration(-Str2Int(s[0])) * time.Minute)
+	case "hours", "hour":
+		then = today.Add(time.Duration(-Str2Int(s[0])) * time.Hour)
+	case "days", "day":
+		then = today.AddDate(0, 0, -Str2Int(s[0]))
+	case "weeks", "week":
+		then = today.AddDate(0, 0, -Str2Int(s[0])*7)
+	case "months", "month":
+		then = today.AddDate(0, -Str2Int(s[0]), 0)
+	case "years", "year":
+		then = today.AddDate(-Str2Int(s[0]), 0, 0)
+	}
+	return then.Unix()
+
 }
 
 func ParseWBCreatedAt(dateStr string) int64 {

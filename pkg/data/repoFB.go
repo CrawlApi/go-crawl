@@ -6,8 +6,6 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/models"
 )
 
-
-
 type FBRepo struct {
 	UserId string
 	RawUrl string
@@ -18,7 +16,7 @@ type FBRepo struct {
 func NewFBRepoWithLimit(userId string, limit string) *FBRepo {
 	return &FBRepo{
 		UserId: userId,
-		Limit: limit,
+		Limit:  limit,
 	}
 }
 
@@ -76,7 +74,7 @@ func (r *FBRepo) ParseRawProfile(result client.Result) models.Profile {
 	return data
 }
 
-func (r *FBRepo) ParseRawPosts(result client.Result) models.Posts{
+func (r *FBRepo) ParseRawPosts(result client.Result) models.Posts {
 	data, err := result.GetFBPosts()
 	if err != nil {
 		return FetchPostsErr(err)
@@ -93,13 +91,12 @@ func (r *FBRepo) ParsePostInfo(result client.Result) models.Post {
 
 }
 
-func (r *FBRepo) ParseRawReactions(result client.Result) models.FBReactions{
+func (r *FBRepo) ParseRawReactions(result client.Result) models.FBReactions {
 	data, err := result.GetFBReactions()
 	if err != nil {
 		return FetchReactionsError(err)
 	}
 	return data
-
 
 }
 

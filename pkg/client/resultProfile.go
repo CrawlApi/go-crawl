@@ -99,7 +99,7 @@ func (r *Result) GetYTBProfile() (models.Profile, error) {
 	profile.Name, _ = doc.Selection.Find(".primary-header-contents").Find("a").Attr("title")
 	profile.Avatar, _ = doc.Selection.Find(".channel-header-profile-image").Attr("src")
 
-	doc.Selection.Find(".about-stats").Find("span").Each(func(i int, s *goquery.Selection) {
+	doc.Selection.Find(".about-stats").Find(".about-stat").Each(func(i int, s *goquery.Selection) {
 		switch i {
 		case 0:
 			profile.Fans = common.Str2Int(common.Replace(s.Find("b").Text(), ",", ""))

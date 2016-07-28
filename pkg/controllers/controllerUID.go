@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/llitfkitfk/cirkol/pkg/data"
 	"github.com/llitfkitfk/cirkol/pkg/models"
-	"net/http"
 	"github.com/llitfkitfk/cirkol/pkg/parser"
+	"net/http"
 )
 
 func GetUid(c *gin.Context) {

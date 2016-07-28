@@ -197,9 +197,9 @@ type IGRawPost struct {
 				Comments        struct {
 					Count int `json:"count"`
 					Nodes []struct {
-						ID        string `json:"id"`
-						Text      string `json:"text"`
-						User      struct {
+						ID   string `json:"id"`
+						Text string `json:"text"`
+						User struct {
 							ID            string `json:"id"`
 							ProfilePicURL string `json:"profile_pic_url"`
 							Username      string `json:"username"`

@@ -31,7 +31,7 @@ func (p *Post) FetchErr(err error) {
 	p.Status = false
 }
 
-func (p *Post) ParseIGRawPost(data IGRawPost)  {
+func (p *Post) ParseIGRawPost(data IGRawPost) {
 	p.ID = data.EntryData.PostPage[0].Media.Code
 	p.UID = data.EntryData.PostPage[0].Media.Owner.ID
 	p.CreatedAt = int64(data.EntryData.PostPage[0].Media.Date)
@@ -54,7 +54,6 @@ func (p *Post) ParseIGRawPost(data IGRawPost)  {
 	p.Date = common.Now()
 	p.Status = true
 }
-
 
 func (p *Post) ParseFBRawPost(data FBRawPost) {
 	p.ID = data.ID

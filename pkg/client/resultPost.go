@@ -1,9 +1,11 @@
 package client
 
 import (
+	"github.com/PuerkitoBio/goquery"
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/llitfkitfk/cirkol/pkg/parser"
+	"strings"
 )
 
 func (r *Result) GetFBPosts() (models.Posts, error) {
@@ -89,19 +91,31 @@ func (r *Result) GetWXPosts() (models.Posts, error) {
 }
 
 func (r *Result) GetYTBPosts() (models.Posts, error) {
-	//var rawPosts models.WBRawPosts
-	//
-	//err := common.ParseJson(body, &rawPosts)
-	//
-	//var posts models.Posts
-	//if err != nil {
-	//	posts.FetchErr(err)
-	//	return posts
-	//}
-	//posts.ParseWBRawPosts(rawPosts)
-	//
-	//return posts
-	return models.Posts{}, nil
+	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(r.Body))
+
+	var posts models.Posts
+
+	doc.Selection.Find("#channels-browse-content-grid").Find(".channels-content-item").Each(func(i int, s *goquery.Selection) {
+		var post models.Post
+		rawId, _ := s.Find(".yt-lockup-title").Find("a").Attr("href")
+		if len(rawId) > 9 {
+			post.ID = rawId[9:]
+			post.Status = true
+		}
+
+		post.CreatedAt = common.ParseYTBCreatedAt(s.Find(".yt-lockup-meta-info").Find("li").Last().Text())
+		post.ViewCount = common.Str2Int(common.Replace(common.Replace(s.Find(".yt-lockup-meta-info").Find("li").First().Text(), ",", ""), " views", ""))
+		post.ContentFullPicture, _ = s.Find(".yt-thumb-default").Find("img").Attr("src")
+		post.ContentCaption, _ = s.Find(".yt-lockup-title").Find("a").Attr("title")
+		post.ContentType = "video"
+		post.PermalinkUrl = common.UrlString("https://www.youtube.com/watch?v=%s", post.ID)
+		post.Date = common.Now()
+
+		posts.Items = append(posts.Items, post)
+	})
+	posts.Date = common.Now()
+	posts.Status = true
+	return posts, nil
 }
 
 func (r *Result) GetFBPost() (models.Post, error) {

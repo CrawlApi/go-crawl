@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/llitfkitfk/cirkol/pkg/common"
-	"github.com/llitfkitfk/cirkol/pkg/routers"
-	"github.com/llitfkitfk/cirkol/pkg/data"
 	"github.com/llitfkitfk/cirkol/pkg/client"
+	"github.com/llitfkitfk/cirkol/pkg/common"
+	"github.com/llitfkitfk/cirkol/pkg/data"
+	"github.com/llitfkitfk/cirkol/pkg/routers"
 )
 
 func main() {

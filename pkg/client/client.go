@@ -205,13 +205,7 @@ func (c *Client) GetYTBProfileResult(userId string) Result {
 }
 
 func (c *Client) GetYTBPostsResult(userId string) Result {
-	//body, err := getApi(r.Agent, common.UrlString(URL_YOUTUBE_POSTS, r.UserId))
-	//if err != nil {
-	//	return body, err
-	//}
-	//
-	//return body, nil
-	return c.sendRequest(userId)
+	return c.sendRequest(common.UrlString(URL_YOUTUBE_POSTS, userId))
 }
 
 func (c *Client) GetYTBPostResult(url string) Result {

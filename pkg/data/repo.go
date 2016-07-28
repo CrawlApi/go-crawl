@@ -2,8 +2,8 @@ package data
 
 import (
 	"github.com/llitfkitfk/cirkol/pkg/client"
-	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/llitfkitfk/cirkol/pkg/common"
+	"github.com/llitfkitfk/cirkol/pkg/models"
 )
 
 var Agent *client.Client

@@ -1,8 +1,8 @@
 package data
 
 import (
-	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/llitfkitfk/cirkol/pkg/client"
+	"github.com/llitfkitfk/cirkol/pkg/models"
 )
 
 type WBRepo struct {
