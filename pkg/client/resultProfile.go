@@ -1,9 +1,11 @@
 package client
 
 import (
+	"github.com/PuerkitoBio/goquery"
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/llitfkitfk/cirkol/pkg/parser"
+	"strings"
 )
 
 func (r *Result) GetFBProfile() (models.Profile, error) {
@@ -81,7 +83,7 @@ func (r *Result) GetWXProfile() (models.Profile, error) {
 		return profile, r.err
 	}
 	var data models.WXRawProfile
-	data.Name =  parser.ParseWXName(r.Body)
+	data.Name = parser.ParseWXName(r.Body)
 	data.Website = common.DecodeString(parser.ParseWXWeb(r.Body))
 	data.Avatar = parser.ParseWXAvatar(r.Body)
 	data.About = parser.ParseWXAbout(r.Body)
@@ -91,17 +93,26 @@ func (r *Result) GetWXProfile() (models.Profile, error) {
 }
 
 func (r *Result) GetYTBProfile() (models.Profile, error) {
-	//var rawProfile models.WBRawProfile
-	//
-	//err := common.ParseJson(body, &rawProfile)
-	//
-	//var profile models.Profile
-	//if err != nil {
-	//	profile.FetchErr(err)
-	//	return profile
-	//}
-	//profile.ParseWBProfile(rawProfile)
-	//
-	//return profile
-	return models.Profile{}, nil
+	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(r.Body))
+
+	var profile models.Profile
+	profile.Name, _ = doc.Selection.Find(".primary-header-contents").Find("a").Attr("title")
+	profile.Avatar, _ = doc.Selection.Find(".channel-header-profile-image").Attr("src")
+
+	doc.Selection.Find(".about-stats").Find("span").Each(func(i int, s *goquery.Selection) {
+		switch i {
+		case 0:
+			profile.Fans = common.Str2Int(common.Replace(s.Find("b").Text(), ",", ""))
+		case 1:
+			profile.ViewCount = common.Str2Int(common.Replace(s.Find("b").Text(), ",", ""))
+		case 2:
+			profile.Birthday = s.Text()[7:]
+		}
+	})
+
+	profile.About = doc.Selection.Find(".about-description").Text()
+	profile.Status = true
+	profile.Date = common.Now()
+
+	return profile, nil
 }

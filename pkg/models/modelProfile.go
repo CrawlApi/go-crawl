@@ -9,6 +9,7 @@ type Profile struct {
 	Name       string `json:"name"`
 	Avatar     string `json:"avatar"`
 	PostNum    int    `json:"post_num"`
+	ViewCount  int    `json:"view_count, omitempty"`
 	FollowNum  int    `json:"follow_num"`
 	Fans       int    `json:"fans"`
 	Birthday   string `json:"birthday"`
