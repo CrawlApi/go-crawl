@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>html</title>
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+	<style type="text/css">
+	    body{ margin: 10px; }
+		button{
+			padding: 5px 10px;
+    		width: 50px;
+    		border: none;
+    		border-radius: 2px;
+    		cursor: pointer;
+		}
+		.name:hover{
+			cursor: pointer;
+			color: red;
+		}
+		.api-method:hover{ cursor: pointer; }
+		.api-post { background-color: #e7f6ec; }
+	</style>
+</head>
+<body>
+	<div class="facebook">
+	    <div class="name">Facebook</div>
+		<div class="api" style="display:none;">
+	    	<div class="api-post">
+	    		<div class="api-method">
+	    		    <h3>
+						<span class="api-toggleOperation">POST</span>
+						<span>/Pet</span>
+					</h3>
+				</div>
+				<div class="api-content" style="display:none;">
+				    <h4>Parameters</h4>
+					<table class="api-content-body">
+						<tr><td>Parameter</td><td>Value</td></tr>
+						<tr><td><label>body</label></td><td><textarea placeholder="(required)" rows="5" cols="40"></textarea></td></tr>
+						<tr><td><h4>Response Messages</h4></td></tr>
+						<tr><td><button class="api-try">Try!</button></td><td><div>Result</div></td></tr>
+					</table>	
+				</div>
+	    	</div>
+		</div>
+	</div><hr>
+	<div class="instagram">Instagram</div><hr>
+	<div class="weibo">Weibo</div><hr>
+</body>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('.name').click(function(){
+           $(this).next('div').toggle();
+        })
+
+        $('.api-method').click(function(){
+           $(this).next('div').toggle();
+        })
+
+        $('.api-try').click(function(){
+			var req = $(this).parent().parent().prev().prev().children("td").eq(1).children("textarea").val();
+			var res = $(this).parent().next().children('div');
+			  $.ajax({
+			type: "GET",
+			url: "http://petstore.swagger.io/v2/swagger.json",
+			data: "", 
+			success: function(data){
+				 alert(data);
+			     res.html(req);
+			  },
+		    error: function(request){
+				       alert(request.responseText);
+			},
+			complete : function(){
+			}
+			});
+        })
+	});	
+</script>
+</html>
