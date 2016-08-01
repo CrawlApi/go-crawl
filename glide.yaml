@@ -1,6 +1,0 @@
-package: github.com/llitfkitfk/cirkol
-import:
-- package: github.com/gin-gonic/gin
-- package: github.com/valyala/fasthttp
-- package: github.com/Sirupsen/logrus
-  version: ^0.10.0
