@@ -16,7 +16,7 @@ func getRealUid(c *gin.Context, repo data.UID) {
 		return
 	}
 
-	timeout := c.DefaultQuery("timeout", "5")
+	timeout := c.DefaultQuery("timeout", "10")
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.UID)
 
@@ -37,7 +37,7 @@ func getRealUid(c *gin.Context, repo data.UID) {
 }
 
 func getProfile(c *gin.Context, repo data.Profile) {
-	timeout := c.DefaultQuery("timeout", "5")
+	timeout := c.DefaultQuery("timeout", "10")
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.Profile)
 
@@ -58,7 +58,7 @@ func getProfile(c *gin.Context, repo data.Profile) {
 }
 
 func getPosts(c *gin.Context, repo data.Posts) {
-	timeout := c.DefaultQuery("timeout", "5")
+	timeout := c.DefaultQuery("timeout", "10")
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.Posts)
 
@@ -79,7 +79,7 @@ func getPosts(c *gin.Context, repo data.Posts) {
 }
 
 func getPostInfo(c *gin.Context, repo data.Post) {
-	timeout := c.DefaultQuery("timeout", "5")
+	timeout := c.DefaultQuery("timeout", "10")
 	timer := common.Timeout(timeout)
 	pCh := make(chan models.Post)
 

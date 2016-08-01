@@ -65,10 +65,14 @@ func New() *Client {
 }
 
 func (c *Client) sendRequest(url string) Result {
+	common.Log.Info("fetched url: ", url)
+
 	_, body, err := c.agent.GetTimeout(nil, url, 10*time.Second)
 	if err != nil {
+		common.Log.Info("fetched err: ", err)
 		return Result{Body: string(body), err: err}
 	}
+
 	return Result{Body: string(body)}
 }
 
