@@ -5,7 +5,6 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/llitfkitfk/cirkol/pkg/parser"
 	"github.com/valyala/fasthttp"
-	"time"
 )
 
 const (
