@@ -18,6 +18,11 @@
 			"Rev": "3ad29d1ad1c4f2023e355603324348cf1f4b2d48"
 		},
 		{
+			"ImportPath": "github.com/ddliu/go-httpclient",
+			"Comment": "v0.5.1",
+			"Rev": "52a7afc73c57c5b898b5514a5467f8d38decd3ed"
+		},
+		{
 			"ImportPath": "github.com/gin-gonic/gin",
 			"Comment": "v1.0rc1-268-gf931d1e",
 			"Rev": "f931d1ea80ae95a6fc739213cdd9399bd2967fb6"
@@ -37,47 +42,8 @@
 			"Rev": "c3cefd437628a0b7d31b34fe44b3a7a540e98527"
 		},
 		{
-			"ImportPath": "github.com/klauspost/compress/flate",
-			"Comment": "v1.0-12-g14eb9c4",
-			"Rev": "14eb9c4951195779ecfbec34431a976de7335b0a"
-		},
-		{
-			"ImportPath": "github.com/klauspost/compress/gzip",
-			"Comment": "v1.0-12-g14eb9c4",
-			"Rev": "14eb9c4951195779ecfbec34431a976de7335b0a"
-		},
-		{
-			"ImportPath": "github.com/klauspost/compress/zlib",
-			"Comment": "v1.0-12-g14eb9c4",
-			"Rev": "14eb9c4951195779ecfbec34431a976de7335b0a"
-		},
-		{
-			"ImportPath": "github.com/klauspost/cpuid",
-			"Comment": "v1.0",
-			"Rev": "09cded8978dc9e80714c4d85b0322337b0a1e5e0"
-		},
-		{
-			"ImportPath": "github.com/klauspost/crc32",
-			"Comment": "v1.0",
-			"Rev": "19b0b332c9e4516a6370a0456e6182c3b5036720"
-		},
-		{
 			"ImportPath": "github.com/manucorporat/sse",
 			"Rev": "ee05b128a739a0fb76c7ebd3ae4810c1de808d6d"
-		},
-		{
-			"ImportPath": "github.com/valyala/bytebufferpool",
-			"Rev": "8ebd0474e5a2f0a5c7a74ad2bf421a1d1a90264f"
-		},
-		{
-			"ImportPath": "github.com/valyala/fasthttp",
-			"Comment": "v20160617-26-g45697fe",
-			"Rev": "45697fe30a130ec6a54426a069c82f3abe76b63d"
-		},
-		{
-			"ImportPath": "github.com/valyala/fasthttp/fasthttputil",
-			"Comment": "v20160617-26-g45697fe",
-			"Rev": "45697fe30a130ec6a54426a069c82f3abe76b63d"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",

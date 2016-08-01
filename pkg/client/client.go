@@ -1,10 +1,10 @@
 package client
 
 import (
+	"github.com/ddliu/go-httpclient"
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/models"
 	"github.com/llitfkitfk/cirkol/pkg/parser"
-	"github.com/valyala/fasthttp"
 )
 
 const (
@@ -53,12 +53,15 @@ const (
 )
 
 type Client struct {
-	agent *fasthttp.Client
+	agent *httpclient.HttpClient
 }
 
 func New() *Client {
 	client := Client{
-		agent: &fasthttp.Client{},
+		agent: httpclient.Defaults(httpclient.Map{
+			httpclient.OPT_USERAGENT: "go-api",
+			"Accept-Language":        "en-us",
+		}),
 	}
 	return &client
 }
@@ -66,12 +69,17 @@ func New() *Client {
 func (c *Client) sendRequest(url string) Result {
 	common.Log.Info("fetched url: ", url)
 
-	_, body, err := c.agent.Get(nil, url)
+	resp, err := c.agent.Get(url, nil)
 	if err != nil {
 		common.Log.Info("fetched err: ", err)
+		return Result{Body: resp.Status, err: err}
+	}
+	body, err := resp.ReadAll()
+	if err != nil {
+		common.Log.Info("read err: ", err)
 		return Result{Body: string(body), err: err}
 	}
-
+	common.Log.Debug("body: ", string(body))
 	return Result{Body: string(body)}
 }
 
