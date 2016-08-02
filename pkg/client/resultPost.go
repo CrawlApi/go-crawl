@@ -31,11 +31,12 @@ func (r *Result) GetWBPosts() (models.Posts, error) {
 	}
 
 	var rawPosts models.WBRawPosts
+	common.Log.Debug(parser.ParseWBPostsStr(r.Body))
+
 	err := common.ParseJson(parser.ParseWBPostsStr(r.Body), &rawPosts)
 	if err != nil {
 		return posts, err
 	}
-
 	posts.ParseWBRawPosts(rawPosts)
 	return posts, nil
 }

@@ -4,6 +4,12 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/common"
 )
 
+const (
+	VIDEO = "video"
+	IMAGE = "image"
+	TEXT  = "text"
+)
+
 type Post struct {
 	ID                 string `json:"id"`
 	UID                string `json:"uid"`
@@ -42,9 +48,9 @@ func (p *Post) ParseIGRawPost(data IGRawPost) {
 	p.ViewCount = data.EntryData.PostPage[0].Media.VideoViews
 
 	if data.EntryData.PostPage[0].Media.IsVideo {
-		p.ContentType = "video"
+		p.ContentType = VIDEO
 	} else {
-		p.ContentType = "image"
+		p.ContentType = IMAGE
 	}
 
 	p.ContentCaption = data.EntryData.PostPage[0].Media.Caption
@@ -142,10 +148,16 @@ func (p *Posts) ParseWBRawPosts(data WBRawPosts) {
 		data.LikeCount = node.Mblog.AttitudesCount
 		data.CommentCount = node.Mblog.CommentsCount
 		//data.ViewCount
-		//data.ContentType        =
+
 		//data.ContentCaption	=
 		data.ContentBody = node.Mblog.Text
 		data.ContentFullPicture = node.Mblog.ThumbnailPic
+		if len(node.Mblog.ThumbnailPic) > 0 {
+			data.ContentType = IMAGE
+		} else {
+			data.ContentType = TEXT
+		}
+
 		data.PermalinkUrl = "http://m.weibo.cn/" + common.Int2Str(node.Mblog.User.ID) + "/" + node.Mblog.Bid
 		data.HasComment = true
 		data.RawData = common.Interface2String(node)
@@ -229,9 +241,9 @@ func (p *Posts) ParseIGV2RawPosts(rawPost IGV2RawPosts) {
 		data.CommentCount = node.Comments.Count
 		data.ViewCount = node.VideoViews
 		if node.IsVideo {
-			data.ContentType = "video"
+			data.ContentType = VIDEO
 		} else {
-			data.ContentType = "image"
+			data.ContentType = IMAGE
 		}
 
 		data.ContentCaption = node.Caption
