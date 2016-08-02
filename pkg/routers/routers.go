@@ -13,6 +13,11 @@ func InitRouters(router *gin.RouterGroup) {
 	setupUIDRouters(router)
 	setupAPIRouters(router)
 	setupYTBRouters(router)
+	setupWeb(router)
+}
+
+func setupWeb(router *gin.RouterGroup) {
+	router.GET("/web", controllers.WEB)
 }
 
 func setupAPIRouters(router *gin.RouterGroup) {

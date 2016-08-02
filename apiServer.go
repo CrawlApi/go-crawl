@@ -17,6 +17,7 @@ func main() {
 	if !common.AppConfig.DebugMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
+	engine.LoadHTMLGlob("pkg/resources/*.templ.html")
 
 	routers.InitRouters(&engine.RouterGroup)
 
@@ -27,6 +28,7 @@ func main() {
 
 	engine.Run(addr)
 }
+
 
 func initClient() {
 	cl := client.New()
