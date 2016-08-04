@@ -32,6 +32,12 @@ func GetUid(c *gin.Context) {
 		repo = data.NewWBRepoWithUrl(api.Url)
 	case "youtube":
 		repo = data.NewYTBRepoWithUrl(api.Url)
+	default:
+		c.JSON(http.StatusOK, gin.H{
+			"status":  false,
+			"message": "no matched repo",
+		})
+		return
 	}
 
 	getRealUid(c, repo)
