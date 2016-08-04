@@ -72,7 +72,7 @@ func (c *Client) sendRequest(url string) Result {
 	resp, err := c.agent.Get(url, nil)
 	if err != nil {
 		common.Log.Info("fetched err: ", err)
-		return Result{Body: resp.Status, err: err}
+		return Result{Body: "", err: err}
 	}
 	body, err := resp.ReadAll()
 	if err != nil {
