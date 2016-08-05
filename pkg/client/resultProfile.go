@@ -96,6 +96,12 @@ func (r *Result) GetYTBProfile() (models.Profile, error) {
 	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(r.Body))
 
 	var profile models.Profile
+
+	uid, _ := doc.Selection.Find(".appbar-content-hidable").Find("a").Attr("href")
+	if len(uid) > 6 {
+		profile.UserId = uid[6:]
+	}
+
 	profile.Name, _ = doc.Selection.Find(".primary-header-contents").Find("a").Attr("title")
 	profile.Avatar, _ = doc.Selection.Find(".channel-header-profile-image").Attr("src")
 
