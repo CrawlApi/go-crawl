@@ -101,6 +101,7 @@ func (r *Result) GetYTBProfile() (models.Profile, error) {
 	if len(uid) > 6 {
 		profile.UserId = uid[6:]
 	}
+	profile.Website = common.UrlString("https://www.youtube.com%s", uid)
 
 	profile.Name, _ = doc.Selection.Find(".primary-header-contents").Find("a").Attr("title")
 	profile.Avatar, _ = doc.Selection.Find(".channel-header-profile-image").Attr("src")
