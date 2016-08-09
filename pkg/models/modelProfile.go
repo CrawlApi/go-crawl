@@ -52,7 +52,7 @@ func (p *Profile) ParseWBProfile(data WBRawProfile) {
 	p.FollowNum = data.UserInfo.FriendsCount
 	p.Fans = data.UserInfo.FollowersCount
 	p.About = data.UserInfo.Description
-
+	p.Website = data.UserInfo.URL
 	p.RawData = common.Interface2String(data)
 	p.Date = common.Now()
 	p.Status = true
