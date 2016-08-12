@@ -15,11 +15,18 @@ func InitRouters(router *gin.RouterGroup) {
 	setupYTBRouters(router)
 	setupWeb(router)
 	setupHealthz(router)
+	setupApiHealthz(router)
 }
 
 func setupHealthz(router *gin.RouterGroup) {
 	router.GET("/healthz", controllers.Healthz)
 }
+
+
+func setupApiHealthz(router *gin.RouterGroup) {
+	router.GET("/api/healthz", controllers.APIHealthz)
+}
+
 func setupWeb(router *gin.RouterGroup) {
 	router.GET("/web", controllers.WEB)
 }
