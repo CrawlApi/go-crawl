@@ -11,5 +11,4 @@ func setupFBRouters(router *gin.RouterGroup) {
 	router.GET("/api/fb/post/:postId/reactions", controllers.GetFBPostReactions)
 
 	router.POST("/api/fb/post", controllers.GetFBPostInfo)
-
 }

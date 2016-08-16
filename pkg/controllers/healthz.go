@@ -6,90 +6,74 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/data"
 	"github.com/llitfkitfk/cirkol/pkg/models"
 	"net/http"
-	"sync"
 )
 
 func Healthz(c *gin.Context) {
 	c.String(http.StatusOK, "ok")
 }
 
-type APICheck struct {
-	Status map[string]bool `json:"status"`
-	lock   sync.RWMutex
-}
+func ProfileFBHealthz(c *gin.Context) {
 
-func (ac *APICheck) SetMap(key string, value bool) {
-	ac.lock.Lock()
-	defer ac.lock.Unlock()
-	ac.Status[key] = value
-}
-
-func APIHealthz(c *gin.Context) {
-	ch := &APICheck{
-		Status: make(map[string]bool),
+	r := data.GR().GetFBProfileResult("JustinTimberlake")
+	if r.HasError() {
+		c.AbortWithError(http.StatusBadRequest, r.GetError())
 	}
-	var wg sync.WaitGroup
-	wg.Add(5)
-	go checkingFB(ch, &wg)
-	go checkingIG(ch, &wg)
-	go checkingYTB(ch, &wg)
-	go checkingWX(ch, &wg)
-	go checkingWB(ch, &wg)
-
-	wg.Wait()
-
-	c.JSON(http.StatusOK, ch)
+	var rawData models.FBRawProfile
+	err := common.ParseJson(r.Body, &rawData)
+	if err != nil {
+		c.AbortWithError(http.StatusConflict, err)
+	}
+	if rawData.ID == "" {
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+	c.String(http.StatusOK, "ok")
 }
 
-func checkingFB(ch *APICheck, wg *sync.WaitGroup) {
-	wg.Add(2)
-	go func() {
-		r := data.GR().GetFBProfileResult("JustinTimberlake")
-		var rawData models.FBRawProfile
-		err := common.ParseJson(r.Body, &rawData)
-		if err != nil {
-			ch.SetMap("facebook_api_profile", false)
-		}
-		if rawData.ID == "" {
-			ch.SetMap("facebook_api_profile", false)
-		}
-		ch.SetMap("facebook_api_profile", true)
-
-		wg.Done()
-	}()
-	go func() {
-		r := data.GR().GetFBPostsResult("JustinTimberlake", "5")
-		var rawData models.FBRawPosts
-		err := common.ParseJson(r.Body, &rawData)
-		if err != nil {
-			ch.SetMap("facebook_api_posts", false)
-		}
-		if len(rawData.Data) > 0 {
-			ch.SetMap("facebook_api_posts", false)
-		}
-		ch.SetMap("facebook_api_posts", true)
-
-		wg.Done()
-	}()
-
-	wg.Done()
-}
-
-func checkingIG(ch *APICheck, wg *sync.WaitGroup) {
-	ch.SetMap("instagram_api", true)
-	wg.Done()
+func ProfileIGHealthz(c *gin.Context) {
 
 }
-func checkingYTB(ch *APICheck, wg *sync.WaitGroup) {
-	ch.SetMap("youtube_api", true)
-	wg.Done()
+
+func ProfileWBHealthz(c *gin.Context) {
 
 }
-func checkingWX(ch *APICheck, wg *sync.WaitGroup) {
-	ch.SetMap("wechat_api", true)
-	wg.Done()
+
+func ProfileWXHealthz(c *gin.Context) {
+
 }
-func checkingWB(ch *APICheck, wg *sync.WaitGroup) {
-	ch.SetMap("weibo_api", true)
-	wg.Done()
+
+func ProfileYTBHealthz(c *gin.Context) {
+
+}
+
+func PostsFBHealthz(c *gin.Context) {
+
+	r := data.GR().GetFBPostsResult("JustinTimberlake", "5")
+	if r.HasError() {
+		c.AbortWithError(http.StatusBadRequest, r.GetError())
+	}
+	var rawData models.FBRawPosts
+	err := common.ParseJson(r.Body, &rawData)
+	if err != nil {
+		c.AbortWithError(http.StatusConflict, err)
+
+	}
+	if len(rawData.Data) > 0 {
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+	c.String(http.StatusOK, "ok")
+}
+
+func PostsIGHealthz(c *gin.Context) {
+
+}
+
+func PostsWXHealthz(c *gin.Context) {
+
+}
+func PostsWBHealthz(c *gin.Context) {
+
+}
+
+func PostsYTBHealthz(c *gin.Context) {
+
 }
