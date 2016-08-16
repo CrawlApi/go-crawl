@@ -6,14 +6,17 @@ import (
 	"github.com/llitfkitfk/cirkol/pkg/common"
 	"github.com/llitfkitfk/cirkol/pkg/data"
 	"github.com/llitfkitfk/cirkol/pkg/routers"
+	"runtime"
+	"github.com/llitfkitfk/cirkol/pkg/pprof"
 )
 
 func main() {
 
 	common.StartUp()
 	initClient()
+	setMaxProcs()
 	engine := gin.Default()
-
+	pprof.Wrap(engine)
 	if !common.AppConfig.DebugMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -29,6 +32,11 @@ func main() {
 	engine.Run(addr)
 }
 
+func setMaxProcs() {
+	nuCPU := runtime.NumCPU()
+	runtime.GOMAXPROCS(nuCPU)
+	common.Log.Info("Running with ", nuCPU, " CPUs")
+}
 
 func initClient() {
 	cl := client.New()
