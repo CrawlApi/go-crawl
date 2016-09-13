@@ -15,10 +15,10 @@ type Post struct {
 	UID                string `json:"uid"`
 	CreatedAt          int64  `json:"created_at"`
 	UpdatedAt          int64  `json:"updated_at"`
-	ShareCount         int    `json:"share_count"`
-	LikeCount          int    `json:"like_count"`
-	CommentCount       int    `json:"comment_count"`
-	ViewCount          int    `json:"view_count"`
+	ShareCount         int    `json:"share_count,omitempty"`
+	LikeCount          int    `json:"like_count,omitempty"`
+	CommentCount       int    `json:"comment_count,omitempty"`
+	ViewCount          int    `json:"view_count,omitempty"`
 	ContentType        string `json:"content_type"`
 	ContentCaption     string `json:"content_caption"`
 	ContentBody        string `json:"content_body"`
