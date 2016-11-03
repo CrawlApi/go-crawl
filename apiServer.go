@@ -15,11 +15,14 @@ func main() {
 	common.StartUp()
 	initClient()
 	setMaxProcs()
-	engine := gin.Default()
-	pprof.Wrap(engine)
+
 	if !common.AppConfig.DebugMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	engine := gin.Default()
+
+	pprof.Wrap(engine)
 	engine.LoadHTMLGlob("pkg/resources/*.templ.html")
 
 	routers.InitRouters(&engine.RouterGroup)

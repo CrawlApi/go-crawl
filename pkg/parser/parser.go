@@ -101,10 +101,21 @@ func ParseFBPostSuffId(url string) string {
 func ParseYTBUID(body string) string {
 	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(body))
 
-	uid, exists := doc.Selection.Find("#watch7-user-header").Find("a").Attr("href")
+	var uid string
+	var exists bool
+
 	if !exists {
-		uid, _ = doc.Selection.Find("#qualified-channel-title-text").Find("a").Attr("href")
+		uid, exists = doc.Selection.Find("#watch7-user-header").Find("a").Attr("href")
 	}
+
+	if !exists {
+		uid, exists = doc.Selection.Find("#appbar-nav").Find("a").Attr("href")
+	}
+
+	if !exists {
+		uid, exists = doc.Selection.Find("#qualified-channel-title-text").Find("a").Attr("href")
+	}
+
 	common.Log.Info(uid)
 	if len(uid) > 6 {
 		return uid[6:]
