@@ -35,7 +35,7 @@ func (r *WBRepo) FetchPostsApi() client.Result {
 }
 
 func (r *WBRepo) FetchPostInfo() client.Result {
-	return GR().GetWBPostResult(r.UserId)
+	return GR().GetWBPostResult(r.RawUrl)
 }
 
 func (r *WBRepo) ParseRawUID(result client.Result) models.UID {

@@ -25,6 +25,7 @@ const (
 	regexp_wb_profile_id = `uid=(\d+)`
 	regexp_wb_post_link  = `(http://|)(www.|)weibo.com`
 	regexp_wb_post_info  = `}}},(...+),{"mod_type":`
+	regexp_wb_post_info_plain = `<div class="weibo-text">(...+)</div><div class="weibo-media`
 
 	// instagram
 	regexp_ig_profile    = `ProfilePage": \[([\s\S]+), "nodes": ([\s\S]+)]([\s\S]+)]},`
@@ -74,6 +75,10 @@ func ParseWBPostsUrl(src string) string {
 
 func ParseWBPostStr(body string) string {
 	return getMatcherValue(1, regexp_wb_post_info, body)
+}
+
+func ParseWBPostHtml(body string) string {
+	return getMatcherValue(1, regexp_wb_post_info_plain, body)
 }
 
 // facebook

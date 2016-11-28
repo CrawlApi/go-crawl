@@ -137,7 +137,15 @@ func (r *Result) GetFBPost() (models.Post, error) {
 
 func (r *Result) parseRawPost(body string) (models.WBRawPost, error) {
 	str := parser.ParseWBPostStr(body)
+
 	var result models.WBRawPost
+
+	if str == "" {
+		str = parser.ParseWBPostHtml(body)
+		result.Mblog.RawText = str
+		return result, nil
+	}
+
 	err := common.ParseJson(str, &result)
 	if err != nil {
 		return result, err
